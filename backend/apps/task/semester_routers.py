@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-from .models import SemesterModel, UpdateSemesterModel
+from .models import SemesterModel, UpdateSemesterModel, LessonModel, UpdateLessonModel
 
 router = APIRouter()
 
@@ -80,9 +80,9 @@ async def update_semester(
                     return semester
 
     if (
-        updated_user := await request.app.mongodb["users"].find_one({"_id": uid})
+        existing_user := await request.app.mongodb["users"].find_one({"_id": uid})
     ) is not None:
-        for semester in user["semesters"]:
+        for semester in existing_user["semesters"]:
             if semester["_id"] == sid:
                 return semester
 
@@ -103,7 +103,9 @@ async def delete_semester(uid: str, sid: str, request: Request):
                     {"_id": uid}
                 )
             ) is not None:
-                return updated_user
+                for semester in updated_user["semesters"]:
+                    if semester["_id"] == sid:
+                        return semester
 
     if (
         existing_user := await request.app.mongodb["users"].find_one({"_id": uid})

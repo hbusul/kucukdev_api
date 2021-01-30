@@ -5,9 +5,10 @@ from datetime import datetime
 
 
 class LessonModel(BaseModel):
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
     instructor: str = Field(...)
-    sections: List[List[str]] = Field(...)
+    slots: List[List[str]] = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -15,7 +16,7 @@ class LessonModel(BaseModel):
             "example": {
                 "name": "EE203",
                 "instructor": "Ali Veli",
-                "sections": [["W", "7"], ["W", "8"]],
+                "slots": [["W", "7"], ["W", "8"]],
             }
         }
 
@@ -23,14 +24,14 @@ class LessonModel(BaseModel):
 class UpdateLessonModel(BaseModel):
     name: Optional[str]
     instructor: Optional[str]
-    sections: Optional[List[List[str]]]
+    slots: Optional[List[List[str]]]
 
     class Config:
         schema_extra = {
             "example": {
                 "name": "EE203",
                 "instructor": "Ali Veli",
-                "sections": [["W", "7"], ["W", "8"]],
+                "slots": [["W", "7"], ["W", "8"]],
             }
         }
 
@@ -44,7 +45,7 @@ class SemesterModel(BaseModel):
     dLesson: int = 0
     dBreak: int = 0
     slotCount: int = 0
-    lessons: Dict[str, LessonModel] = {}
+    lessons: List[LessonModel] = []
 
     class Config:
         allow_population_by_field_name = True
@@ -57,13 +58,13 @@ class SemesterModel(BaseModel):
                 "dLesson": 50,
                 "dBreak": 10,
                 "slotCount": 12,
-                "lessons": {
-                    "EE203": {
+                "lessons": [
+                    {
                         "name": "EE203",
                         "instructor": "Ali Veli",
                         "sections": [["W", "7"], ["W", "8"]],
                     },
-                    "EE213": {
+                    {
                         "name": "EE213",
                         "instructor": "Ali Ahmet",
                         "sections": [
@@ -74,7 +75,7 @@ class SemesterModel(BaseModel):
                             ["T", "4"],
                         ],
                     },
-                },
+                ],
             }
         }
 
@@ -87,7 +88,7 @@ class UpdateSemesterModel(BaseModel):
     dLesson: Optional[int]
     dBreak: Optional[int]
     slotCount: Optional[int]
-    lessons: Optional[Dict[str, LessonModel]]
+    lessons: Optional[List[LessonModel]]
 
     class Config:
         allow_population_by_field_name = True
@@ -100,13 +101,13 @@ class UpdateSemesterModel(BaseModel):
                 "dLesson": 50,
                 "dBreak": 10,
                 "slotCount": 12,
-                "lessons": {
-                    "EE203": {
+                "lessons": [
+                    {
                         "name": "EE203",
                         "instructor": "Ali Veli",
                         "sections": [["W", "7"], ["W", "8"]],
                     },
-                },
+                ],
             }
         }
 
