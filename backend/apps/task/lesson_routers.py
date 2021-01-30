@@ -73,40 +73,43 @@ async def show_lesson(uid: str, sid: str, lid: str, request: Request):
     raise HTTPException(status_code=404, detail=f"Lesson of semester {sid} not found")
 
 
-# @router.put(
-#     "/{uid}/semesters/{sid}/lessons/{lid}", response_description="Update a lesson"
-# )
-# async def update_lesson(
-#     uid: str,
-#     sid: str,
-#     lid: str,
-#     request: Request,
-#     lesson: UpdateLessonModel = Body(...),
-# ):
-#     lesson = {k: v for k, v in lesson.dict().items() if v is not None}
+@router.put(
+    "/{uid}/semesters/{sid}/lessons/{lid}", response_description="Update a lesson"
+)
+async def update_lesson(
+    uid: str,
+    sid: str,
+    lid: str,
+    request: Request,
+    lesson: UpdateLessonModel = Body(...),
+):
+    lesson = {k: v for k, v in lesson.dict().items() if v is not None}
 
-#     if len(lesson) >= 1:
-#         update_result = await request.app.mongodb["users"].update_many(
-#             {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid},
-#             {
-#                 "$set": {
-#                     "semesters.$.lessons.$.name": lesson["name"],
-#                 }
-#             },
-#         )
+    # if len(lesson) >= 1:
+    update_result = await request.app.mongodb["users"].update_many(
+        {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid},
+        {
+            "$set": {
+                "semesters.$[i].lessons.$.name": lesson["name"],
+                "semesters.$[i].lessons.$.instructor": lesson["instructor"],
+                "semesters.$[i].lessons.$.slots": lesson["slots"],
+            }
+        },
+        array_filters=[{"i._id": sid}],
+    )
 
-#     if (
-#         existing_user := await request.app.mongodb["users"].find_one(
-#             {"_id": uid, "semesters._id": sid}
-#         )
-#     ) is not None:
-#         for semester in existing_user["semesters"]:
-#             if semester["_id"] == sid:
-#                 for lesson in semester["lessons"]:
-#                     if lesson["_id"] == lid:
-#                         return lesson
+    if (
+        existing_user := await request.app.mongodb["users"].find_one(
+            {"_id": uid, "semesters._id": sid}
+        )
+    ) is not None:
+        for semester in existing_user["semesters"]:
+            if semester["_id"] == sid:
+                for lesson in semester["lessons"]:
+                    if lesson["_id"] == lid:
+                        return lesson
 
-#     raise HTTPException(status_code=404, detail=f"Lesson {lid} not found")
+    raise HTTPException(status_code=404, detail=f"Lesson {lid} not found")
 
 
 @router.delete(
