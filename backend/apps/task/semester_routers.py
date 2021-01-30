@@ -75,12 +75,16 @@ async def update_semester(
         if (
             updated_user := await request.app.mongodb["users"].find_one({"_id": uid})
         ) is not None:
-            return updated_user
+            for semester in updated_user["semesters"]:
+                if semester["_id"] == sid:
+                    return semester
 
     if (
         updated_user := await request.app.mongodb["users"].find_one({"_id": uid})
     ) is not None:
-        return updated_user
+        for semester in user["semesters"]:
+            if semester["_id"] == sid:
+                return semester
 
     raise HTTPException(status_code=404, detail=f"Semester {sid} not found")
 
@@ -104,6 +108,8 @@ async def delete_semester(uid: str, sid: str, request: Request):
     if (
         existing_user := await request.app.mongodb["users"].find_one({"_id": uid})
     ) is not None:
-        return existing_user
+        for semester in user["semesters"]:
+            if semester["_id"] == sid:
+                return semester
 
-    raise HTTPException(status_code=404, detail=f"User {uid} not found")
+    raise HTTPException(status_code=404, detail=f"Semester {sid} not found")
