@@ -58,24 +58,24 @@ class SemesterModel(BaseModel):
                 "dLesson": 50,
                 "dBreak": 10,
                 "slotCount": 12,
-                "lessons": [
-                    {
-                        "name": "EE203",
-                        "instructor": "Ali Veli",
-                        "slots": [["W", "7"], ["W", "8"]],
-                    },
-                    {
-                        "name": "EE213",
-                        "instructor": "Ali Ahmet",
-                        "slots": [
-                            ["M", "4"],
-                            ["M", "5"],
-                            ["T", "2"],
-                            ["T", "3"],
-                            ["T", "4"],
-                        ],
-                    },
-                ],
+                # "lessons": [
+                #     {
+                #         "name": "EE203",
+                #         "instructor": "Ali Veli",
+                #         "slots": [["W", "7"], ["W", "8"]],
+                #     },
+                #     {
+                #         "name": "EE213",
+                #         "instructor": "Ali Ahmet",
+                #         "slots": [
+                #             ["M", "4"],
+                #             ["M", "5"],
+                #             ["T", "2"],
+                #             ["T", "3"],
+                #             ["T", "4"],
+                #         ],
+                #     },
+                # ],
             }
         }
 
@@ -101,13 +101,13 @@ class UpdateSemesterModel(BaseModel):
                 "dLesson": 50,
                 "dBreak": 10,
                 "slotCount": 12,
-                "lessons": [
-                    {
-                        "name": "EE203",
-                        "instructor": "Ali Veli",
-                        "slots": [["W", "7"], ["W", "8"]],
-                    },
-                ],
+                # "lessons": [
+                #     {
+                #         "name": "EE203",
+                #         "instructor": "Ali Veli",
+                #         "slots": [["W", "7"], ["W", "8"]],
+                #     },
+                # ],
             }
         }
 

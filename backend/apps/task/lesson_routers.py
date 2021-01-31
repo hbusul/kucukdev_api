@@ -51,7 +51,9 @@ async def list_lessons(uid: str, sid: str, request: Request):
             if semester["_id"] == sid:
                 return semester["lessons"]
 
-    raise HTTPException(status_code=404, detail=f"Semesters of user {uid} not found")
+    raise HTTPException(
+        status_code=404, detail=f"Semester {sid} of user {uid} not found"
+    )
 
 
 @router.get(
@@ -70,7 +72,7 @@ async def show_lesson(uid: str, sid: str, lid: str, request: Request):
                     if lesson["_id"] == lid:
                         return lesson
 
-    raise HTTPException(status_code=404, detail=f"Lesson of semester {sid} not found")
+    raise HTTPException(status_code=404, detail=f"Lesson {lid} not found")
 
 
 @router.put(
@@ -90,12 +92,12 @@ async def update_lesson(
         {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid},
         {
             "$set": {
-                "semesters.$[i].lessons.$.name": lesson["name"],
-                "semesters.$[i].lessons.$.instructor": lesson["instructor"],
-                "semesters.$[i].lessons.$.slots": lesson["slots"],
+                "semesters.$[i].lessons.$[j].name": lesson["name"],
+                "semesters.$[i].lessons.$[j].instructor": lesson["instructor"],
+                "semesters.$[i].lessons.$[j].slots": lesson["slots"],
             }
         },
-        array_filters=[{"i._id": sid}],
+        array_filters=[{"i._id": sid}, {"j._id": lid}],
     )
 
     if (
