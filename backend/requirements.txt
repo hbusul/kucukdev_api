@@ -16,3 +16,5 @@ typing-extensions==3.7.4.3
 uvicorn==0.13.1
 passlib==1.7.4
 bcrypt==3.2.0
+python-jose[cryptography]==3.2.0
+python-multipart==0.0.5
