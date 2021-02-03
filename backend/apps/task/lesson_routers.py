@@ -30,11 +30,22 @@ async def create_lesson(
         )
 
         if (
-            existing_user := await request.app.mongodb["users"].find_one({"_id": uid})
+            existing_user := await request.app.mongodb["users"].find_one(
+                {"_id": uid, "semesters._id": sid},
+                {"semesters.lessons": {"$slice": -1}},
+            )
         ) is not None:
             for semester in existing_user["semesters"]:
                 if semester["_id"] == sid:
-                    return semester["lessons"]
+                    for lesson in semester["lessons"]:
+                        lessonAPI = UpdateLessonModel(
+                            id=lesson["_id"],
+                            name=lesson["name"],
+                            instructor=lesson["instructor"],
+                            slots=lesson["slots"],
+                        )
+
+                    return lessonAPI
 
         raise HTTPException(status_code=404, detail=f"Semester {sid} of found")
 
@@ -150,7 +161,9 @@ async def update_lesson(
                     if semester["_id"] == sid:
                         for lesson in semester["lessons"]:
                             if lesson["_id"] == lid:
-                                return lesson
+                                return JSONResponse(
+                                    status_code=status.HTTP_200_OK, content=lesson
+                                )
 
         raise HTTPException(status_code=404, detail=f"Lesson {lid} not found")
 
@@ -184,13 +197,13 @@ async def delete_lesson(
                     {"_id": uid, "semesters._id": sid}
                 )
             ) is not None:
-                for semester in updated_user["semesters"]:
+                for semester in auth_user["semesters"]:
                     if semester["_id"] == sid:
                         for lesson in semester["lessons"]:
                             if lesson["_id"] == lid:
-                                return lesson
+                                lessonAPI = lesson
 
-            return Response(status_code=status.HTTP_200_OK)
+            return JSONResponse(status_code=status.HTTP_200_OK, content=lessonAPI)
 
         raise HTTPException(status_code=404, detail=f"Lesson {lid} not found")
 

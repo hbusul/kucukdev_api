@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, Request, HTTPException, status, Depends, Re
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-from .models import SemesterModel, UpdateSemesterModel, LessonModel, UpdateLessonModel
+from .models import SemesterModel, UpdateSemesterModel, SemesterAPIModel
 from apps.task import models
 
 router = APIRouter()
@@ -25,14 +25,28 @@ async def create_semester(
 
         if update_result.modified_count == 1:
             if (
-                user := await request.app.mongodb["users"].find_one({"_id": uid})
+                created_semester := await request.app.mongodb["users"].find_one(
+                    {"_id": uid}, {"semesters": {"$slice": -1}}
+                )
             ) is not None:
-                return user["semesters"]
+                for semester in created_semester["semesters"]:
+                    sid = semester["_id"]
+                    lessons_url = (
+                        f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
+                    )
+                    semesterAPI = SemesterAPIModel(
+                        id=semester["_id"],
+                        name=semester["name"],
+                        startDate=semester["startDate"],
+                        endDate=semester["endDate"],
+                        startHour=semester["startHour"],
+                        dLesson=semester["dLesson"],
+                        dBreak=semester["dBreak"],
+                        slotCount=semester["slotCount"],
+                        lessons_url=lessons_url,
+                    )
 
-        if (
-            user := await request.app.mongodb["users"].find_one({"_id": uid})
-        ) is not None:
-            return user["semesters"]
+                    return semesterAPI
 
         raise HTTPException(status_code=404, detail=f"User not found")
 
@@ -46,11 +60,28 @@ async def create_semester(
 async def list_semesters(
     uid: str, request: Request, token: str = Depends(models.oauth2_scheme)
 ):
+    semesters_API = []
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
         if auth_user["semesters"] is not None:
-            return auth_user["semesters"]
+            for semester in auth_user["semesters"]:
+                sid = semester["_id"]
+                lessons_url = f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
+                semesterAPI = SemesterAPIModel(
+                    id=semester["_id"],
+                    name=semester["name"],
+                    startDate=semester["startDate"],
+                    endDate=semester["endDate"],
+                    startHour=semester["startHour"],
+                    dLesson=semester["dLesson"],
+                    dBreak=semester["dBreak"],
+                    slotCount=semester["slotCount"],
+                    lessons_url=lessons_url,
+                )
+                semesters_API.append(semesterAPI)
+
+            return semesters_API
 
         raise HTTPException(status_code=404, detail=f"Semesters of user not found")
 
@@ -69,7 +100,21 @@ async def show_semester(
     ) is not None and auth_user["_id"] == uid:
         for semester in auth_user["semesters"]:
             if semester["_id"] == sid:
-                return semester
+                sid = semester["_id"]
+                lessons_url = f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
+                semesterAPI = SemesterAPIModel(
+                    id=semester["_id"],
+                    name=semester["name"],
+                    startDate=semester["startDate"],
+                    endDate=semester["endDate"],
+                    startHour=semester["startHour"],
+                    dLesson=semester["dLesson"],
+                    dBreak=semester["dBreak"],
+                    slotCount=semester["slotCount"],
+                    lessons_url=lessons_url,
+                )
+
+                return semesterAPI
 
         raise HTTPException(status_code=404, detail=f"Semester {sid} not found")
 
@@ -115,7 +160,23 @@ async def update_semester(
             ) is not None:
                 for semester in updated_user["semesters"]:
                     if semester["_id"] == sid:
-                        return semester
+                        sid = semester["_id"]
+                        lessons_url = (
+                            f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
+                        )
+                        semesterAPI = SemesterAPIModel(
+                            id=semester["_id"],
+                            name=semester["name"],
+                            startDate=semester["startDate"],
+                            endDate=semester["endDate"],
+                            startHour=semester["startHour"],
+                            dLesson=semester["dLesson"],
+                            dBreak=semester["dBreak"],
+                            slotCount=semester["slotCount"],
+                            lessons_url=lessons_url,
+                        )
+
+                        return semesterAPI
 
         if (
             existing_user := await request.app.mongodb["users"].find_one(
@@ -124,7 +185,23 @@ async def update_semester(
         ) is not None:
             for semester in existing_user["semesters"]:
                 if semester["_id"] == sid:
-                    return semester
+                    sid = semester["_id"]
+                    lessons_url = (
+                        f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
+                    )
+                    semesterAPI = SemesterAPIModel(
+                        id=semester["_id"],
+                        name=semester["name"],
+                        startDate=semester["startDate"],
+                        endDate=semester["endDate"],
+                        startHour=semester["startHour"],
+                        dLesson=semester["dLesson"],
+                        dBreak=semester["dBreak"],
+                        slotCount=semester["slotCount"],
+                        lessons_url=lessons_url,
+                    )
+
+                    return semesterAPI
 
         raise HTTPException(status_code=404, detail=f"Semester {sid} not found")
 
@@ -138,24 +215,39 @@ async def update_semester(
 async def delete_semester(
     uid: str, sid: str, request: Request, token: str = Depends(models.oauth2_scheme)
 ):
+
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
+        find_user = await request.app.mongodb["users"].find_one(
+            {"_id": uid, "semesters._id": sid}
+        )
+
         update_result = await request.app.mongodb["users"].update_one(
             {"_id": uid}, {"$pull": {"semesters": {"_id": sid}}}
         )
 
         if update_result.modified_count == 1:
-            if (
-                updated_user := await request.app.mongodb["users"].find_one(
-                    {"_id": uid}
-                )
-            ) is not None:
-                for semester in updated_user["semesters"]:
-                    if semester["_id"] == sid:
-                        return semester
+            for semester in find_user["semesters"]:
+                if semester["_id"] == sid:
+                    sid = semester["_id"]
+                    lessons_url = (
+                        f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
+                    )
+                    semesterAPI = SemesterAPIModel(
+                        id=semester["_id"],
+                        name=semester["name"],
+                        startDate=semester["startDate"],
+                        endDate=semester["endDate"],
+                        startHour=semester["startHour"],
+                        dLesson=semester["dLesson"],
+                        dBreak=semester["dBreak"],
+                        slotCount=semester["slotCount"],
+                        lessons_url=lessons_url,
+                    )
+                    jsonable_semesterAPI = jsonable_encoder(semesterAPI)
 
-            return Response(status_code=status.HTTP_200_OK)
+            return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_semesterAPI)
 
         raise HTTPException(status_code=404, detail=f"Semester {sid} not found")
 

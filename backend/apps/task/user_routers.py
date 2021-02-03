@@ -17,7 +17,7 @@ from jose import JWTError, jwt
 
 
 from apps.task import models
-from .models import UserModel, UpdateUserModel
+from .models import UserModel, UpdateUserModel, UserAPIModel
 
 router = APIRouter()
 
@@ -36,8 +36,18 @@ async def create_user(request: Request, user: UserModel = Body(...)):
         created_user = await request.app.mongodb["users"].find_one(
             {"_id": new_user.inserted_id}
         )
+        uid = created_user["_id"]
+        semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
+        userAPI = UserAPIModel(
+            id=created_user["_id"],
+            email=created_user["email"],
+            semesters_url=semesters_url,
+        )
+        jsonable_userAPI = jsonable_encoder(userAPI)
 
-        return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_user)
+        return JSONResponse(
+            status_code=status.HTTP_201_CREATED, content=jsonable_userAPI
+        )
 
     raise HTTPException(status_code=400, detail="Given email already exists")
 
@@ -47,7 +57,15 @@ async def create_user(request: Request, user: UserModel = Body(...)):
 async def list_users(request: Request):
     users = []
     for doc in await request.app.mongodb["users"].find().to_list(length=100):
-        users.append(doc)
+        uid = doc["_id"]
+        semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
+        userAPI = UserAPIModel(
+            id=doc["_id"],
+            email=doc["email"],
+            semesters_url=semesters_url,
+        )
+        users.append(userAPI)
+
     return users
 
 
@@ -58,7 +76,13 @@ async def show_user(
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
-        return auth_user
+        semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
+        userAPI = UserAPIModel(
+            id=auth_user["_id"], email=auth_user["email"], semesters_url=semesters_url
+        )
+        jsonable_userAPI = jsonable_encoder(userAPI)
+
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_userAPI)
 
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
@@ -96,7 +120,16 @@ async def update_user(
                             {"_id": uid}
                         )
                     ) is not None:
-                        return updated_user
+                        semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
+                        userAPI = UserAPIModel(
+                            id=auth_user["_id"],
+                            email=user["email"],
+                            semesters_url=semesters_url,
+                        )
+                        jsonable_userAPI = jsonable_encoder(userAPI)
+                        return JSONResponse(
+                            status_code=status.HTTP_200_OK, content=jsonable_userAPI
+                        )
 
             raise HTTPException(status_code=400, detail="Given email already exists")
 
@@ -120,12 +153,20 @@ async def delete_user(
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
 
-        delete_result = await request.app.mongodb["users"].delete_one(
-            {"_id": auth_user["_id"]}
-        )
+        delete_result = await request.app.mongodb["users"].delete_one({"_id": uid})
 
         if delete_result.deleted_count == 1:
-            return Response(status_code=status.HTTP_200_OK)
+            semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
+            userAPI = UserAPIModel(
+                id=uid,
+                email=auth_user["email"],
+                semesters_url=semesters_url,
+            )
+            jsonable_userAPI = jsonable_encoder(userAPI)
+
+            return JSONResponse(
+                status_code=status.HTTP_200_OK, content=jsonable_userAPI
+            )
 
         raise HTTPException(status_code=404, detail=f"User not found")
 

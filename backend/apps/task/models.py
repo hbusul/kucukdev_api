@@ -34,6 +34,7 @@ class LessonModel(BaseModel):
 
 
 class UpdateLessonModel(BaseModel):
+    id: Optional[str]
     name: Optional[str]
     instructor: Optional[str]
     slots: Optional[List[List[str]]]
@@ -124,6 +125,18 @@ class UpdateSemesterModel(BaseModel):
         }
 
 
+class SemesterAPIModel(BaseModel):
+    id: Optional[str]
+    name: Optional[str]
+    startDate: Optional[datetime]
+    endDate: Optional[datetime]
+    startHour: Optional[str]
+    dLesson: Optional[int]
+    dBreak: Optional[int]
+    slotCount: Optional[int]
+    lessons_url: Optional[str]
+
+
 class UserModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     email: EmailStr = Field(...)
@@ -153,6 +166,12 @@ class UpdateUserModel(BaseModel):
                 "password": "hello1234",
             }
         }
+
+
+class UserAPIModel(BaseModel):
+    id: Optional[str]
+    email: Optional[EmailStr]
+    semesters_url: Optional[str]
 
 
 class Token(BaseModel):
