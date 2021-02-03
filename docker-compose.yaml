@@ -1,11 +1,11 @@
-version: '3.3'
+version: "3.3"
 services:
   backend:
     build: ./backend
     ports:
-      - '8000:8000'
+      - "8000:8000"
     environment:
-      DB_URL: 'mongodb://root:example@mongo/'
+      DB_URL: "mongodb://root:example@mongo/"
       DB_NAME: farmstack
     networks:
       - app-network
@@ -16,6 +16,16 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     networks:
       - app-network
+  frontend:
+    image: node:15.7.0-buster
+    networks:
+      - app-network
+    entrypoint: "sh -c 'cd frontend && npm start'"
+    volumes:
+      - "./frontend:/frontend"
+    ports:
+      - "3000:3000"
+
 networks:
   app-network:
     driver: bridge
