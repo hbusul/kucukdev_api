@@ -1,10 +1,9 @@
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import HTTPException, status, Request, Depends
 from typing import Optional, List, Dict
 import uuid
 from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime, timedelta
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.context import CryptContext
-from fastapi import HTTPException, status, Request, Depends
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 
@@ -172,6 +171,10 @@ class UserAPIModel(BaseModel):
     id: Optional[str]
     email: Optional[EmailStr]
     semesters_url: Optional[str]
+
+
+class Message(BaseModel):
+    message: str
 
 
 class Token(BaseModel):

@@ -12,18 +12,25 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from passlib.hash import bcrypt
 from pydantic import BaseModel
-from typing import Optional
+from typing import List
 from jose import JWTError, jwt
 
 
 from apps.task import models
-from .models import UserModel, UpdateUserModel, UserAPIModel
+from .models import UserModel, UpdateUserModel, UserAPIModel, Message
 
 router = APIRouter()
 
 
-@router.post("", response_description="Add new user")
+@router.post(
+    "",
+    response_description="Add new user",
+    response_model=UserAPIModel,
+    responses={409: {"model": Message}},
+)
 async def create_user(request: Request, user: UserModel = Body(...)):
+    """Create a user"""
+
     user = jsonable_encoder(user)
 
     if (
@@ -45,16 +52,23 @@ async def create_user(request: Request, user: UserModel = Body(...)):
         )
         jsonable_userAPI = jsonable_encoder(userAPI)
 
-        return JSONResponse(
-            status_code=status.HTTP_201_CREATED, content=jsonable_userAPI
-        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_userAPI)
 
-    raise HTTPException(status_code=400, detail="Given email already exists")
+    return JSONResponse(
+        status_code=status.HTTP_409_CONFLICT,
+        content={"message": "Given email already exists"},
+    )
 
 
 # It should stay for test purposes by now
-@router.get("", response_description="List all users")
+@router.get(
+    "",
+    response_description="List all users",
+    response_model=List[UserAPIModel],
+)
 async def list_users(request: Request):
+    """list all users"""
+
     users = []
     for doc in await request.app.mongodb["users"].find().to_list(length=100):
         uid = doc["_id"]
@@ -64,15 +78,25 @@ async def list_users(request: Request):
             email=doc["email"],
             semesters_url=semesters_url,
         )
-        users.append(userAPI)
 
-    return users
+        jsonable_userAPI = jsonable_encoder(userAPI)
+
+        users.append(jsonable_userAPI)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=users)
 
 
-@router.get("/{uid}", response_description="Get a single user")
+@router.get(
+    "/{uid}",
+    response_description="Get a single user",
+    response_model=UserAPIModel,
+    responses={403: {"model": Message}, 401: {"model": Message}},
+)
 async def show_user(
     uid: str, request: Request, token: str = Depends(models.oauth2_scheme)
 ):
+    """Get a single user with given userID"""
+
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
@@ -84,19 +108,30 @@ async def show_user(
 
         return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_userAPI)
 
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="No right to access",
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )
 
 
-@router.put("/{uid}", response_description="Update a user")
+@router.put(
+    "/{uid}",
+    response_description="Update a user",
+    response_model=UserAPIModel,
+    responses={
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
+        409: {"model": Message},
+    },
+)
 async def update_user(
     uid: str,
     request: Request,
     user: UpdateUserModel = Body(...),
     token: str = Depends(models.oauth2_scheme),
 ):
+    """Update a user with given userID"""
+
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
@@ -126,29 +161,48 @@ async def update_user(
                             email=user["email"],
                             semesters_url=semesters_url,
                         )
+
                         jsonable_userAPI = jsonable_encoder(userAPI)
+
                         return JSONResponse(
                             status_code=status.HTTP_200_OK, content=jsonable_userAPI
                         )
 
-            raise HTTPException(status_code=400, detail="Given email already exists")
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"message": "Given email already exists"},
+            )
 
         if (
             existing_user := await request.app.mongodb["users"].find_one({"_id": uid})
         ) is not None:
             return existing_user
 
-        raise HTTPException(status_code=404, detail=f"User not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "User not found"},
+        )
 
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN, detail="No right to access"
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )
 
 
-@router.delete("/{uid}", response_description="Delete user")
+@router.delete(
+    "/{uid}",
+    response_description="Delete user",
+    response_model=UserAPIModel,
+    responses={
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
+    },
+)
 async def delete_user(
     uid: str, request: Request, token: str = Depends(models.oauth2_scheme)
 ):
+    """Delete a user with given userID"""
+
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
@@ -168,9 +222,11 @@ async def delete_user(
                 status_code=status.HTTP_200_OK, content=jsonable_userAPI
             )
 
-        raise HTTPException(status_code=404, detail=f"User not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "User not found"},
+        )
 
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="No right to access",
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )

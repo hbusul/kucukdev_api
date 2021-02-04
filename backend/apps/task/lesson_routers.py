@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Body, Request, HTTPException, status, Depends, Response
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from typing import List
 
 from apps.task import models
-from .models import LessonModel, UpdateLessonModel
+from .models import LessonModel, UpdateLessonModel, Message
 
 router = APIRouter()
 
@@ -11,6 +12,12 @@ router = APIRouter()
 @router.post(
     "/{uid}/semesters/{sid}/lessons",
     response_description="Add new lesson into a semester",
+    response_model=LessonModel,
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
 )
 async def create_lesson(
     uid: str,
@@ -19,6 +26,8 @@ async def create_lesson(
     lesson: LessonModel = Body(...),
     token: str = Depends(models.oauth2_scheme),
 ):
+    """Create a lessons for a semester with given userID, semesterID"""
+
     lesson = jsonable_encoder(lesson)
 
     if (
@@ -44,24 +53,37 @@ async def create_lesson(
                             instructor=lesson["instructor"],
                             slots=lesson["slots"],
                         )
+                    jsonable_lessonAPI = jsonable_encoder(lessonAPI)
 
-                    return lessonAPI
+                    return JSONResponse(
+                        status_code=status.HTTP_200_OK, content=jsonable_lessonAPI
+                    )
 
-        raise HTTPException(status_code=404, detail=f"Semester {sid} of found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Semester not found"},
+        )
 
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="No right to access",
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )
 
 
 @router.get(
     "/{uid}/semesters/{sid}/lessons",
     response_description="List all lessons of a semester",
+    response_model=List[LessonModel],
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
 )
 async def list_lessons(
     uid: str, sid: str, request: Request, token: str = Depends(models.oauth2_scheme)
 ):
+    """List all lessons of a semester with given userID, semesterID"""
+
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
@@ -72,19 +94,29 @@ async def list_lessons(
         ) is not None:
             for semester in user["semesters"]:
                 if semester["_id"] == sid:
-                    return semester["lessons"]
+                    return JSONResponse(
+                        status_code=status.HTTP_200_OK, content=semester["lessons"]
+                    )
 
-        raise HTTPException(status_code=404, detail=f"Semester {sid} not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Semester not found"},
+        )
 
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="No right to access",
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )
 
 
 @router.get(
     "/{uid}/semesters/{sid}/lessons/{lid}",
     response_description="Get a single lesson of a semester",
+    response_model=LessonModel,
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
 )
 async def show_lesson(
     uid: str,
@@ -93,6 +125,8 @@ async def show_lesson(
     request: Request,
     token: str = Depends(models.oauth2_scheme),
 ):
+    """Get a single lesson with given userID, semesterID and lessonID"""
+
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
@@ -109,18 +143,29 @@ async def show_lesson(
                 if semester["_id"] == sid:
                     for lesson in semester["lessons"]:
                         if lesson["_id"] == lid:
-                            return lesson
+                            return JSONResponse(
+                                status_code=status.HTTP_200_OK, content=lesson
+                            )
 
-        raise HTTPException(status_code=404, detail=f"Lesson {lid} not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Lesson not found"},
+        )
 
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="No right to access",
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )
 
 
 @router.put(
-    "/{uid}/semesters/{sid}/lessons/{lid}", response_description="Update a lesson"
+    "/{uid}/semesters/{sid}/lessons/{lid}",
+    response_description="Update a lesson",
+    response_model=LessonModel,
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
 )
 async def update_lesson(
     uid: str,
@@ -130,6 +175,8 @@ async def update_lesson(
     lesson: UpdateLessonModel = Body(...),
     token: str = Depends(models.oauth2_scheme),
 ):
+    """Update a lesson with given userID, semesterID and lessonID"""
+
     lesson = {k: v for k, v in lesson.dict().items() if v is not None}
 
     if (
@@ -165,16 +212,25 @@ async def update_lesson(
                                     status_code=status.HTTP_200_OK, content=lesson
                                 )
 
-        raise HTTPException(status_code=404, detail=f"Lesson {lid} not found")
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "Lesson not found"},
+            )
 
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="No right to access",
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )
 
 
 @router.delete(
-    "/{uid}/semesters/{sid}/lessons/{lid}", response_description="Delete lesson"
+    "/{uid}/semesters/{sid}/lessons/{lid}",
+    response_description="Delete lesson",
+    response_model=LessonModel,
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
 )
 async def delete_lesson(
     uid: str,
@@ -183,6 +239,8 @@ async def delete_lesson(
     request: Request,
     token: str = Depends(models.oauth2_scheme),
 ):
+    """Delete a lesson with given userID, semesterID and lessonID"""
+
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
@@ -205,9 +263,11 @@ async def delete_lesson(
 
             return JSONResponse(status_code=status.HTTP_200_OK, content=lessonAPI)
 
-        raise HTTPException(status_code=404, detail=f"Lesson {lid} not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Lesson not found"},
+        )
 
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="No right to access",
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )
