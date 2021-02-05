@@ -12,6 +12,7 @@ router = APIRouter()
 @router.post(
     "/{uid}/semesters/{sid}/lessons",
     response_description="Add new lesson into a semester",
+    operation_id="createLesson",
     response_model=LessonModel,
     responses={
         404: {"model": Message},
@@ -72,6 +73,7 @@ async def create_lesson(
 @router.get(
     "/{uid}/semesters/{sid}/lessons",
     response_description="List all lessons of a semester",
+    operation_id="listLessonsOfSemester",
     response_model=List[LessonModel],
     responses={
         404: {"model": Message},
@@ -111,6 +113,7 @@ async def list_lessons(
 @router.get(
     "/{uid}/semesters/{sid}/lessons/{lid}",
     response_description="Get a single lesson of a semester",
+    operation_id="getSingleLesson",
     response_model=LessonModel,
     responses={
         404: {"model": Message},
@@ -160,6 +163,7 @@ async def show_lesson(
 @router.put(
     "/{uid}/semesters/{sid}/lessons/{lid}",
     response_description="Update a lesson",
+    operation_id="updateLesson",
     response_model=LessonModel,
     responses={
         404: {"model": Message},
@@ -225,6 +229,7 @@ async def update_lesson(
 @router.delete(
     "/{uid}/semesters/{sid}/lessons/{lid}",
     response_description="Delete lesson",
+    operation_id="deleteLesson",
     response_model=LessonModel,
     responses={
         404: {"model": Message},

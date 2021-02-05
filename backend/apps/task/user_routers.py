@@ -25,6 +25,7 @@ router = APIRouter()
 @router.post(
     "",
     response_description="Add new user",
+    operation_id="createUser",
     response_model=UserAPIModel,
     responses={409: {"model": Message}},
 )
@@ -64,6 +65,7 @@ async def create_user(request: Request, user: UserModel = Body(...)):
 @router.get(
     "",
     response_description="List all users",
+    operation_id="listUsers",
     response_model=List[UserAPIModel],
 )
 async def list_users(request: Request):
@@ -89,6 +91,7 @@ async def list_users(request: Request):
 @router.get(
     "/{uid}",
     response_description="Get a single user",
+    operation_id="getSingleUser",
     response_model=UserAPIModel,
     responses={403: {"model": Message}, 401: {"model": Message}},
 )
@@ -116,6 +119,7 @@ async def show_user(
 @router.put(
     "/{uid}",
     response_description="Update a user",
+    operation_id="updateUser",
     response_model=UserAPIModel,
     responses={
         401: {"model": Message},
@@ -191,6 +195,7 @@ async def update_user(
 @router.delete(
     "/{uid}",
     response_description="Delete user",
+    operation_id="deleteUser",
     response_model=UserAPIModel,
     responses={
         401: {"model": Message},

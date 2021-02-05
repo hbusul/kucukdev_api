@@ -12,8 +12,13 @@ router = APIRouter()
 @router.post(
     "/{uid}/semesters",
     response_description="Add new semester",
+    operation_id="createSemester",
     response_model=SemesterAPIModel,
-    responses={404: {"model": Message}, 403: {"model": Message}, 401: {"model": Message}},
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
 )
 async def create_semester(
     uid: str,
@@ -74,8 +79,13 @@ async def create_semester(
 @router.get(
     "/{uid}/semesters",
     response_description="List all semesters",
+    operation_id="	listSemestersOfUser",
     response_model=List[SemesterAPIModel],
-    responses={404: {"model": Message}, 403: {"model": Message}, 401: {"model": Message}},
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
 )
 async def list_semesters(
     uid: str, request: Request, token: str = Depends(models.oauth2_scheme)
@@ -122,8 +132,13 @@ async def list_semesters(
 @router.get(
     "/{uid}/semesters/{sid}",
     response_description="Get a single semester",
+    operation_id="getSingleSemester",
     response_model=SemesterAPIModel,
-    responses={404: {"model": Message}, 403: {"model": Message}, 401: {"model": Message}},
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
 )
 async def show_semester(
     uid: str, sid: str, request: Request, token: str = Depends(models.oauth2_scheme)
@@ -168,8 +183,13 @@ async def show_semester(
 @router.put(
     "/{uid}/semesters/{sid}",
     response_description="Update a semester",
+    operation_id="updateSemester",
     response_model=SemesterAPIModel,
-    responses={404: {"model": Message}, 403: {"model": Message}, 401: {"model": Message}},
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
 )
 async def update_semester(
     uid: str,
@@ -243,8 +263,13 @@ async def update_semester(
 @router.delete(
     "/{uid}/semesters/{sid}",
     response_description="Delete semester",
+    operation_id="deleteSemester",
     response_model=SemesterAPIModel,
-    responses={404: {"model": Message}, 403: {"model": Message}, 401: {"model": Message}},
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
 )
 async def delete_semester(
     uid: str, sid: str, request: Request, token: str = Depends(models.oauth2_scheme)
