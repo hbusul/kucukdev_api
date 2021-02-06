@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from config import settings
 from datetime import datetime, timedelta
 from fastapi.responses import JSONResponse
-
+from fastapi.middleware.cors import CORSMiddleware
 from apps.task import models
 
 from apps.task.user_routers import router as user_router
@@ -13,6 +13,16 @@ from apps.task.semester_routers import router as semester_router
 from apps.task.lesson_routers import router as lesson_router
 
 app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["DELETE,GET,POST,PUT"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
