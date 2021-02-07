@@ -1,11 +1,23 @@
 import React, { Component } from 'react'
+import UserConsumer from '../Context';
+
 
 class Home extends Component {
+
     render() {
         return (
-            <div class="h-48 flex justify-center m-auto">
-                <h1 class="text-xl">Welcome to Kucukdev.org</h1>
-            </div>
+            <UserConsumer>
+                {
+                    value => {
+                        const { userToken } = value;
+                        return (
+                            <div className="flex h-full">
+                                <h1 className="text-9xl mx-auto mt-48">{userToken}</h1>
+                            </div>
+                        )
+                    }
+                }
+            </UserConsumer>
         )
     }
 
