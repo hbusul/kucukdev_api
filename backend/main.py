@@ -20,7 +20,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["DELETE,GET,POST,PUT"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -49,9 +49,9 @@ async def login_for_access_token(
         request, form_data.username, form_data.password
     )
     if not user:
-        raise JSONResponse(
+        raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"message": "Incorrect username or password"},
+            detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=models.ACCESS_TOKEN_EXPIRE_MINUTES)

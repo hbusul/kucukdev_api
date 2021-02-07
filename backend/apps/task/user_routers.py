@@ -61,31 +61,38 @@ async def create_user(request: Request, user: UserModel = Body(...)):
     )
 
 
-# It should stay for test purposes by now
 @router.get(
     "",
-    response_description="List all users",
-    operation_id="listUsers",
-    response_model=List[UserAPIModel],
+    response_description="Get current user",
+    operation_id="getCurrentUser",
+    response_model=UserAPIModel,
+    responses={401: {"model": Message}},
 )
-async def list_users(request: Request):
-    """list all users"""
+async def get_current(request: Request, token: str = Depends(models.oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, models.SECRET_KEY, algorithms=[models.ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+        token_data = models.TokenData(email=email)
+    except JWTError:
+        raise credentials_exception
+    user = await request.app.mongodb["users"].find_one({"email": token_data.email})
+    if user is None:
+        raise credentials_exception
+    uid = user["_id"]
+    semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
+    userAPI = UserAPIModel(
+        id=user["_id"], email=user["email"], semesters_url=semesters_url
+    )
+    jsonable_userAPI = jsonable_encoder(userAPI)
 
-    users = []
-    for doc in await request.app.mongodb["users"].find().to_list(length=100):
-        uid = doc["_id"]
-        semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
-        userAPI = UserAPIModel(
-            id=doc["_id"],
-            email=doc["email"],
-            semesters_url=semesters_url,
-        )
-
-        jsonable_userAPI = jsonable_encoder(userAPI)
-
-        users.append(jsonable_userAPI)
-
-    return JSONResponse(status_code=status.HTTP_200_OK, content=users)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_userAPI)
 
 
 @router.get(
