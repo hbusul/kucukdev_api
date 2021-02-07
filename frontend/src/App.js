@@ -1,42 +1,35 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
-var Kucukdevapi = require('kucukdevapi');
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Navbar from "./layout/Navbar";
+import NotFound from "./pages/NotFound";
+import Semester from "./components/Semester"
+import Home from "./components/Home"
+import Login from "./components/Login"
+import Register from "./components/Register"
+import ResetPassword from './components/ResetPassword';
 
 
 function App() {
 
-  var api = new Kucukdevapi.DefaultApi()
-  var username = "hello@agu.edu.tr"; // {String} 
-  var password = "123456"; // {String} 
-  var opts = {
-    'grantType': "password", // {String} 
-  };
-  var callback = function (error, data, response) {
-    if (error) {
-      console.error(error);
-    } else {
-      console.log('API called successfully. Returned data: ' + data);
-    }
-  };
-  api.loginForAccessTokenTokenPost(username, password, opts, callback);
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Hello <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Navbar />
+
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route exact path="/semesters" component={Semester} />
+          <Route exact path="/signin" component={Login} />
+          <Route exact path="/signup" component={Register} />
+          <Route exact path="/reset-password" component={ResetPassword} />
+
+
+          <Route component={NotFound} />
+
+        </Switch>
+      </div>
+    </Router>
   );
 }
 
