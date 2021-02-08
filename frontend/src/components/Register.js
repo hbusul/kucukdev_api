@@ -1,6 +1,43 @@
 import React, { Component } from 'react'
 
+var Kucukdevapi = require('kucukdevapi');
+
+
 class Register extends Component {
+    state = {
+        formEmail: "",
+        formPassword: "",
+        formValidatePassword: "",
+    }
+
+    changeInput = (e) => {
+        this.setState({
+            [e.target.name]: e.target.value
+        })
+    }
+
+    onRegisterUser = async (e) => {
+        e.preventDefault();
+
+        const { formEmail, formPassword, formValidatePassword } = this.state;
+
+        if (formPassword === formValidatePassword) {
+            let apiInstance = new Kucukdevapi.UsersApi();
+            let userModel = new Kucukdevapi.UserModel(formEmail, formPassword); // UserModel | 
+            apiInstance.createUser(userModel, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log('API called successfully. Returned data: ' + data.body);
+                }
+            });
+        }
+
+
+        // Redirect
+        this.props.history.push("/signin");
+    }
+
 
     render() {
         return (
@@ -13,16 +50,18 @@ class Register extends Component {
                         </div>
                         <div className="w-full lg:w-7/12 bg-white p-5 rounded-lg lg:rounded-l-none mx-auto">
                             <h3 className="pt-4 text-2xl text-center">Create an Account!</h3>
-                            <form className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
+                            <form onSubmit={this.onRegisterUser.bind(this)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
                                 <div className="mb-4">
                                     <label className="block mb-2 text-lg font-bold text-gray-700" htmlFor="email">
                                         Email
 								</label>
                                     <input
                                         className="w-full px-3 py-2 mb-3 text-lg leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                                        id="email"
+                                        id="formEmail"
                                         type="email"
                                         placeholder="Email"
+                                        name="formEmail"
+                                        onChange={this.changeInput}
                                     />
                                 </div>
                                 <div className="mb-4 md:flex md:justify-between">
@@ -32,9 +71,11 @@ class Register extends Component {
 									</label>
                                         <input
                                             className="w-full px-3 py-2 mb-3 text-lg leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                                            id="password"
+                                            id="formPassword"
                                             type="password"
                                             placeholder="******************"
+                                            name="formPassword"
+                                            onChange={this.changeInput}
                                         />
                                         <p className="text-xs italic text-red-500">Please choose a password.</p>
                                     </div>
@@ -44,16 +85,18 @@ class Register extends Component {
 									</label>
                                         <input
                                             className="w-full px-3 py-2 mb-3 text-lg leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                                            id="c_password"
+                                            id="formValidatePassword"
                                             type="password"
                                             placeholder="******************"
+                                            name="formValidatePassword"
+                                            onChange={this.changeInput}
                                         />
                                     </div>
                                 </div>
                                 <div className="mb-6 text-center">
                                     <button
                                         className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
-                                        type="button"
+                                        type="submit"
                                     >
                                         Register Account
 								</button>

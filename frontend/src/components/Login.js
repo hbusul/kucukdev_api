@@ -13,7 +13,6 @@ class Login extends Component {
 
     changeInput = (e) => {
         this.setState({
-
             [e.target.name]: e.target.value
         })
     }
@@ -33,9 +32,22 @@ class Login extends Component {
         var callback = function (error, data, response) {
             if (error) {
                 console.error(error);
+                console.log(response.body.detail)
+
             } else {
                 console.log('API called successfully. Returned data: ' + data);
                 dispatch({ type: "LOGIN_USER", payload: data });
+
+                let defaultClient = Kucukdevapi.ApiClient.instance;
+                let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
+                OAuth2PasswordBearer.accessToken = data.access_token;
+
+                let apiInstance = new Kucukdevapi.UsersApi();
+                apiInstance.getCurrentUser((error, data, response) => {
+                    console.log('API called successfully. Returned data: ' + response.body);
+                    dispatch({ type: "CURRENT_USER_ID", payload: response.body });
+                });
+
 
             }
         };
@@ -44,6 +56,7 @@ class Login extends Component {
 
         // Redirect
         this.props.history.push("/");
+
     }
 
     render() {

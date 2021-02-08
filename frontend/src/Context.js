@@ -3,17 +3,26 @@ import React, { Component } from 'react'
 const UserContext = React.createContext();
 
 const reducer = (state, action) => {
-    console.log(action.type);
-
+    console.log(action.type)
     switch (action.type) {
         case "LOGIN_USER":
             return {
-                userToken: action.payload.access_token
+                userToken: action.payload.access_token,
+                isLogin: true
             }
-        case "UPDATE_USER":
+        case "CURRENT_USER_ID":
             return {
-                ...state,
-                users: state.users.map(user => user.id === action.payload.id ? action.payload : user)
+                userID: action.payload.id,
+                userEmail: action.payload.email
+            }
+        case "LOGOUT_USER":
+            return {
+                userToken: "",
+                userID: "",
+                userEmail: "",
+                isLogin: false,
+                isSemestersFound: false
+
             }
         default:
             return state
@@ -24,10 +33,15 @@ const reducer = (state, action) => {
 export class UserProvider extends Component {
     state = {
         userToken: "",
+        userID: "",
+        userEmail: "",
+        isLogin: false,
+        isSemestersFound: false,
         dispatch: action => {
             this.setState(state => reducer(state, action))
         }
     }
+
     render() {
         return (
             <UserContext.Provider value={this.state}>

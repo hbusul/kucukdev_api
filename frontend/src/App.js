@@ -22,8 +22,8 @@ function App() {
           <Route exact path="/semesters" component={Semester} />
           <Route exact path="/signin" component={Login} />
           <Route exact path="/signup" component={Register} />
+          <Route exact path="/logout" component={ResetPassword} />
           <Route exact path="/reset-password" component={ResetPassword} />
-
 
           <Route component={NotFound} />
 

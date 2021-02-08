@@ -9,10 +9,11 @@ class Home extends Component {
             <UserConsumer>
                 {
                     value => {
-                        const { userToken } = value;
+                        const { userToken, userID } = value;
                         return (
                             <div className="flex h-full">
-                                <h1 className="text-9xl mx-auto mt-48">{userToken}</h1>
+                                <h1 className="text-md mx-auto mt-48">{userToken}</h1>
+                                <h1 className="text-md mx-auto mt-48">{userID}</h1>
                             </div>
                         )
                     }
