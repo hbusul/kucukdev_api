@@ -9,20 +9,21 @@ const reducer = (state, action) => {
             return {
                 userToken: action.payload.access_token,
                 isLogin: true
+
             }
         case "CURRENT_USER_ID":
+            localStorage.setItem("USER_LOGIN", JSON.stringify({ userToken: state.userToken, userID: action.payload.id, userEmail: action.payload.email, isLogin: true }))
             return {
                 userID: action.payload.id,
                 userEmail: action.payload.email
             }
         case "LOGOUT_USER":
+            localStorage.clear()
             return {
                 userToken: "",
                 userID: "",
                 userEmail: "",
                 isLogin: false,
-                isSemestersFound: false
-
             }
         default:
             return state
@@ -32,11 +33,12 @@ const reducer = (state, action) => {
 
 export class UserProvider extends Component {
     state = {
-        userToken: "",
-        userID: "",
-        userEmail: "",
-        isLogin: false,
-        isSemestersFound: false,
+        // userToken: localStorage.getItem("USER_TOKEN") || "",
+        // userID: JSON.parse(localStorage.getItem("USER_LOGIN")) || false,
+        // userEmail: "",
+        // isLogin: localStorage.getItem("USER_TOKEN") ? true : false,
+        ...(localStorage.getItem("USER_LOGIN") ? JSON.parse(localStorage.getItem("USER_LOGIN")) : { userToken: "", userID: "", userEmail: "", isLogin: false }),
+
         dispatch: action => {
             this.setState(state => reducer(state, action))
         }

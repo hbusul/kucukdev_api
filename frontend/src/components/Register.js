@@ -42,8 +42,8 @@ class Register extends Component {
     render() {
         return (
             <div className="flex h-full">
-                <div className="flex bg-white shadow-xl rounded flex-col md:w-2/3 sm:w-full mx-auto md:mt-32 mt-4">
-                    <div className="w-full xl:w-3/4 lg:w-11/12 flex">
+                <div className="flex bg-white shadow-xl rounded flex-col md:w-2/3 sm:w-full mx-auto xl:mt-16 mt-4">
+                    <div className="w-full flex">
                         <div
                             className="w-full h-auto bg-gray-400 hidden lg:block lg:w-5/12 bg-cover rounded-l-lg"
                             style={{ backgroundImage: `url("https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80")` }}>
