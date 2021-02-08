@@ -3,7 +3,7 @@ from fastapi import HTTPException, status, Request, Depends
 from typing import Optional, List, Dict
 import uuid
 from pydantic import BaseModel, Field, EmailStr
-from datetime import datetime, timedelta
+from datetime import date, timedelta, datetime
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 
@@ -51,12 +51,12 @@ class UpdateLessonModel(BaseModel):
 class SemesterModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
-    startDate: datetime = Field(...)
-    endDate: datetime = Field(...)
+    startDate: date = Field(...)
+    endDate: date = Field(...)
     startHour: str = Field(...)
-    dLesson: int = 0
-    dBreak: int = 0
-    slotCount: int = 0
+    dLesson: int = Field(...)
+    dBreak: int = Field(...)
+    slotCount: int = Field(...)
     lessons: List[Dict[str, LessonModel]] = []
 
     class Config:
@@ -94,8 +94,8 @@ class SemesterModel(BaseModel):
 
 class UpdateSemesterModel(BaseModel):
     name: Optional[str]
-    startDate: Optional[datetime]
-    endDate: Optional[datetime]
+    startDate: Optional[date]
+    endDate: Optional[date]
     startHour: Optional[str]
     dLesson: Optional[int]
     dBreak: Optional[int]
@@ -127,8 +127,8 @@ class UpdateSemesterModel(BaseModel):
 class SemesterAPIModel(BaseModel):
     id: Optional[str]
     name: Optional[str]
-    startDate: Optional[datetime]
-    endDate: Optional[datetime]
+    startDate: Optional[date]
+    endDate: Optional[date]
     startHour: Optional[str]
     dLesson: Optional[int]
     dBreak: Optional[int]
@@ -140,6 +140,7 @@ class UserModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     email: EmailStr = Field(...)
     password: str = Field(...)
+    currentSemester: str = Field(...)
     semesters: List[SemesterModel] = []
 
     class Config:
@@ -148,6 +149,7 @@ class UserModel(BaseModel):
             "example": {
                 "email": "hello@agu.edu.tr",
                 "password": "hello1234",
+                "currentSemester": "265a5220-9b00-45cf-abea-f8dd7df99893",
             }
         }
 
@@ -155,6 +157,7 @@ class UserModel(BaseModel):
 class UpdateUserModel(BaseModel):
     email: Optional[EmailStr]
     password: Optional[str]
+    currentSemester: Optional[str]
     semesters: Optional[List[SemesterModel]]
 
     class Config:
@@ -163,6 +166,7 @@ class UpdateUserModel(BaseModel):
             "example": {
                 "email": "hello@agu.edu.tr",
                 "password": "hello1234",
+                "currentSemester": "265a5220-9b00-45cf-abea-f8dd7df99893",
             }
         }
 
@@ -170,6 +174,7 @@ class UpdateUserModel(BaseModel):
 class UserAPIModel(BaseModel):
     id: Optional[str]
     email: Optional[EmailStr]
+    currentSemester: Optional[str]
     semesters_url: Optional[str]
 
 

@@ -49,6 +49,7 @@ async def create_user(request: Request, user: UserModel = Body(...)):
         userAPI = UserAPIModel(
             id=created_user["_id"],
             email=created_user["email"],
+            currentSemester="null",
             semesters_url=semesters_url,
         )
         jsonable_userAPI = jsonable_encoder(userAPI)
@@ -88,7 +89,10 @@ async def get_current(request: Request, token: str = Depends(models.oauth2_schem
     uid = user["_id"]
     semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
     userAPI = UserAPIModel(
-        id=user["_id"], email=user["email"], semesters_url=semesters_url
+        id=user["_id"],
+        email=user["email"],
+        currentSemester=user["currentSemester"],
+        semesters_url=semesters_url,
     )
     jsonable_userAPI = jsonable_encoder(userAPI)
 
@@ -112,7 +116,10 @@ async def show_user(
     ) is not None and auth_user["_id"] == uid:
         semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
         userAPI = UserAPIModel(
-            id=auth_user["_id"], email=auth_user["email"], semesters_url=semesters_url
+            id=auth_user["_id"],
+            email=auth_user["email"],
+            currentSemester=auth_user["currentSemester"],
+            semesters_url=semesters_url,
         )
         jsonable_userAPI = jsonable_encoder(userAPI)
 
@@ -170,6 +177,7 @@ async def update_user(
                         userAPI = UserAPIModel(
                             id=auth_user["_id"],
                             email=user["email"],
+                            currentSemester=user["currentSemester"],
                             semesters_url=semesters_url,
                         )
 
