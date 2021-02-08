@@ -92,7 +92,7 @@ class AddSemester extends Component {
                                                                     <input
                                                                         className="w-full px-3 py-2 mb-3 text-md leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                                                         id="startDate"
-                                                                        type="datetime-local"
+                                                                        type="date"
                                                                         placeholder="2018-05-18"
                                                                         name="startDate"
                                                                         onChange={this.changeInput}
@@ -105,7 +105,7 @@ class AddSemester extends Component {
                                                                     <input
                                                                         className="w-full px-3 py-2 mb-3 text-md leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                                                         id="endDate"
-                                                                        type="datetime-local"
+                                                                        type="date"
                                                                         placeholder="2018-02-05"
                                                                         name="endDate"
                                                                         onChange={this.changeInput}

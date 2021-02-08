@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import UserConsumer from "../Context"
 
 
@@ -25,7 +24,7 @@ class SemesterDetail extends Component {
             <UserConsumer>
                 {
                     value => {
-                        const { userToken, userID } = value;
+                        // const { userToken, userID } = value;
                         const { sid } = this.state;
 
                         return (

@@ -23,7 +23,7 @@ class Register extends Component {
 
         if (formPassword === formValidatePassword) {
             let apiInstance = new Kucukdevapi.UsersApi();
-            let userModel = new Kucukdevapi.UserModel(formEmail, formPassword); // UserModel | 
+            let userModel = new Kucukdevapi.UserModel(formEmail, formPassword, "null"); // UserModel | 
             apiInstance.createUser(userModel, (error, data, response) => {
                 if (error) {
                     console.error(error);

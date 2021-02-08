@@ -43,8 +43,13 @@ class Login extends Component {
 
                 let apiInstance = new Kucukdevapi.UsersApi();
                 apiInstance.getCurrentUser((error, data, response) => {
-                    console.log('API called successfully. Returned data: ' + response.body);
-                    dispatch({ type: "CURRENT_USER_ID", payload: response.body });
+                    if (error) {
+                        console.error(error);
+
+                    } else {
+                        console.log('API called successfully. Returned data: ' + response.body);
+                        dispatch({ type: "CURRENT_USER_ID", payload: response.body });
+                    }
                 });
 
 
