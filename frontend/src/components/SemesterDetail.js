@@ -1,53 +1,32 @@
-import React, { Component } from 'react'
 import UserConsumer from "../Context"
 
+const SemesterDetail = (props) => {
 
-class SemesterDetail extends Component {
-    state = {
-        sid: ""
-    }
+    const sid = props.match.params.id;
 
-    componentDidMount() {
-        const sid = this.props.match.params.id;
-        console.log(sid)
+    return (
+        <UserConsumer>
+            {
+                value => {
+                    // const { userToken, userID } = value;
 
-        this.setState({
-            sid: sid
-        })
-
-
-    }
-
-    render() {
-
-        return (
-            <UserConsumer>
-                {
-                    value => {
-                        // const { userToken, userID } = value;
-                        const { sid } = this.state;
-
-                        return (
-                            <div className="flex w-screen" >
-                                <div className="mx-auto">
-                                    <div className="flex m-4">
-                                        <h1>{sid}</h1>
-                                    </div>
-
+                    return (
+                        <div className="flex w-screen" >
+                            <div className="mx-auto">
+                                <div className="flex m-4">
+                                    <h1>{sid}</h1>
                                 </div>
 
                             </div>
-                        )
+
+                        </div>
+                    )
 
 
-                    }
                 }
-
-
-            </UserConsumer>)
-
-
-    }
+            }
+        </UserConsumer>
+    )
 }
 
-export default SemesterDetail;
+export default SemesterDetail
