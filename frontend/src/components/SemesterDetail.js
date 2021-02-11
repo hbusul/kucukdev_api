@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 
 var Kucukdevapi = require('kucukdevapi');
 
@@ -23,118 +22,96 @@ const SemesterDetail = (props) => {
 
     return (
         <div>
-            <div className="flex flex-col md:flex-row">
-                <div className="flex flex-col my-8 xl:m-16 xl:mx-40">
-                    <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Summary of {semester.name}</h1>
-                    <div className="my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8">
-                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
-                            <table className="min-w-full">
-                                <thead>
-                                    <tr className="">
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Week Count</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Start</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Finish</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Lesson Count</th>
+            <div className="flex flex-col">
+                <div className="flex flex-col lg:flex-row my-4 xl:my-4 ml-0 lg:ml-32">
+                    <div className="m-0 md:m-2 xl:m-10 overflow-x-auto">
+                        <h1 className="flex justify-start text-2xl ml-8 md:ml-4 my-2">Summary of {semester.name}</h1>
+                        <table className="min-w-full">
+                            <thead>
+                                <tr className="">
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">Week Count</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Start</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Finish</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Lesson Count</th>
 
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white  ">
-                                    <tr>
-                                        <td className="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{weekCount}</td>
-                                        <td className="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{startDate}</td>
-                                        <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">{endDate}</td>
-                                        <td className="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">0</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                        </div>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white  ">
+                                <tr>
+                                    <td className="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{weekCount}</td>
+                                    <td className="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{startDate}</td>
+                                    <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">{endDate}</td>
+                                    <td className="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
+                    <div className="m-0 md:m-2 xl:m-10 overflow-x-auto">
+                        <h1 className="flex justify-start text-2xl ml-8 md:ml-4 my-2">Schedule</h1>
+                        <table className="min-w-full">
+                            <thead>
+                                <tr className="">
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-xs md:text-sm text-left leading-4 text-blue-500 tracking-wider">#</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">1</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">2</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">3</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">4</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">5</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">6</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">7</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">8</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">9</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">10</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">11</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">12</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">13</th>
+                                    <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">14</th>
 
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white  ">
+
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div className="flex flex-col my-8 xl:m-16 xl:mx-40">
-                    <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Schedule</h1>
-                    <div className="my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8">
-                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
-                            <table className="min-w-full">
-                                <thead>
-                                    <tr className="">
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">#</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">1</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">2</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">3</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">4</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">5</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">6</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">7</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">8</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">9</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">10</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">11</th>
 
+                <div className="flex flex-col lg:flex-row my-4 xl:my-8 ml-0 lg:ml-32">
+                    <div className="m-0 md:m-2 xl:m-10 overflow-x-auto">
+                        <h1 className="flex justify-start text-2xl ml-8 md:ml-4 my-2">Lessons</h1>
+                        <table className="min-w-full">
+                            <thead>
+                                <tr className="">
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">Lesson Name</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Instructor</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Absence</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Absence Limit</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white  ">
 
-
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white  ">
-
-                                </tbody>
-                            </table>
-
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
 
+                    <div className="m-0 md:m-2 xl:m-10  overflow-x-auto">
+                        <h1 className="flex justify-start text-2xl ml-8 md:ml-4 my-2">Absence</h1>
+                        <table className="min-w-full">
+                            <thead>
+                                <tr className="">
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">Lesson Name</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Day</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Slot</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Week</th>
+                                    <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white  ">
 
-                </div>
-            </div>
-            <div className="flex flex-col md:flex-row">
-                <div className="flex flex-col my-8 xl:m-16 xl:mx-40">
-                    <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Lessons</h1>
-                    <div className="my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8">
-                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
-                            <table className="min-w-full">
-                                <thead>
-                                    <tr className="">
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">Lesson Name</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Instructor</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Absence</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Absence Limit</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white  ">
-
-                                </tbody>
-                            </table>
-
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
-
-
-                </div>
-                <div className="flex flex-col my-8 xl:m-16 xl:mx-40">
-                    <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Absence</h1>
-                    <div className="my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8">
-                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
-                            <table className="min-w-full">
-                                <thead>
-                                    <tr className="">
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">Lesson Name</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Day</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Slot</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Week</th>
-                                        <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white  ">
-
-                                </tbody>
-                            </table>
-
-                        </div>
-                    </div>
-
-
                 </div>
             </div>
         </div>

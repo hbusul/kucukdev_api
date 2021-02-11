@@ -7,6 +7,7 @@ var Kucukdevapi = require('kucukdevapi');
 const Semesters = () => {
     const [semesters, setSemesters] = useState([])
     const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
+    const currentSemester = USER_LOGIN.currentSemester
 
     useEffect(() => {
         let defaultClient = Kucukdevapi.ApiClient.instance;
@@ -48,6 +49,30 @@ const Semesters = () => {
 
     }
 
+    const setCurrentSemester = (id) => {
+
+        console.log(id)
+
+        // let defaultClient = Kucukdevapi.ApiClient.instance;
+        // // Configure OAuth2 access token for authorization: OAuth2PasswordBearer
+        // let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
+        // OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
+
+        // let apiInstance = new Kucukdevapi.UsersApi();
+        // let uid = USER_LOGIN.userID; // String | 
+        // let updateUserModel = new Kucukdevapi.UpdateUserModel(); // UpdateUserModel | 
+        // apiInstance.updateUser(uid, updateUserModel, (error, data, response) => {
+        //     if (error) {
+        //         console.error(error);
+        //     } else {
+        //         console.log('API called successfully. Returned data: ' + data);
+        //     }
+        // });
+
+        // window.location.reload()
+
+    }
+
 
     return (
         <div>
@@ -76,6 +101,8 @@ const Semesters = () => {
                                                         key={semester.id}
                                                         semester={semester}
                                                         onDeleteProps={() => deleteSemester(semester.id)}
+                                                        onCurrentProps={() => setCurrentSemester(semester.id)}
+                                                        currentSemester={currentSemester}
                                                     />
                                                 )
 
@@ -89,9 +116,9 @@ const Semesters = () => {
                                             Showing
                                 <span className="font-medium mx-1">1</span>
                                 to
-                                <span className="font-medium mx-1">10</span>
+                                <span className="font-medium mx-1">5</span>
                                 of
-                                <span className="font-medium mx-1">17</span>
+                                <span className="font-medium mx-1">9</span>
                                 results
                             </p>
                                     </div>

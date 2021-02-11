@@ -1,7 +1,6 @@
-import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
-const Semester = ({ semester, onDeleteProps }) => {
+const Semester = ({ semester, onDeleteProps, onCurrentProps, currentSemester }) => {
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "June",
         "July", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
@@ -27,7 +26,7 @@ const Semester = ({ semester, onDeleteProps }) => {
                 <div className="flex justify-evenly flex-col md:flex-row">
                     <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
                         <span aria-hidden className="absolute inset-0 bg-yellow-300 rounded-full"></span>
-                        <Link to="/update-semester" className="relative text-xs font-bold">Update</Link>
+                        <button onClick={onCurrentProps} className="relative text-xs font-bold">{currentSemester === semester.id ? "Current" : "Set Current"}</button>
 
                     </span>
                     <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
@@ -41,10 +40,6 @@ const Semester = ({ semester, onDeleteProps }) => {
             </td>
         </tr>
     )
-}
-
-Semester.propTypes = {
-    onDeleteProps: PropTypes.func
 }
 
 export default Semester
