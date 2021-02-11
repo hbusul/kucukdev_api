@@ -33,6 +33,7 @@ const AddSemester = ({ history }) => {
         });
 
         history.push("/semesters")
+        window.location.reload()
     }
 
     return (

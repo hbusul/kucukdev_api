@@ -1,9 +1,8 @@
 import { useState } from 'react'
-
+import { Link } from "react-router-dom";
 var Kucukdevapi = require('kucukdevapi');
 
 const Register = ({ history }) => {
-    const [isRegistered, setIsRegistered] = useState(false)
     const [formEmail, setEmail] = useState("")
     const [formPassword, setPassword] = useState("")
     const [formValidatePassword, setValidatePassword] = useState("")
@@ -19,7 +18,6 @@ const Register = ({ history }) => {
                     console.error(error);
                 } else {
                     console.log('API called successfully. Returned data: ' + data.body);
-                    setIsRegistered(true)
                 }
             });
         } else {
@@ -31,7 +29,7 @@ const Register = ({ history }) => {
 
     return (
         <div className="flex h-full">
-            <div className="flex bg-white shadow-xl rounded flex-col md:w-2/3 sm:w-full mx-auto xl:mt-16 mt-4">
+            <div className="flex bg-white shadow-xl rounded flex-col md:w-2/3 sm:w-full mx-auto xl:mt-12 mt-4">
                 <div className="w-full flex">
                     <div
                         className="w-full h-auto bg-gray-400 hidden lg:block lg:w-5/12 bg-cover rounded-l-lg"
@@ -92,20 +90,20 @@ const Register = ({ history }) => {
                             </div>
                             <hr className="mb-6 border-t" />
                             <div className="text-center my-4">
-                                <a
+                                <Link
+                                    to="signin"
                                     className="inline-block text-lg text-blue-500 align-baseline hover:text-blue-800"
-                                    href="/signin"
                                 >
                                     Already have an account? Login!
-                            </a>
+                            </Link>
                             </div>
                             <div className="text-center my-4">
-                                <a
+                                <Link
+                                    to="/reset-password"
                                     className="inline-block text-lg text-blue-500 align-baseline hover:text-blue-800"
-                                    href="/reset-password"
                                 >
                                     Forgot Password?
-                            </a>
+                            </Link>
                             </div>
                         </form>
                     </div>
