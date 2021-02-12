@@ -11,12 +11,11 @@ const Semesters = () => {
 
     useEffect(() => {
         let defaultClient = Kucukdevapi.ApiClient.instance;
-        // Configure OAuth2 access token for authorization: OAuth2PasswordBearer
         let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
         OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
 
         let apiInstance = new Kucukdevapi.SemestersApi();
-        let uid = USER_LOGIN.userID; // String | 
+        let uid = USER_LOGIN.userID;
         apiInstance.listSemestersOfUser(uid, (error, data, response) => {
             if (error) {
                 console.error(error);
@@ -30,13 +29,12 @@ const Semesters = () => {
     const deleteSemester = (id) => {
 
         let defaultClient = Kucukdevapi.ApiClient.instance;
-        // Configure OAuth2 access token for authorization: OAuth2PasswordBearer
         let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
         OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
 
         let apiInstance = new Kucukdevapi.SemestersApi();
-        let uid = USER_LOGIN.userID; // String | 
-        let sid = id; // String | 
+        let uid = USER_LOGIN.userID;
+        let sid = id;
         apiInstance.deleteSemester(uid, sid, (error, data, response) => {
             if (error) {
                 console.error(error);
@@ -50,24 +48,6 @@ const Semesters = () => {
     }
 
     const setCurrentSemester = (id) => {
-
-        console.log(id)
-
-        // let defaultClient = Kucukdevapi.ApiClient.instance;
-        // // Configure OAuth2 access token for authorization: OAuth2PasswordBearer
-        // let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-        // OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
-
-        // let apiInstance = new Kucukdevapi.UsersApi();
-        // let uid = USER_LOGIN.userID; // String | 
-        // let updateUserModel = new Kucukdevapi.UpdateUserModel(); // UpdateUserModel | 
-        // apiInstance.updateUser(uid, updateUserModel, (error, data, response) => {
-        //     if (error) {
-        //         console.error(error);
-        //     } else {
-        //         console.log('API called successfully. Returned data: ' + data);
-        //     }
-        // });
 
         // window.location.reload()
 
@@ -100,8 +80,8 @@ const Semesters = () => {
                                                     <Semester
                                                         key={semester.id}
                                                         semester={semester}
-                                                        onDeleteProps={() => deleteSemester(semester.id)}
-                                                        onCurrentProps={() => setCurrentSemester(semester.id)}
+                                                        onDeleteSemester={() => deleteSemester(semester.id)}
+                                                        onCurrentSemester={() => setCurrentSemester(semester.id)}
                                                         currentSemester={currentSemester}
                                                     />
                                                 )

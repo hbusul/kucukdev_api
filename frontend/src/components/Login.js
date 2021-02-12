@@ -13,10 +13,10 @@ const Login = ({ history }) => {
 
 
         var api = new Kucukdevapi.DefaultApi()
-        var username = formEmail; // {String} 
-        var password = formPassword; // {String} 
+        var username = formEmail;
+        var password = formPassword;
         var opts = {
-            'grantType': "password", // {String} 
+            'grantType': "password",
         };
 
         var callback = function (error, data, response) {

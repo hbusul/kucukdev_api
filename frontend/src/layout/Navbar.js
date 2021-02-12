@@ -41,7 +41,7 @@ const Navbar = () => {
                                         </div>
                                         :
                                         <div className="hidden sm:flex sm:items-center">
-                                            <Link to="/" className="text-gray-800 text-md font-semibold hover:text-purple-600 mr-4">{userEmail}</Link>
+                                            <Link to="/" className="text-gray-800 text-md font-semibold hover:text-purple-600 mr-4">Profile</Link>
                                             <Link to="/" onClick={onLogoutUser.bind(this, dispatch)} className="text-gray-800 text-md font-semibold border px-4 py-2 rounded-lg hover:text-purple-600 hover:border-purple-600">Logout</Link>
 
                                         </div>
@@ -72,7 +72,7 @@ const Navbar = () => {
                                             </div>
                                             :
                                             <div>
-                                                <Link to="/" className="text-gray-800 text-sm font-semibold hover:text-purple-600 mr-4">{userEmail}</Link>
+                                                <Link to="/" className="text-gray-800 text-sm font-semibold hover:text-purple-600 mr-4">Profile</Link>
                                                 <Link to="/" onClick={onLogoutUser.bind(this, dispatch)} className="text-gray-800 text-sm font-semibold border px-4 py-1 rounded-lg hover:text-purple-600 hover:border-purple-600">Logout</Link>
 
                                             </div>

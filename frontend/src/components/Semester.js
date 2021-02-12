@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom'
 
-const Semester = ({ semester, onDeleteProps, onCurrentProps, currentSemester }) => {
+const Semester = ({ semester, onDeleteSemester, onCurrentSemester, currentSemester }) => {
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "June",
         "July", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
 
-    const startDate = monthNames[(semester.startDate.getMonth())] + " " + semester.startDate.getDate() + ", " + semester.startDate.getFullYear()
-    const endDate = monthNames[(semester.endDate.getMonth())] + " " + semester.endDate.getDate() + ", " + semester.endDate.getFullYear()
+    const resStartDate = String(semester.startDate).split(" ");
+    const startDate = resStartDate[1] + " " + resStartDate[2] + ", " + resStartDate[3]
+
+    const resEndDate = String(semester.endDate).split(" ");
+    const endDate = resEndDate[1] + " " + resEndDate[2] + ", " + resEndDate[3]
 
     const weeksBetween = (d1, d2) => {
         return Math.round((d2 - d1) / (7 * 24 * 60 * 60 * 1000));
@@ -26,12 +29,12 @@ const Semester = ({ semester, onDeleteProps, onCurrentProps, currentSemester }) 
                 <div className="flex justify-evenly flex-col md:flex-row">
                     <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
                         <span aria-hidden className="absolute inset-0 bg-yellow-300 rounded-full"></span>
-                        <button onClick={onCurrentProps} className="relative text-xs font-bold">{currentSemester === semester.id ? "Current" : "Set Current"}</button>
+                        <button onClick={onCurrentSemester} className="relative text-xs font-bold">{currentSemester === semester.id ? "Current" : "Set Current"}</button>
 
                     </span>
                     <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
                         <span aria-hidden className="absolute inset-0 bg-red-500 opacity-90 rounded-full"></span>
-                        <button onClick={onDeleteProps} className="relative text-xs font-bold">Delete</button>
+                        <button onClick={onDeleteSemester} className="relative text-xs font-bold">Delete</button>
                     </span>
                 </div>
             </td>

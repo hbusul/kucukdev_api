@@ -16,13 +16,12 @@ const AddSemester = ({ history }) => {
         e.preventDefault();
 
         let defaultClient = Kucukdevapi.ApiClient.instance;
-        // Configure OAuth2 access token for authorization: OAuth2PasswordBearer
         let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
         OAuth2PasswordBearer.accessToken = userToken;
 
         let apiInstance = new Kucukdevapi.SemestersApi();
-        let uid = userID; // String | 
-        let semesterModel = new Kucukdevapi.SemesterModel(semesterName, startDate, endDate, startHour, dLesson, dBreak, slotCount); // SemesterModel | 
+        let uid = userID;
+        let semesterModel = new Kucukdevapi.SemesterModel(semesterName, startDate, endDate, startHour, dLesson, dBreak, slotCount);
         console.log(semesterModel)
         apiInstance.createSemester(uid, semesterModel, (error, data, response) => {
             if (error) {
