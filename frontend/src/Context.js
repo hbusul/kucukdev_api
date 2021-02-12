@@ -12,10 +12,16 @@ const reducer = (state, action) => {
 
             }
         case "CURRENT_USER_ID":
-            localStorage.setItem("USER_LOGIN", JSON.stringify({ userToken: state.userToken, userID: action.payload.id, userEmail: action.payload.email, currentSemester: action.payload.currentSemester, isLogin: true }))
+            localStorage.setItem("CURRENT_SEMESTER", JSON.stringify({ currentSemester: action.payload.currentSemester }))
+            localStorage.setItem("USER_LOGIN", JSON.stringify({ userToken: state.userToken, userID: action.payload.id, userEmail: action.payload.email, isLogin: true }))
             return {
                 userID: action.payload.id,
                 userEmail: action.payload.email
+            }
+        case "SET_CURRENT_SEMESTER":
+            localStorage.setItem("CURRENT_SEMESTER", JSON.stringify({ currentSemester: action.payload.currentSemester }))
+            return {
+                currentSemester: action.payload.currentSemester
             }
         case "LOGOUT_USER":
             localStorage.clear()
@@ -23,6 +29,7 @@ const reducer = (state, action) => {
                 userToken: "",
                 userID: "",
                 userEmail: "",
+                currentSemester: "",
                 isLogin: false,
             }
         default:
@@ -37,7 +44,8 @@ export class UserProvider extends Component {
         // userID: JSON.parse(localStorage.getItem("USER_LOGIN")) || false,
         // userEmail: "",
         // isLogin: localStorage.getItem("USER_TOKEN") ? true : false,
-        ...(localStorage.getItem("USER_LOGIN") ? JSON.parse(localStorage.getItem("USER_LOGIN")) : { userToken: "", userID: "", userEmail: "", isLogin: false }),
+        ...(localStorage.getItem("USER_LOGIN") ? JSON.parse(localStorage.getItem("USER_LOGIN")) : { userToken: "", userID: "", userEmail: "", currentSemester: "", isLogin: false }),
+        ...(localStorage.getItem("CURRENT_SEMESTER") ? JSON.parse(localStorage.getItem("CURRENT_SEMESTER")) : { currentSemester: "" }),
 
         dispatch: action => {
             this.setState(state => reducer(state, action))

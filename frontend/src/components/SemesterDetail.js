@@ -44,7 +44,6 @@ const SemesterDetail = (props) => {
     }
 
     const weeksBetween = (d1, d2) => {
-        console.log(d1)
         return String(Math.round((d2 - d1) / (7 * 24 * 60 * 60 * 1000)));
     }
 
