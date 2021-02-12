@@ -64,8 +64,8 @@ class SemesterModel(BaseModel):
         schema_extra = {
             "example": {
                 "name": "2020-21 Spring",
-                "startDate": "2016-02-18T16:00:00Z",
-                "endDate": "2016-06-18T16:00:00Z",
+                "startDate": "2016-02-18",
+                "endDate": "2016-06-18",
                 "startHour": "8.10",
                 "dLesson": 50,
                 "dBreak": 10,
@@ -107,8 +107,8 @@ class UpdateSemesterModel(BaseModel):
         schema_extra = {
             "example": {
                 "name": "2020-21 Spring",
-                "startDate": "2016-02-18T16:00:00Z",
-                "endDate": "2016-06-18T16:00:00Z",
+                "startDate": "2016-02-18",
+                "endDate": "2016-06-18",
                 "startHour": "8.10",
                 "dLesson": 50,
                 "dBreak": 10,
@@ -149,24 +149,33 @@ class UserModel(BaseModel):
             "example": {
                 "email": "hello@agu.edu.tr",
                 "password": "hello1234",
-                "currentSemester": "265a5220-9b00-45cf-abea-f8dd7df99893",
+                "currentSemester": "null",
             }
         }
 
 
-class UpdateUserModel(BaseModel):
-    email: Optional[EmailStr]
-    password: Optional[str]
-    currentSemester: Optional[str]
-    semesters: Optional[List[SemesterModel]]
+class UpdatePasswordModel(BaseModel):
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    password: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "email": "hello@agu.edu.tr",
-                "password": "hello1234",
-                "currentSemester": "265a5220-9b00-45cf-abea-f8dd7df99893",
+                "password": "123456",
+            }
+        }
+
+
+class UpdateSemesterModel(BaseModel):
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    currentSemester: str = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "currentSemester": "jkklj-jkll3-jaias-asad4",
             }
         }
 

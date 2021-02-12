@@ -17,7 +17,13 @@ from jose import JWTError, jwt
 
 
 from apps.task import models
-from .models import UserModel, UpdateUserModel, UserAPIModel, Message
+from .models import (
+    UserModel,
+    UserAPIModel,
+    UpdatePasswordModel,
+    UpdateSemesterModel,
+    Message,
+)
 
 router = APIRouter()
 
@@ -131,66 +137,47 @@ async def show_user(
 
 
 @router.put(
-    "/{uid}",
-    response_description="Update a user",
-    operation_id="updateUser",
-    response_model=UserAPIModel,
+    "/{uid}/change-password",
+    response_description="Update password of a user",
+    operation_id="updatePassword",
+    response_model=UpdatePasswordModel,
     responses={
         401: {"model": Message},
         403: {"model": Message},
         404: {"model": Message},
-        409: {"model": Message},
     },
 )
-async def update_user(
+async def update_password(
     uid: str,
     request: Request,
-    user: UpdateUserModel = Body(...),
+    password: UpdatePasswordModel = Body(...),
     token: str = Depends(models.oauth2_scheme),
 ):
-    """Update a user with given userID"""
+    """Update password of a user with given userID"""
 
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
 
-        user = {k: v for k, v in user.dict().items() if v is not None}
+        password = {k: v for k, v in password.dict().items() if v is not None}
 
-        if len(user) >= 1:
-            if (
-                current_user := await request.app.mongodb["users"].find_one(
-                    {"email": user["email"]}
-                )
-            ) is None or auth_user["email"] == user["email"]:
-                user["password"] = bcrypt.hash(user["password"])
-                update_result = await request.app.mongodb["users"].update_one(
-                    {"_id": uid}, {"$set": user}
-                )
+        if len(password) >= 1:
 
-                if update_result.modified_count == 1:
-                    if (
-                        updated_user := await request.app.mongodb["users"].find_one(
-                            {"_id": uid}
-                        )
-                    ) is not None:
-                        semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
-                        userAPI = UserAPIModel(
-                            id=auth_user["_id"],
-                            email=user["email"],
-                            currentSemester=user["currentSemester"],
-                            semesters_url=semesters_url,
-                        )
-
-                        jsonable_userAPI = jsonable_encoder(userAPI)
-
-                        return JSONResponse(
-                            status_code=status.HTTP_200_OK, content=jsonable_userAPI
-                        )
-
-            return JSONResponse(
-                status_code=status.HTTP_409_CONFLICT,
-                content={"message": "Given email already exists"},
+            password["password"] = bcrypt.hash(password["password"])
+            update_result = await request.app.mongodb["users"].update_one(
+                {"_id": uid}, {"$set": {"password": password["password"]}}
             )
+
+            if update_result.modified_count == 1:
+                if (
+                    updated_user := await request.app.mongodb["users"].find_one(
+                        {"_id": uid}
+                    )
+                ) is not None:
+                    return JSONResponse(
+                        status_code=status.HTTP_200_OK,
+                        content={"message": "Password succesfully changed!"},
+                    )
 
         if (
             existing_user := await request.app.mongodb["users"].find_one({"_id": uid})
@@ -241,6 +228,66 @@ async def delete_user(
             return JSONResponse(
                 status_code=status.HTTP_200_OK, content=jsonable_userAPI
             )
+
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "User not found"},
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
+    )
+
+
+@router.put(
+    "/{uid}/current-semester",
+    response_description="Update current semester of a user",
+    operation_id="updateCurrentSemester",
+    response_model=UpdateSemesterModel,
+    responses={
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
+    },
+)
+async def update_current_semester(
+    uid: str,
+    request: Request,
+    semester: UpdateSemesterModel = Body(...),
+    token: str = Depends(models.oauth2_scheme),
+):
+    """Update current semester ID of a user with given userID"""
+
+    if (
+        auth_user := await models.get_current_user(request, token)
+    ) is not None and auth_user["_id"] == uid:
+
+        semester = {k: v for k, v in semester.dict().items() if v is not None}
+
+        if len(semester) >= 1:
+
+            update_result = await request.app.mongodb["users"].update_one(
+                {"_id": uid}, {"$set": {"currentSemester": semester["currentSemester"]}}
+            )
+
+            if update_result.modified_count == 1:
+                if (
+                    updated_user := await request.app.mongodb["users"].find_one(
+                        {"_id": uid}
+                    )
+                ) is not None:
+
+                    jsonable_currentSemester = jsonable_encoder(semester)
+
+                    return JSONResponse(
+                        status_code=status.HTTP_200_OK,
+                        content=jsonable_currentSemester,
+                    )
+
+        if (
+            existing_user := await request.app.mongodb["users"].find_one({"_id": uid})
+        ) is not None:
+            return existing_user
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
