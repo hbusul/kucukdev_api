@@ -16,7 +16,8 @@ const reducer = (state, action) => {
             localStorage.setItem("USER_LOGIN", JSON.stringify({ userToken: state.userToken, userID: action.payload.id, userEmail: action.payload.email, isLogin: true }))
             return {
                 userID: action.payload.id,
-                userEmail: action.payload.email
+                userEmail: action.payload.email,
+                currentSemester: action.payload.currentSemester
             }
         case "SET_CURRENT_SEMESTER":
             localStorage.setItem("CURRENT_SEMESTER", JSON.stringify({ currentSemester: action.payload.currentSemester }))
