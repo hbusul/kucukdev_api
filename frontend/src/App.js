@@ -10,7 +10,7 @@ import Register from "./components/Register"
 import ResetPassword from './components/ResetPassword';
 import AddSemester from './forms/AddSemester';
 import SemesterDetail from './components/SemesterDetail';
-import AddLesson from './forms/AddLesson';
+import AddLesson from './forms/AddUpdateLesson';
 import AddUISLesson from './components/AddUISLesson';
 import ShowLessons from './components/Lessons';
 
@@ -32,6 +32,7 @@ function App() {
           <Route exact path="/reset-password" component={ResetPassword} />
           <Route exact path={"/semesters/:id"} component={SemesterDetail} />
           <Route exact path="/lessons/add-lesson" component={AddLesson} />
+          <Route exact path="/lessons/update-lesson/:id" component={AddLesson} />
           <Route exact path="/lessons/add-from-uis" component={AddUISLesson} />
           <Route exact path="/lessons/show-lessons" component={ShowLessons} />
           <Route component={NotFound} />

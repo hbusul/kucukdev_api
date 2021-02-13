@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom'
 var Kucukdevapi = require('kucukdevapi');
 
 
-const AddLesson = ({ history }) => {
+const AddLesson = (props) => {
     const [semester, setSemester] = useState({})
     const [calculateModal, setCalculateModal] = useState(false);
+    const [lesson, setLesson] = useState()
 
     const [slots, setSlots] = useState([])
     const [lessonName, setLessonName] = useState("")
@@ -18,16 +19,16 @@ const AddLesson = ({ history }) => {
 
     const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
     const CURRENT_SEMESTER = JSON.parse(localStorage.getItem("CURRENT_SEMESTER"))
+    const currentLessonID = props.match.params.id
 
+    let defaultClient = Kucukdevapi.ApiClient.instance;
+    let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
+    OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
+    let uid = USER_LOGIN.userID;
+    let sid = CURRENT_SEMESTER.currentSemester;
 
     useEffect(() => {
-        let defaultClient = Kucukdevapi.ApiClient.instance;
-        let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-        OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
-
         let apiInstance = new Kucukdevapi.SemestersApi();
-        let uid = USER_LOGIN.userID;
-        let sid = CURRENT_SEMESTER.currentSemester;
         apiInstance.getSingleSemester(uid, sid, (error, data, response) => {
             if (error) {
                 console.error(error);
@@ -36,6 +37,22 @@ const AddLesson = ({ history }) => {
                 setSemester(data)
             }
         });
+
+        if (currentLessonID) {
+            let apiInstance = new Kucukdevapi.LessonsApi();
+            let lid = currentLessonID; // String | 
+            apiInstance.getSingleLesson(uid, sid, lid, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                    setLesson(data)
+                    setAbsenceLimit(data.absenceLimit)
+                    setLessonName(data.name)
+                    setInstructorName(data.instructor)
+                }
+            });
+        }
     }, [])
 
     const selectSlots = (newSlot) => {
@@ -46,8 +63,19 @@ const AddLesson = ({ history }) => {
         }
     }
 
-    const addLesson = (e) => {
-        e.preventDefault()
+    // const days = ["M", "Tu", "W", "Th", "F"]
+
+    const setLessonSlots = () => {
+        // If slots didn't selected in order
+        for (let i = 0; i < slots.length; i++) {
+            for (let j = i + 1; j < slots.length; j++) {
+                if (slots[j] < slots[i]) {
+                    let temp = slots[j]
+                    slots[j] = slots[i]
+                    slots[i] = temp
+                }
+            }
+        }
 
         const lessonSlots = []
         for (let index = 0; index < slots.length; index++) {
@@ -56,6 +84,31 @@ const AddLesson = ({ history }) => {
             lessonSlots.push(newSlot)
         }
 
+        return lessonSlots
+    }
+
+    const addLesson = (e) => {
+        e.preventDefault()
+
+        const lessonSlots = setLessonSlots()
+
+        let apiInstance = new Kucukdevapi.LessonsApi();
+        let lessonModel = new Kucukdevapi.LessonModel(lessonName, instrutcorName, absenceLimit, lessonSlots);
+        apiInstance.createLesson(uid, sid, lessonModel, (error, data, response) => {
+            if (error) {
+                console.error(error);
+            } else {
+                console.log('API called successfully. Returned data: ' + data);
+            }
+        });
+
+        props.history.push("/lessons")
+    }
+
+    const updateLesson = (e) => {
+        e.preventDefault()
+
+        const lessonSlots = setLessonSlots()
         let defaultClient = Kucukdevapi.ApiClient.instance;
         let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
         OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
@@ -63,19 +116,19 @@ const AddLesson = ({ history }) => {
         let apiInstance = new Kucukdevapi.LessonsApi();
         let uid = USER_LOGIN.userID;
         let sid = CURRENT_SEMESTER.currentSemester;
-        let lessonModel = new Kucukdevapi.LessonModel(lessonName, instrutcorName, lessonSlots);
-        apiInstance.createLesson(uid, sid, lessonModel, (error, data, response) => {
+        let lid = currentLessonID;
+        let updateLessonModel = new Kucukdevapi.UpdateLessonModel(lessonName, instrutcorName, absenceLimit, lessonSlots);
+        apiInstance.updateLesson(uid, sid, lid, updateLessonModel, (error, data, response) => {
             if (error) {
                 console.error(error);
             } else {
                 console.log('API called successfully. Returned data: ' + data);
-                console.log(data)
             }
         });
 
-        history.push("/lessons")
-
+        props.history.push("/lessons")
     }
+
 
     let hour = String(semester.startHour)
     let resStart = hour.split(".")
@@ -90,11 +143,11 @@ const AddLesson = ({ history }) => {
     for (let index = 1; index <= semester.slotCount; index++) {
         scheduleRows.push(<tr key={index}>
             <td className="px-6 py-1 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{hour}</td>
-            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`M,${index}`)} type="checkbox"></input></td>
-            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`Tu,${index}`)} type="checkbox"></input></td>
-            <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`W,${index}`)} type="checkbox"></input></td>
-            <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`Th,${index}`)} type="checkbox"></input></td>
-            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`F,${index}`)} type="checkbox"></input></td>
+            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`0,${index}`)} type="checkbox"></input></td>
+            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`1,${index}`)} type="checkbox"></input></td>
+            <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`2,${index}`)} type="checkbox"></input></td>
+            <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`3,${index}`)} type="checkbox"></input></td>
+            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`4,${index}`)} type="checkbox"></input></td>
         </tr >);
 
         startHour += periodHour
@@ -115,16 +168,16 @@ const AddLesson = ({ history }) => {
     return (
         <div className="flex flex-col my-8 xl:mx-40">
             <div className="flex flex-row justify-around mb-4">
-                <Link to="/lessons/show-lessons" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:bg-gray-200 md:px-12 md:py-2 rounded-full">Show Lessons</Link>
-                <Link to="/lessons/add-lesson" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:bg-gray-200 md:px-12 md:py-2 rounded-full">Add Lesson</Link>
-                <Link to="/lessons/add-from-uis" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:bg-gray-200 md:px-12 md:py-2 rounded-full">Add from UIS</Link>
+                <a href="/lessons/show-lessons" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:bg-gray-200 md:px-12 md:py-2 rounded-full">Show Lessons</a>
+                <a href="/lessons/add-lesson" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:bg-gray-200 md:px-12 md:py-2 rounded-full">Add Lesson</a>
+                <a href="/lessons/add-from-uis" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:bg-gray-200 md:px-12 md:py-2 rounded-full">Add from UIS</a>
             </div>
             <div className="flex h-full">
                 <div className="flex bg-white shadow-xl rounded flex-col w-full mx-auto mt-2">
                     <div className="w-full flex flex-col md:flex-row">
                         <div
                             className="w-full h-auto lg:block lg:w-7/12 bg-cover rounded-l-lg">
-                            <h1 className="flex justify-center md:justify-start text-2xl ml-4 my-2">Select Hours</h1>
+                            <h1 className="flex justify-center md:justify-start text-2xl ml-4 my-2">{lesson ? "Select Updated Hours" : "Select Hours"}</h1>
                             <table className="min-w-full">
                                 <thead>
                                     <tr className="">
@@ -145,8 +198,8 @@ const AddLesson = ({ history }) => {
 
                         </div>
                         <div className="w-full lg:w-5/12 bg-white p-5 rounded-lg lg:rounded-l-none mx-auto">
-                            <h3 className="pt-4 text-2xl text-center">Add Lesson!</h3>
-                            <form onSubmit={(e) => addLesson(e)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
+                            <h3 className="pt-4 text-2xl text-center">{lesson ? "Update Lesson" : "Add Lesson!"}</h3>
+                            <form onSubmit={lesson ? (e) => updateLesson(e) : (e) => addLesson(e)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
                                 <div className="mb-4">
                                     <label className="block mb-2 text-base font-bold text-gray-700">
                                         Leeson Name
@@ -156,6 +209,7 @@ const AddLesson = ({ history }) => {
                                         id="lessonName"
                                         type="text"
                                         placeholder="EE213"
+                                        defaultValue={lesson && lessonName}
                                         name="lessonName"
                                         onChange={(e) => setLessonName(e.target.value)}
                                     />
@@ -169,6 +223,7 @@ const AddLesson = ({ history }) => {
                                         id="instructorName"
                                         type="text"
                                         placeholder="John Doe"
+                                        defaultValue={lesson && instrutcorName}
                                         name="instructorName"
                                         onChange={(e) => setInstructorName(e.target.value)}
                                     />
@@ -201,11 +256,11 @@ const AddLesson = ({ history }) => {
                                 </div>
                                 <div className="mb-6 text-center">
                                     <button
-                                        className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+                                        className={`w-full px-4 py-2 font-bold text-white ${lesson ? "bg-yellow-400 hover:bg-yellow-500" : "bg-blue-500 hover:bg-blue-700"} rounded-full  focus:outline-none focus:shadow-outline`}
                                         type="submit"
                                     >
-                                        Add The Lesson
-            </button>
+                                        {lesson ? "Update The Lesson" : "Add The Lesson"}
+                                    </button>
                                 </div>
                                 <hr className="mb-6 border-t" />
 
