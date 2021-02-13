@@ -10,7 +10,7 @@ import Register from "./components/Register"
 import ResetPassword from './components/ResetPassword';
 import AddSemester from './forms/AddSemester';
 import SemesterDetail from './components/SemesterDetail';
-import AddLesson from './components/AddLesson';
+import AddLesson from './forms/AddLesson';
 import AddUISLesson from './components/AddUISLesson';
 import ShowLessons from './components/Lessons';
 

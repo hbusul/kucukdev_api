@@ -40,7 +40,7 @@ const Lessons = () => {
 
         let apiInstance = new Kucukdevapi.LessonsApi();
         let uid = USER_LOGIN.userID;
-        let sid = USER_LOGIN.currentSemester;
+        let sid = CURRENT_SEMESTER.currentSemester;
         let lid = id;
         apiInstance.deleteLesson(uid, sid, lid, (error, data, response) => {
             if (error) {
