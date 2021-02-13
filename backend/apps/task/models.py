@@ -19,7 +19,9 @@ class LessonModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
     instructor: str = Field(...)
+    absenceLimit: int = Field(...)
     slots: List[List[str]] = Field(...)
+    absences: List[str] = []
 
     class Config:
         allow_population_by_field_name = True
@@ -27,6 +29,7 @@ class LessonModel(BaseModel):
             "example": {
                 "name": "EE203",
                 "instructor": "Ali Veli",
+                "absenceLimit": 0,
                 "slots": [["W", "7"], ["W", "8"]],
             }
         }
@@ -34,16 +37,30 @@ class LessonModel(BaseModel):
 
 class UpdateLessonModel(BaseModel):
     id: Optional[str]
-    name: Optional[str]
-    instructor: Optional[str]
-    slots: Optional[List[List[str]]]
+    name: str = Field(...)
+    instructor: str = Field(...)
+    absenceLimit: int = Field(...)
+    slots: List[List[str]] = Field(...)
 
     class Config:
         schema_extra = {
             "example": {
                 "name": "EE203",
                 "instructor": "Ali Veli",
+                "absenceLimit": 0,
                 "slots": [["W", "7"], ["W", "8"]],
+            }
+        }
+
+
+class AbsenceModel(BaseModel):
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    absence: str = Field(...)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "absence": "1,0,2,2016-02-18",
             }
         }
 

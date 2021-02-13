@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from typing import List
 
 from apps.task import models
-from .models import LessonModel, UpdateLessonModel, Message
+from .models import LessonModel, UpdateLessonModel, AbsenceModel, Message
 
 router = APIRouter()
 
@@ -52,6 +52,7 @@ async def create_lesson(
                             id=lesson["_id"],
                             name=lesson["name"],
                             instructor=lesson["instructor"],
+                            absenceLimit=lesson["absenceLimit"],
                             slots=lesson["slots"],
                         )
                     jsonable_lessonAPI = jsonable_encoder(lessonAPI)
@@ -197,6 +198,9 @@ async def update_lesson(
                     "$set": {
                         "semesters.$[i].lessons.$[j].name": lesson["name"],
                         "semesters.$[i].lessons.$[j].instructor": lesson["instructor"],
+                        "semesters.$[i].lessons.$[j].absenceLimit": lesson[
+                            "absenceLimit"
+                        ],
                         "semesters.$[i].lessons.$[j].slots": lesson["slots"],
                     }
                 },
@@ -267,6 +271,126 @@ async def delete_lesson(
                                 lessonAPI = lesson
 
             return JSONResponse(status_code=status.HTTP_200_OK, content=lessonAPI)
+
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Lesson not found"},
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
+    )
+
+
+@router.post(
+    "/{uid}/semesters/{sid}/lessons/{lid}/absences",
+    response_description="Add absence into a lesson",
+    operation_id="createAbsence",
+    response_model=AbsenceModel,
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
+)
+async def create_absence(
+    uid: str,
+    sid: str,
+    lid: str,
+    request: Request,
+    absence: AbsenceModel = Body(...),
+    token: str = Depends(models.oauth2_scheme),
+):
+    """Create an absence for a lesson with given userID, semesterID and lessonID"""
+
+    absence = jsonable_encoder(absence)
+
+    if (
+        auth_user := await models.get_current_user(request, token)
+    ) is not None and auth_user["_id"] == uid:
+        update_result = (
+            await request.app.mongodb["users"].update_one(
+                {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid},
+                {
+                    "$push": {
+                        "semesters.$[i].lessons.$[j].absences": absence["absence"],
+                    }
+                },
+                array_filters=[{"i._id": sid}, {"j._id": lid}],
+            ),
+        )
+
+        if (
+            existing_user := await request.app.mongodb["users"].find_one(
+                {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid}
+            )
+        ) is not None:
+            for semester in existing_user["semesters"]:
+                if semester["_id"] == sid:
+                    for lesson in semester["lessons"]:
+                        if lesson["_id"] == lid:
+                            return JSONResponse(
+                                status_code=status.HTTP_200_OK,
+                                content=lesson["absences"],
+                            )
+
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Lesson not found"},
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
+    )
+
+
+@router.delete(
+    "/{uid}/semesters/{sid}/lessons/{lid}/absences",
+    response_description="Delete absence into a lesson",
+    operation_id="deleteAbsence",
+    response_model=AbsenceModel,
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        401: {"model": Message},
+    },
+)
+async def delete_absence(
+    uid: str,
+    sid: str,
+    lid: str,
+    request: Request,
+    absence: AbsenceModel = Body(...),
+    token: str = Depends(models.oauth2_scheme),
+):
+    """Delete an absence from a lesson with given userID, semesterID and lessonID"""
+
+    absence = jsonable_encoder(absence)
+
+    if (
+        auth_user := await models.get_current_user(request, token)
+    ) is not None and auth_user["_id"] == uid:
+        update_result = (
+            await request.app.mongodb["users"].update_one(
+                {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid},
+                {"$pull": {"semesters.$[i].lessons.$[j].absences": absence["absence"]}},
+                array_filters=[{"i._id": sid}, {"j._id": lid}],
+            ),
+        )
+
+        if (
+            existing_user := await request.app.mongodb["users"].find_one(
+                {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid}
+            )
+        ) is not None:
+            for semester in existing_user["semesters"]:
+                if semester["_id"] == sid:
+                    for lesson in semester["lessons"]:
+                        if lesson["_id"] == lid:
+                            return JSONResponse(
+                                status_code=status.HTTP_200_OK,
+                                content=lesson["absences"],
+                            )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
