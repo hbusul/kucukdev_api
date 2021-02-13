@@ -13,7 +13,7 @@ const Navbar = () => {
         <UserConsumer>
             {
                 value => {
-                    const { isLogin, userEmail, dispatch } = value;
+                    const { isLogin, dispatch } = value;
 
                     return (
                         <nav className="bg-white md:h-24 shadow">

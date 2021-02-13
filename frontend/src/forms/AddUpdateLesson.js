@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 
 var Kucukdevapi = require('kucukdevapi');
 
@@ -63,7 +62,7 @@ const AddLesson = (props) => {
         }
     }
 
-    // const days = ["M", "Tu", "W", "Th", "F"]
+    const days = ["M", "Tu", "W", "Th", "F"]
 
     const setLessonSlots = () => {
         // If slots didn't selected in order
@@ -80,7 +79,7 @@ const AddLesson = (props) => {
         const lessonSlots = []
         for (let index = 0; index < slots.length; index++) {
             const resSlot = (slots[index]).split(",")
-            const newSlot = [resSlot[0], resSlot[1]]
+            const newSlot = [days[resSlot[0]], resSlot[1]]
             lessonSlots.push(newSlot)
         }
 

@@ -17,7 +17,8 @@ const Register = ({ history }) => {
                 if (error) {
                     console.error(error);
                 } else {
-                    console.log('API called successfully. Returned data: ' + data.body);
+                    console.log('API called successfully. Returned data: ' + data);
+                    history.push("/signin")
                 }
             });
         } else {
