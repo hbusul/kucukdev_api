@@ -9,6 +9,7 @@ var Kucukdevapi = require('kucukdevapi');
 const Lessons = () => {
 
     const [lessons, setLessons] = useState([])
+    const [refresh, setRefresh] = useState(0);
     const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
     const CURRENT_SEMESTER = JSON.parse(localStorage.getItem("CURRENT_SEMESTER"))
 
@@ -30,7 +31,7 @@ const Lessons = () => {
                 setLessons(data)
             }
         });
-    }, [])
+    }, [refresh])
 
     const deleteLesson = (id) => {
 
@@ -48,7 +49,7 @@ const Lessons = () => {
             } else {
                 console.log('API called successfully. Returned data: ' + data);
             }
-            window.location.reload()
+            setRefresh((x)=>x+1);
         });
     }
 
