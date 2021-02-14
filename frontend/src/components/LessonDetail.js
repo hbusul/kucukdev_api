@@ -69,28 +69,28 @@ const LessonDetail = (props) => {
                         </thead>
                         <tbody className="bg-white  ">
                             <tr>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Name</td>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.name}</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Name</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.name}</td>
                             </tr>
                             <tr>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Instructor</td>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.instructor}</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Instructor</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.instructor}</td>
                             </tr>
                             <tr>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Absence Limit</td>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.absenceLimit}</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Absence Limit</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.absenceLimit}</td>
                             </tr>
                             <tr>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Current Absent Number</td>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{absences.length}</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Current Absent Number</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{absences.length}</td>
                             </tr>
                             <tr>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Weekly Schedule</td>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.slots}</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Weekly Schedule</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.slots}</td>
                             </tr>
                             <tr>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Quick Actions</td>
-                                <td className="px-20 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Quick Actions</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                     <div className="flex justify-around flex-col md:flex-row">
                                         <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
                                             <span aria-hidden className="absolute inset-0 bg-yellow-300 rounded-full"></span>

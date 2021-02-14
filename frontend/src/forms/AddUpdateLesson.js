@@ -156,8 +156,9 @@ const AddLesson = (props) => {
             startHour += 1
             startMin = startMin % 60
         }
-        if (startMin === 0) {
-            hour = startHour + ".00"
+
+        if (startMin < 10) {
+            hour = startHour + ".0" + startMin
         } else {
             hour = startHour + "." + startMin
         }
@@ -167,9 +168,9 @@ const AddLesson = (props) => {
     return (
         <div className="flex flex-col my-8 xl:mx-40">
             <div className="flex flex-row justify-around mb-4">
-                <a href="/lessons/show-lessons" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:bg-gray-200 md:px-12 md:py-2 rounded-full">Show Lessons</a>
-                <a href="/lessons/add-lesson" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:bg-gray-200 md:px-12 md:py-2 rounded-full">Add Lesson</a>
-                <a href="/lessons/add-from-uis" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:bg-gray-200 md:px-12 md:py-2 rounded-full">Add from UIS</a>
+                <a href="/lessons/show-lessons" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Show Lessons</a>
+                <a href="/lessons/add-lesson" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Add Lesson</a>
+                <a href="/lessons/add-from-uis" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Add from UIS</a>
             </div>
             <div className="flex h-full">
                 <div className="flex bg-white shadow-xl rounded flex-col w-full mx-auto mt-2">

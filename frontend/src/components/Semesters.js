@@ -82,7 +82,7 @@ const Semesters = () => {
                                 USER_LOGIN.isLogin ?
                                     <div className="flex flex-col my-8 xl:m-16 xl:mx-40">
                                         <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Your Semesters</h1>
-                                        <div className="my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8">
+                                        <div className="my-2 py-2 overflow-x-auto sm:px-6 pr-10 lg:px-8">
                                             <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
                                                 <table className="min-w-full">
                                                     <thead>
@@ -145,10 +145,10 @@ const Semesters = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex justify-center md:justify-end text-xs md:text-base">
+                                        <div className="flex justify-center md:justify-end text-xs md:text-base my-8 mx-4">
                                             <Link
                                                 to="/add-semester"
-                                                className="w-1/2 md:w-1/3 lg:w-1/5 px-8 py-2 my-8 mx-4 font-bold text-white bg-green-500 rounded-full hover:bg-green-700 focus:outline-none focus:shadow-outline"
+                                                className="w-1/2 md:w-1/3 lg:w-1/5 px-8 py-2 font-bold text-white bg-green-500 rounded-full hover:bg-green-700 focus:outline-none focus:shadow-outline"
 
                                             >
                                                 Add Semester
