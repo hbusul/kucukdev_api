@@ -41,10 +41,8 @@ const Semesters = () => {
             } else {
                 console.log('API called successfully. Returned data: ' + data);
             }
+            window.location.reload()
         });
-
-        window.location.reload()
-
     }
 
     const setCurrentSemester = (id, dispatch) => {

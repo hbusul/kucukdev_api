@@ -29,10 +29,8 @@ const AddSemester = ({ history }) => {
             } else {
                 console.log('API called successfully. Returned data: ' + data);
             }
+            history.push("/semesters")
         });
-
-        history.push("/semesters")
-        window.location.reload()
     }
 
     return (
