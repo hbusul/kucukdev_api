@@ -12,7 +12,7 @@ const AddSemester = ({ history }) => {
     const [dBreak, setDBreak] = useState(0)
     const [slotCount, setSlotCount] = useState(0)
 
-    const onCreateSemester = async (userToken, userID, e) => {
+    const onCreateSemester = async (userToken, userID, dispatch, e) => {
         e.preventDefault();
 
         let defaultClient = Kucukdevapi.ApiClient.instance;
@@ -22,12 +22,14 @@ const AddSemester = ({ history }) => {
         let apiInstance = new Kucukdevapi.SemestersApi();
         let uid = userID;
         let semesterModel = new Kucukdevapi.SemesterModel(semesterName, startDate, endDate, startHour, dLesson, dBreak, slotCount);
-        console.log(semesterModel)
         apiInstance.createSemester(uid, semesterModel, (error, data, response) => {
             if (error) {
                 console.error(error);
             } else {
                 console.log('API called successfully. Returned data: ' + data);
+                (data.length === 1) && dispatch({
+                    type: "SET_FIRST_SEMESTER", payload: data[0]
+                });
             }
             history.push("/semesters")
         });
@@ -37,7 +39,7 @@ const AddSemester = ({ history }) => {
         <UserConsumer>
             {
                 value => {
-                    const { userToken, userID, isLogin } = value;
+                    const { userToken, userID, isLogin, dispatch } = value;
 
                     return (
                         <div>
@@ -52,7 +54,7 @@ const AddSemester = ({ history }) => {
                                                 </div>
                                                 <div className="w-full lg:w-7/12 bg-white p-5 rounded-lg lg:rounded-l-none mx-auto">
                                                     <h3 className="pt-4 text-xl text-center">Add Semester</h3>
-                                                    <form onSubmit={onCreateSemester.bind(this, userToken, userID)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
+                                                    <form onSubmit={onCreateSemester.bind(this, userToken, userID, dispatch)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
                                                         <div className="mb-4">
                                                             <label className="block mb-2 text-md font-bold text-gray-700" htmlFor="email">
                                                                 Semester Name

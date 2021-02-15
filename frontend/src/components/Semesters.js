@@ -2,11 +2,13 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from 'react'
 import Semester from './Semester'
 import UserConsumer from "../Context";
+import UserContext from "../Context"
 
 var Kucukdevapi = require('kucukdevapi');
 
-const Semesters = () => {
+const Semesters = (props) => {
     const [semesters, setSemesters] = useState([])
+    const [refresh, setRefresh] = useState(0);
     const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
 
     useEffect(() => {
@@ -19,12 +21,14 @@ const Semesters = () => {
         apiInstance.listSemestersOfUser(uid, (error, data, response) => {
             if (error) {
                 console.error(error);
+                // const resErr = String(error).split(" ")
+                // if (resErr[1] === "Unauthorized") props.history.push("/signin")
             } else {
                 console.log('API called successfully. Returned data: ' + data);
                 setSemesters(data)
             }
         });
-    }, [])
+    }, [refresh])
 
     const deleteSemester = (id) => {
 
@@ -41,7 +45,7 @@ const Semesters = () => {
             } else {
                 console.log('API called successfully. Returned data: ' + data);
             }
-            window.location.reload()
+            setRefresh((x) => x + 1);
         });
     }
 

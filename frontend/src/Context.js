@@ -19,6 +19,11 @@ const reducer = (state, action) => {
                 userEmail: action.payload.email,
                 currentSemester: action.payload.currentSemester
             }
+        case "SET_FIRST_SEMESTER":
+            localStorage.setItem("CURRENT_SEMESTER", JSON.stringify({ currentSemester: action.payload.id }))
+            return {
+                currentSemester: action.payload.id
+            }
         case "SET_CURRENT_SEMESTER":
             localStorage.setItem("CURRENT_SEMESTER", JSON.stringify({ currentSemester: action.payload.currentSemester }))
             return {

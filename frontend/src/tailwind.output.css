@@ -79,10 +79,6 @@ hr {
   color: inherit; /* 2 */
 }
 
-.dropdown:hover .dropdown-menu {
-  display: block;
-}
-
 /*
 Text-level semantics
 ====================

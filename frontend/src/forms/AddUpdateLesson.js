@@ -27,16 +27,6 @@ const AddLesson = (props) => {
     let sid = CURRENT_SEMESTER.currentSemester;
 
     useEffect(() => {
-        let apiInstance = new Kucukdevapi.SemestersApi();
-        apiInstance.getSingleSemester(uid, sid, (error, data, response) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('API called successfully. Returned data: ' + data);
-                setSemester(data)
-            }
-        });
-
         if (currentLessonID) {
             let apiInstance = new Kucukdevapi.LessonsApi();
             let lid = currentLessonID; // String | 
@@ -49,9 +39,29 @@ const AddLesson = (props) => {
                     setAbsenceLimit(data.absenceLimit)
                     setLessonName(data.name)
                     setInstructorName(data.instructor)
+
+                    const currentSlots = []
+                    for (let i = 0; i < data.slots.length; i++) {
+                        const resCur = `${data.slots[i][0]},${data.slots[i][1]}`
+                        currentSlots.push(resCur)
+                    }
+
+                    setSlots(currentSlots)
                 }
             });
         }
+
+        let apiInstance = new Kucukdevapi.SemestersApi();
+        apiInstance.getSingleSemester(uid, sid, (error, data, response) => {
+            if (error) {
+                console.error(error);
+            } else {
+                console.log('API called successfully. Returned data: ' + data);
+                setSemester(data)
+            }
+        });
+
+
     }, [])
 
     const selectSlots = (newSlot) => {
@@ -62,7 +72,7 @@ const AddLesson = (props) => {
         }
     }
 
-    const days = ["M", "Tu", "W", "Th", "F"]
+    // const days = ["M", "Tu", "W", "Th", "F"]
 
     const setLessonSlots = () => {
         // If slots didn't selected in order
@@ -79,7 +89,7 @@ const AddLesson = (props) => {
         const lessonSlots = []
         for (let index = 0; index < slots.length; index++) {
             const resSlot = (slots[index]).split(",")
-            const newSlot = [days[resSlot[0]], resSlot[1]]
+            const newSlot = [resSlot[0], resSlot[1]]
             lessonSlots.push(newSlot)
         }
 
@@ -142,11 +152,11 @@ const AddLesson = (props) => {
     for (let index = 1; index <= semester.slotCount; index++) {
         scheduleRows.push(<tr key={index}>
             <td className="px-6 py-1 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{hour}</td>
-            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`0,${index}`)} type="checkbox"></input></td>
-            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`1,${index}`)} type="checkbox"></input></td>
-            <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`2,${index}`)} type="checkbox"></input></td>
-            <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`3,${index}`)} type="checkbox"></input></td>
-            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`4,${index}`)} type="checkbox"></input></td>
+            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`0,${index}`)} defaultChecked={slots.includes(`0,${index}`)} type="checkbox"></input></td>
+            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`1,${index}`)} defaultChecked={slots.includes(`1,${index}`)} type="checkbox"></input></td>
+            <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`2,${index}`)} defaultChecked={slots.includes(`2,${index}`)} type="checkbox"></input></td>
+            <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`3,${index}`)} defaultChecked={slots.includes(`3,${index}`)} type="checkbox"></input></td>
+            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`4,${index}`)} defaultChecked={slots.includes(`4,${index}`)} type="checkbox"></input></td>
         </tr >);
 
         startHour += periodHour
