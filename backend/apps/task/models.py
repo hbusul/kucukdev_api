@@ -109,7 +109,7 @@ class SemesterModel(BaseModel):
         }
 
 
-class UpdateSemesterModel(BaseModel):
+class UpdateUserSemesterModel(BaseModel):
     name: Optional[str]
     startDate: Optional[date]
     endDate: Optional[date]

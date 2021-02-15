@@ -3,7 +3,13 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import List
 
-from .models import SemesterModel, UpdateSemesterModel, SemesterAPIModel, Message
+from .models import (
+    SemesterModel,
+    UpdateSemesterModel,
+    SemesterAPIModel,
+    UpdateUserSemesterModel,
+    Message,
+)
 from apps.task import models
 
 router = APIRouter()
@@ -43,27 +49,39 @@ async def create_semester(
                 )
             ) is not None:
                 for semester in created_semester["semesters"]:
-                    sid = semester["_id"]
-                    lessons_url = (
-                        f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
-                    )
-                    semesterAPI = SemesterAPIModel(
-                        id=semester["_id"],
-                        name=semester["name"],
-                        startDate=semester["startDate"],
-                        endDate=semester["endDate"],
-                        startHour=semester["startHour"],
-                        dLesson=semester["dLesson"],
-                        dBreak=semester["dBreak"],
-                        slotCount=semester["slotCount"],
-                        lessons_url=lessons_url,
-                    )
+                    if auth_user["currentSemester"] == "null":
+                        set_current_semester = await request.app.mongodb[
+                            "users"
+                        ].update_one(
+                            {"_id": uid},
+                            {"$set": {"currentSemester": semester["_id"]}},
+                        )
 
-                    jsonable_semesterAPI = jsonable_encoder(semesterAPI)
+                    # sid = semester["_id"]
+                    # lessons_url = (
+                    #     f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
+                    # )
+                    # semesterAPI = SemesterAPIModel(
+                    #     id=sid,
+                    #     name=semester["name"],
+                    #     startDate=semester["startDate"],
+                    #     endDate=semester["endDate"],
+                    #     startHour=semester["startHour"],
+                    #     dLesson=semester["dLesson"],
+                    #     dBreak=semester["dBreak"],
+                    #     slotCount=semester["slotCount"],
+                    #     lessons_url=lessons_url,
+                    # )
+
+                    # jsonable_semesterAPI = jsonable_encoder(semesterAPI)
+
+                    created_semester = await request.app.mongodb["users"].find_one(
+                        {"_id": uid}
+                    )
 
                     return JSONResponse(
                         status_code=status.HTTP_200_OK,
-                        content=jsonable_semesterAPI,
+                        content=created_semester["semesters"],
                     )
 
         return JSONResponse(
@@ -102,7 +120,7 @@ async def list_semesters(
                 sid = semester["_id"]
                 lessons_url = f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
                 semesterAPI = SemesterAPIModel(
-                    id=semester["_id"],
+                    id=sid,
                     name=semester["name"],
                     startDate=semester["startDate"],
                     endDate=semester["endDate"],
@@ -153,7 +171,7 @@ async def show_semester(
                 sid = semester["_id"]
                 lessons_url = f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
                 semesterAPI = SemesterAPIModel(
-                    id=semester["_id"],
+                    id=sid,
                     name=semester["name"],
                     startDate=semester["startDate"],
                     endDate=semester["endDate"],
@@ -195,7 +213,7 @@ async def update_semester(
     uid: str,
     sid: str,
     request: Request,
-    semester: UpdateSemesterModel = Body(...),
+    semester: UpdateUserSemesterModel = Body(...),
     token: str = Depends(models.oauth2_scheme),
 ):
     """Update a semester with given userID and semesterID"""
@@ -233,7 +251,7 @@ async def update_semester(
                             f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
                         )
                         semesterAPI = SemesterAPIModel(
-                            id=semester["_id"],
+                            id=sid,
                             name=semester["name"],
                             startDate=semester["startDate"],
                             endDate=semester["endDate"],
@@ -266,6 +284,7 @@ async def update_semester(
     operation_id="deleteSemester",
     response_model=SemesterAPIModel,
     responses={
+        405: {"model": Message},
         404: {"model": Message},
         403: {"model": Message},
         401: {"model": Message},
@@ -283,9 +302,24 @@ async def delete_semester(
             {"_id": uid, "semesters._id": sid}
         )
 
+        if auth_user["currentSemester"] == sid:
+            return JSONResponse(
+                status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                content={"message": "Current semester cannot be deleted"},
+            )
+
         update_result = await request.app.mongodb["users"].update_one(
             {"_id": uid}, {"$pull": {"semesters": {"_id": sid}}}
         )
+
+        if (
+            created_semester := await request.app.mongodb["users"].find_one(
+                {"_id": uid}, {"semesters": {"$slice": -1}}
+            )
+        ) is None:
+            print(create_semester["semesters"])
+
+        print("not")
 
         if update_result.modified_count == 1:
             for semester in find_user["semesters"]:
@@ -295,7 +329,7 @@ async def delete_semester(
                         f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
                     )
                     semesterAPI = SemesterAPIModel(
-                        id=semester["_id"],
+                        id=sid,
                         name=semester["name"],
                         startDate=semester["startDate"],
                         endDate=semester["endDate"],
