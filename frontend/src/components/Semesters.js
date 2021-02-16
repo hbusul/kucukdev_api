@@ -11,13 +11,15 @@ const Semesters = (props) => {
     const [refresh, setRefresh] = useState(0);
     const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
 
+    let defaultClient = Kucukdevapi.ApiClient.instance;
+    let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
+    OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
+    let uid = USER_LOGIN.userID;
+
     useEffect(() => {
-        let defaultClient = Kucukdevapi.ApiClient.instance;
-        let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-        OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
+
 
         let apiInstance = new Kucukdevapi.SemestersApi();
-        let uid = USER_LOGIN.userID;
         apiInstance.listSemestersOfUser(uid, (error, data, response) => {
             if (error) {
                 console.error(error);
@@ -32,12 +34,7 @@ const Semesters = (props) => {
 
     const deleteSemester = (id) => {
 
-        let defaultClient = Kucukdevapi.ApiClient.instance;
-        let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-        OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
-
         let apiInstance = new Kucukdevapi.SemestersApi();
-        let uid = USER_LOGIN.userID;
         let sid = id;
         apiInstance.deleteSemester(uid, sid, (error, data, response) => {
             if (error) {
@@ -51,12 +48,7 @@ const Semesters = (props) => {
 
     const setCurrentSemester = (id, dispatch) => {
 
-        let defaultClient = Kucukdevapi.ApiClient.instance;
-        let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-        OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
-
         let apiInstance = new Kucukdevapi.UsersApi();
-        let uid = USER_LOGIN.userID;
         let updateSemesterModel = new Kucukdevapi.UpdateSemesterModel(id);
         apiInstance.updateCurrentSemester(uid, updateSemesterModel, (error, data, response) => {
             if (error) {
@@ -84,7 +76,7 @@ const Semesters = (props) => {
                                 USER_LOGIN.isLogin ?
                                     <div className="flex flex-col my-8 xl:m-16 xl:mx-40">
                                         <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Your Semesters</h1>
-                                        <div className="my-2 py-2 overflow-x-auto sm:px-6 pr-10 lg:px-8">
+                                        <div className="my-2 py-2 overflow-x-auto sm:px-6 lg:px-8">
                                             <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
                                                 <table className="min-w-full">
                                                     <thead>

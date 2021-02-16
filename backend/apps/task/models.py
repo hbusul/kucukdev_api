@@ -20,7 +20,7 @@ class LessonModel(BaseModel):
     name: str = Field(...)
     instructor: str = Field(...)
     absenceLimit: int = Field(...)
-    slots: List[List[str]] = Field(...)
+    slots: List[str] = Field(...)
     absences: List[str] = []
 
     class Config:
@@ -30,7 +30,7 @@ class LessonModel(BaseModel):
                 "name": "EE203",
                 "instructor": "Ali Veli",
                 "absenceLimit": 0,
-                "slots": [["W", "7"], ["W", "8"]],
+                "slots": ["2,7", "2,8"],
             }
         }
 
@@ -40,7 +40,7 @@ class UpdateLessonModel(BaseModel):
     name: str = Field(...)
     instructor: str = Field(...)
     absenceLimit: int = Field(...)
-    slots: List[List[str]] = Field(...)
+    slots: List[str] = Field(...)
 
     class Config:
         schema_extra = {
@@ -48,7 +48,7 @@ class UpdateLessonModel(BaseModel):
                 "name": "EE203",
                 "instructor": "Ali Veli",
                 "absenceLimit": 0,
-                "slots": [["W", "7"], ["W", "8"]],
+                "slots": ["2,7", "2,8"],
             }
         }
 
@@ -60,7 +60,7 @@ class AbsenceModel(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "absence": "1,0,2,2016-02-18",
+                "absence": "1,0,2",
             }
         }
 
@@ -74,7 +74,7 @@ class SemesterModel(BaseModel):
     dLesson: int = Field(...)
     dBreak: int = Field(...)
     slotCount: int = Field(...)
-    lessons: List[Dict[str, LessonModel]] = []
+    lessons: List[LessonModel] = []
 
     class Config:
         allow_population_by_field_name = True

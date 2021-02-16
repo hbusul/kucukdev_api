@@ -39,14 +39,7 @@ const AddLesson = (props) => {
                     setAbsenceLimit(data.absenceLimit)
                     setLessonName(data.name)
                     setInstructorName(data.instructor)
-
-                    const currentSlots = []
-                    for (let i = 0; i < data.slots.length; i++) {
-                        const resCur = `${data.slots[i][0]},${data.slots[i][1]}`
-                        currentSlots.push(resCur)
-                    }
-
-                    setSlots(currentSlots)
+                    setSlots(data.slots)
                 }
             });
         }
@@ -72,8 +65,6 @@ const AddLesson = (props) => {
         }
     }
 
-    // const days = ["M", "Tu", "W", "Th", "F"]
-
     const setLessonSlots = () => {
         // If slots didn't selected in order
         for (let i = 0; i < slots.length; i++) {
@@ -85,24 +76,15 @@ const AddLesson = (props) => {
                 }
             }
         }
-
-        const lessonSlots = []
-        for (let index = 0; index < slots.length; index++) {
-            const resSlot = (slots[index]).split(",")
-            const newSlot = [resSlot[0], resSlot[1]]
-            lessonSlots.push(newSlot)
-        }
-
-        return lessonSlots
     }
 
     const addLesson = (e) => {
         e.preventDefault()
 
-        const lessonSlots = setLessonSlots()
+        setLessonSlots()
 
         let apiInstance = new Kucukdevapi.LessonsApi();
-        let lessonModel = new Kucukdevapi.LessonModel(lessonName, instrutcorName, absenceLimit, lessonSlots);
+        let lessonModel = new Kucukdevapi.LessonModel(lessonName, instrutcorName, absenceLimit, slots);
         apiInstance.createLesson(uid, sid, lessonModel, (error, data, response) => {
             if (error) {
                 console.error(error);
@@ -117,16 +99,11 @@ const AddLesson = (props) => {
     const updateLesson = (e) => {
         e.preventDefault()
 
-        const lessonSlots = setLessonSlots()
-        let defaultClient = Kucukdevapi.ApiClient.instance;
-        let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-        OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
+        setLessonSlots()
 
         let apiInstance = new Kucukdevapi.LessonsApi();
-        let uid = USER_LOGIN.userID;
-        let sid = CURRENT_SEMESTER.currentSemester;
         let lid = currentLessonID;
-        let updateLessonModel = new Kucukdevapi.UpdateLessonModel(lessonName, instrutcorName, absenceLimit, lessonSlots);
+        let updateLessonModel = new Kucukdevapi.UpdateLessonModel(lessonName, instrutcorName, absenceLimit, slots);
         apiInstance.updateLesson(uid, sid, lid, updateLessonModel, (error, data, response) => {
             if (error) {
                 console.error(error);
