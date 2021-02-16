@@ -35,7 +35,7 @@ const Navbar = () => {
 
                                                 <ul className="dropdown-menu absolute hidden text-gray-700 pt-1 whitespace-nowrap">
                                                     <Link to="/lessons/show-lessons" className="bg-gray-100 hover:bg-gray-200 py-2 px-8 block text-gray-800 text-sm font-semibold hover:text-purple-600 mb-1">Show Lessons</Link>
-                                                    <a href="/lessons/add-lesson" className="bg-gray-100 hover:bg-gray-200 py-2 px-8 block text-gray-800 text-sm font-semibold hover:text-purple-600 mb-1">Add Lesson</a>
+                                                    <Link to="/lessons/add-lesson" className="bg-gray-100 hover:bg-gray-200 py-2 px-8 block text-gray-800 text-sm font-semibold hover:text-purple-600 mb-1">Add Lesson</Link>
                                                     <Link to="/lessons/add-from-uis" className="bg-gray-100 hover:bg-gray-200 py-2 px-8 block text-gray-800 text-sm font-semibold hover:text-purple-600 mb-1">Add from UIS</Link>
                                                 </ul>
                                             </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from "react-router-dom";
 
 var Kucukdevapi = require('kucukdevapi');
 
@@ -6,7 +7,7 @@ var Kucukdevapi = require('kucukdevapi');
 const AddLesson = (props) => {
     const [semester, setSemester] = useState({})
     const [calculateModal, setCalculateModal] = useState(false);
-    const [lesson, setLesson] = useState()
+    const [dummy, setDummy] = useState(false)
 
     const [slots, setSlots] = useState([])
     const [lessonName, setLessonName] = useState("")
@@ -15,6 +16,7 @@ const AddLesson = (props) => {
     const [numOfWeeks, setNumOfWeeks] = useState(14)
     const [lessonPerWeek, setLessonPerWeek] = useState(5)
     const [maxPercentage, setMaxPercentage] = useState(30)
+    const [scheduleRows, setScheduleRows] = useState([])
 
     const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
     const CURRENT_SEMESTER = JSON.parse(localStorage.getItem("CURRENT_SEMESTER"))
@@ -35,13 +37,15 @@ const AddLesson = (props) => {
                     console.error(error);
                 } else {
                     console.log('API called successfully. Returned data: ' + data);
-                    setLesson(data)
                     setAbsenceLimit(data.absenceLimit)
                     setLessonName(data.name)
                     setInstructorName(data.instructor)
                     setSlots(data.slots)
                 }
             });
+        } else {
+            setSlots([])
+            setAbsenceLimit(0)
         }
 
         let apiInstance = new Kucukdevapi.SemestersApi();
@@ -54,8 +58,50 @@ const AddLesson = (props) => {
             }
         });
 
+    }, [currentLessonID, uid, sid])
 
-    }, [])
+
+    useEffect(() => {
+        let hour = String(semester.startHour)
+        let resStart = hour.split(".")
+        let startHour = Number(resStart[0])
+        let startMin = Number(resStart[1])
+
+        const period = semester.dLesson + semester.dBreak
+        const periodHour = parseInt(period / 60)
+        const periodMin = period % 60
+
+        const scheduleArray = []
+        if (!currentLessonID || slots.length !== 0) {
+            for (let index = 1; index <= semester.slotCount; index++) {
+                scheduleArray.push(<tr key={index}>
+                    <td className="px-6 py-1 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{hour}</td>
+                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`0,${index}`)} checked={slots.includes(`0,${index}`)} type="checkbox"></input></td>
+                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`1,${index}`)} checked={slots.includes(`1,${index}`)} type="checkbox"></input></td>
+                    <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`2,${index}`)} checked={slots.includes(`2,${index}`)} type="checkbox"></input></td>
+                    <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`3,${index}`)} checked={slots.includes(`3,${index}`)} type="checkbox"></input></td>
+                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`4,${index}`)} checked={slots.includes(`4,${index}`)} type="checkbox"></input></td>
+                </tr >);
+
+                startHour += periodHour
+                startMin += periodMin
+
+                if (startMin >= 60) {
+                    startHour += 1
+                    startMin = startMin % 60
+                }
+
+                if (startMin < 10) {
+                    hour = startHour + ".0" + startMin
+                } else {
+                    hour = startHour + "." + startMin
+                }
+            }
+        }
+
+        setScheduleRows(scheduleArray)
+
+    }, [slots, semester, currentLessonID])
 
     const selectSlots = (newSlot) => {
         if (slots.includes(newSlot)) {
@@ -116,59 +162,23 @@ const AddLesson = (props) => {
     }
 
 
-    let hour = String(semester.startHour)
-    let resStart = hour.split(".")
-    let startHour = Number(resStart[0])
-    let startMin = Number(resStart[1])
-
-    const period = semester.dLesson + semester.dBreak
-    const periodHour = parseInt(period / 60)
-    const periodMin = period % 60
-
-    const scheduleRows = [];
-    for (let index = 1; index <= semester.slotCount; index++) {
-        scheduleRows.push(<tr key={index}>
-            <td className="px-6 py-1 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{hour}</td>
-            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`0,${index}`)} defaultChecked={slots.includes(`0,${index}`)} type="checkbox"></input></td>
-            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`1,${index}`)} defaultChecked={slots.includes(`1,${index}`)} type="checkbox"></input></td>
-            <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`2,${index}`)} defaultChecked={slots.includes(`2,${index}`)} type="checkbox"></input></td>
-            <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`3,${index}`)} defaultChecked={slots.includes(`3,${index}`)} type="checkbox"></input></td>
-            <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`4,${index}`)} defaultChecked={slots.includes(`4,${index}`)} type="checkbox"></input></td>
-        </tr >);
-
-        startHour += periodHour
-        startMin += periodMin
-
-        if (startMin >= 60) {
-            startHour += 1
-            startMin = startMin % 60
-        }
-
-        if (startMin < 10) {
-            hour = startHour + ".0" + startMin
-        } else {
-            hour = startHour + "." + startMin
-        }
-    }
-
-
     return (
         <div className="flex flex-col my-8 xl:mx-40">
             <div className="flex flex-row justify-around mb-4">
-                <a href="/lessons/show-lessons" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Show Lessons</a>
-                <a href="/lessons/add-lesson" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Add Lesson</a>
-                <a href="/lessons/add-from-uis" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Add from UIS</a>
+                <Link to="/lessons/show-lessons" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Show Lessons</Link>
+                <Link to="/lessons/add-lesson" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Add Lesson</Link>
+                <Link to="/lessons/add-from-uis" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Add from UIS</Link>
             </div>
             <div className="flex h-full">
                 <div className="flex bg-white shadow-xl rounded flex-col w-full mx-auto mt-2">
                     <div className="w-full flex flex-col md:flex-row">
                         <div
                             className="w-full h-auto lg:block lg:w-7/12 bg-cover rounded-l-lg">
-                            <h1 className="flex justify-center md:justify-start text-2xl ml-4 my-2">{lesson ? "Select Updated Hours" : "Select Hours"}</h1>
+                            <h1 className="flex justify-center md:justify-start text-2xl ml-4 my-2">{currentLessonID ? "Select Updated Hours" : "Select Hours"}</h1>
                             <table className="min-w-full">
                                 <thead>
                                     <tr className="">
-                                        <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">#</th>
+                                        <th className="px-6 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">#</th>
                                         <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Mon</th>
                                         <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Tue</th>
                                         <th className="px-3 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Wed</th>
@@ -185,18 +195,18 @@ const AddLesson = (props) => {
 
                         </div>
                         <div className="w-full lg:w-5/12 bg-white p-5 rounded-lg lg:rounded-l-none mx-auto">
-                            <h3 className="pt-4 text-2xl text-center">{lesson ? "Update Lesson" : "Add Lesson!"}</h3>
-                            <form onSubmit={lesson ? (e) => updateLesson(e) : (e) => addLesson(e)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
+                            <h3 className="pt-4 text-2xl text-center">{currentLessonID ? "Update Lesson" : "Add Lesson!"}</h3>
+                            <form onSubmit={currentLessonID ? (e) => updateLesson(e) : (e) => addLesson(e)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
                                 <div className="mb-4">
                                     <label className="block mb-2 text-base font-bold text-gray-700">
-                                        Leeson Name
-            </label>
+                                        Lesson Name
+                                    </label>
                                     <input
                                         className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                         id="lessonName"
                                         type="text"
                                         placeholder="EE213"
-                                        defaultValue={lesson && lessonName}
+                                        defaultValue={currentLessonID && lessonName}
                                         name="lessonName"
                                         onChange={(e) => setLessonName(e.target.value)}
                                         required
@@ -211,7 +221,7 @@ const AddLesson = (props) => {
                                         id="instructorName"
                                         type="text"
                                         placeholder="John Doe"
-                                        defaultValue={lesson && instrutcorName}
+                                        defaultValue={currentLessonID && instrutcorName}
                                         name="instructorName"
                                         onChange={(e) => setInstructorName(e.target.value)}
                                         required
@@ -245,10 +255,10 @@ const AddLesson = (props) => {
                                 </div>
                                 <div className="mb-6 text-center">
                                     <button
-                                        className={`w-full px-4 py-2 font-bold text-white ${lesson ? "bg-yellow-400 hover:bg-yellow-500" : "bg-blue-500 hover:bg-blue-700"} rounded-full  focus:outline-none focus:shadow-outline`}
+                                        className={`w-full px-4 py-2 font-bold text-white ${currentLessonID ? "bg-yellow-400 hover:bg-yellow-500" : "bg-blue-500 hover:bg-blue-700"} rounded-full  focus:outline-none focus:shadow-outline`}
                                         type="submit"
                                     >
-                                        {lesson ? "Update The Lesson" : "Add The Lesson"}
+                                        {currentLessonID ? "Update The Lesson" : "Add The Lesson"}
                                     </button>
                                 </div>
                                 <hr className="mb-6 border-t" />
