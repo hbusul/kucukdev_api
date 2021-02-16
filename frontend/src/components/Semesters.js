@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from 'react'
 import Semester from './Semester'
 import UserConsumer from "../Context";
-import UserContext from "../Context"
 
 var Kucukdevapi = require('kucukdevapi');
 
@@ -20,7 +19,6 @@ const Semesters = (props) => {
 
     useEffect(() => {
 
-
         let apiInstance = new Kucukdevapi.SemestersApi();
         apiInstance.listSemestersOfUser(uid, (error, data, response) => {
             if (error) {
@@ -32,7 +30,7 @@ const Semesters = (props) => {
                 setSemesters(data)
             }
         });
-    }, [refresh])
+    }, [refresh, uid])
 
     const deleteSemester = (id) => {
 

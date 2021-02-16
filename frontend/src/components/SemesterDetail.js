@@ -14,11 +14,12 @@ const SemesterDetail = (props) => {
     let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
     OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
 
-    let semesterApiInstance = new Kucukdevapi.SemestersApi();
     let uid = USER_LOGIN.userID;
     let sid = semesterID;
 
     useEffect(() => {
+
+        let semesterApiInstance = new Kucukdevapi.SemestersApi();
         semesterApiInstance.getSingleSemester(uid, sid, (error, data, response) => {
             if (error) {
                 console.error(error);
@@ -37,7 +38,7 @@ const SemesterDetail = (props) => {
                 setLessons(data)
             }
         });
-    }, [])
+    }, [uid, sid])
 
     const scheduleHeads = [];
     for (let index = 1; index <= semester.slotCount; index++) {

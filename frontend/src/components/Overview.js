@@ -8,13 +8,13 @@ const Overview = () => {
 
     const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
     const CURRENT_SEMESTER = JSON.parse(localStorage.getItem("CURRENT_SEMESTER"))
+    let defaultClient = Kucukdevapi.ApiClient.instance;
+    let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
+    OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
+    let uid = USER_LOGIN.userID;
+    let sid = CURRENT_SEMESTER.currentSemester;
 
     useEffect(() => {
-        let defaultClient = Kucukdevapi.ApiClient.instance;
-        let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-        OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
-        let uid = USER_LOGIN.userID;
-        let sid = CURRENT_SEMESTER.currentSemester;
 
         let smestersApiInstance = new Kucukdevapi.SemestersApi();
         smestersApiInstance.getSingleSemester(uid, sid, (error, data, response) => {
@@ -37,7 +37,7 @@ const Overview = () => {
         });
 
 
-    }, [])
+    }, [uid, sid])
 
     const colorArray = ["bg-gray-400", "bg-red-600", "bg-yellow-500", "bg-green-600", "bg-blue-300", "bg-indigo-300", "bg-purple-600", "bg-pink-600", "bg-gray-900", "bg-green-900", "bg-indigo-900", "bg-purple-900", "bg-pink-900"]
     let lessonNames = []

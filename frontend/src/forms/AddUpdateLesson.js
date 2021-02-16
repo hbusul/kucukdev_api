@@ -7,7 +7,6 @@ var Kucukdevapi = require('kucukdevapi');
 const AddLesson = (props) => {
     const [semester, setSemester] = useState({})
     const [calculateModal, setCalculateModal] = useState(false);
-    const [dummy, setDummy] = useState(false)
 
     const [slots, setSlots] = useState([])
     const [lessonName, setLessonName] = useState("")
@@ -31,7 +30,7 @@ const AddLesson = (props) => {
     useEffect(() => {
         if (currentLessonID) {
             let apiInstance = new Kucukdevapi.LessonsApi();
-            let lid = currentLessonID; // String | 
+            let lid = currentLessonID;
             apiInstance.getSingleLesson(uid, sid, lid, (error, data, response) => {
                 if (error) {
                     console.error(error);
@@ -76,11 +75,11 @@ const AddLesson = (props) => {
             for (let index = 1; index <= semester.slotCount; index++) {
                 scheduleArray.push(<tr key={index}>
                     <td className="px-6 py-1 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{hour}</td>
-                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`0,${index}`)} checked={slots.includes(`0,${index}`)} type="checkbox"></input></td>
-                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`1,${index}`)} checked={slots.includes(`1,${index}`)} type="checkbox"></input></td>
-                    <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`2,${index}`)} checked={slots.includes(`2,${index}`)} type="checkbox"></input></td>
-                    <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onClick={() => selectSlots(`3,${index}`)} checked={slots.includes(`3,${index}`)} type="checkbox"></input></td>
-                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onClick={() => selectSlots(`4,${index}`)} checked={slots.includes(`4,${index}`)} type="checkbox"></input></td>
+                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onChange={() => selectSlots(`0,${index}`)} checked={slots.includes(`0,${index}`)} type="checkbox"></input></td>
+                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onChange={() => selectSlots(`1,${index}`)} checked={slots.includes(`1,${index}`)} type="checkbox"></input></td>
+                    <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onChange={() => selectSlots(`2,${index}`)} checked={slots.includes(`2,${index}`)} type="checkbox"></input></td>
+                    <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onChange={() => selectSlots(`3,${index}`)} checked={slots.includes(`3,${index}`)} type="checkbox"></input></td>
+                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onChange={() => selectSlots(`4,${index}`)} checked={slots.includes(`4,${index}`)} type="checkbox"></input></td>
                 </tr >);
 
                 startHour += periodHour

@@ -13,15 +13,15 @@ const LessonDetail = (props) => {
     const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
     const CURRENT_SEMESTER = JSON.parse(localStorage.getItem("CURRENT_SEMESTER"))
 
+    let defaultClient = Kucukdevapi.ApiClient.instance;
+    let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
+    OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
+
+    let uid = USER_LOGIN.userID;
+    let sid = CURRENT_SEMESTER.currentSemester;
 
     useEffect(() => {
-        let defaultClient = Kucukdevapi.ApiClient.instance;
-        let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-        OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
-
         let apiInstance = new Kucukdevapi.LessonsApi();
-        let uid = USER_LOGIN.userID;
-        let sid = CURRENT_SEMESTER.currentSemester;
         let lid = currentLessonID;
         apiInstance.getSingleLesson(uid, sid, lid, (error, data, response) => {
             if (error) {
@@ -32,17 +32,11 @@ const LessonDetail = (props) => {
                 setAbsences(data.absences)
             }
         });
-    }, [])
+    }, [currentLessonID, uid, sid])
 
     const deleteLesson = (id) => {
 
-        let defaultClient = Kucukdevapi.ApiClient.instance;
-        let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-        OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
-
         let apiInstance = new Kucukdevapi.LessonsApi();
-        let uid = USER_LOGIN.userID;
-        let sid = CURRENT_SEMESTER.currentSemester;
         let lid = id;
         apiInstance.deleteLesson(uid, sid, lid, (error, data, response) => {
             if (error) {
