@@ -39,13 +39,16 @@ const Overview = () => {
 
     }, [])
 
+    const colorArray = ["bg-gray-400", "bg-red-600", "bg-yellow-500", "bg-green-600", "bg-blue-300", "bg-indigo-300", "bg-purple-600", "bg-pink-600", "bg-gray-900", "bg-green-900", "bg-indigo-900", "bg-purple-900", "bg-pink-900"]
     let lessonNames = []
     let lessonSlots = []
+    let lessonColors = []
 
     for (let i = 0; i < lessons.length; i++) {
         for (let j = 0; j < (lessons[i].slots).length; j++) {
             lessonNames.push(lessons[i].name)
             lessonSlots.push(lessons[i].slots[j])
+            lessonColors.push(colorArray[i])
         }
     }
 
@@ -62,11 +65,11 @@ const Overview = () => {
     for (let index = 1; index <= semester.slotCount; index++) {
         scheduleRows.push(<tr key={index}>
             <td className="px-6 py-1 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{hour}</td>
-            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`0,${index}`) && "bg-blue-300"}`}>{lessonSlots.includes(`0,${index}`) && `${lessonNames[lessonSlots.indexOf(`0,${index}`)]}`}</td>
-            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`1,${index}`) && "bg-blue-300"}`}>{lessonSlots.includes(`1,${index}`) && `${lessonNames[lessonSlots.indexOf(`1,${index}`)]}`}</td>
-            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`2,${index}`) && "bg-blue-300"}`}>{lessonSlots.includes(`2,${index}`) && `${lessonNames[lessonSlots.indexOf(`2,${index}`)]}`}</td>
-            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`3,${index}`) && "bg-blue-300"}`}>{lessonSlots.includes(`3,${index}`) && `${lessonNames[lessonSlots.indexOf(`3,${index}`)]}`}</td>
-            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`4,${index}`) && "bg-blue-300"}`}>{lessonSlots.includes(`4,${index}`) && `${lessonNames[lessonSlots.indexOf(`4,${index}`)]}`}</td>
+            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`0,${index}`) && `${lessonColors[lessonSlots.indexOf(`0,${index}`)]}`}`}>{lessonSlots.includes(`0,${index}`) && `${lessonNames[lessonSlots.indexOf(`0,${index}`)]}`}</td>
+            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`1,${index}`) && `${lessonColors[lessonSlots.indexOf(`1,${index}`)]}`}`}>{lessonSlots.includes(`1,${index}`) && `${lessonNames[lessonSlots.indexOf(`1,${index}`)]}`}</td>
+            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`2,${index}`) && `${lessonColors[lessonSlots.indexOf(`2,${index}`)]}`}`}>{lessonSlots.includes(`2,${index}`) && `${lessonNames[lessonSlots.indexOf(`2,${index}`)]}`}</td>
+            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`3,${index}`) && `${lessonColors[lessonSlots.indexOf(`3,${index}`)]}`}`}>{lessonSlots.includes(`3,${index}`) && `${lessonNames[lessonSlots.indexOf(`3,${index}`)]}`}</td>
+            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`4,${index}`) && `${lessonColors[lessonSlots.indexOf(`4,${index}`)]}`}`}>{lessonSlots.includes(`4,${index}`) && `${lessonNames[lessonSlots.indexOf(`4,${index}`)]}`}</td>
         </tr >);
 
         startHour += periodHour
