@@ -31,6 +31,12 @@ async def create_lesson(
 
     lesson = jsonable_encoder(lesson)
 
+    if lesson["name"] == "" or lesson["instructor"] == "":
+        return JSONResponse(
+            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+            content={"message": "Lesson and instructor name must be filled"},
+        )
+
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:

@@ -35,6 +35,20 @@ async def create_semester(
     """Create a semester for a user with given userID"""
 
     semester = jsonable_encoder(semester)
+
+    if (
+        semester["dLesson"] < 0
+        or semester["dBreak"] < 0
+        or semester["slotCount"] < 3
+        or semester["slotCount"] > 15
+    ):
+        return JSONResponse(
+            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+            content={
+                "message": "Lesson, break duration must be > 0 and slot count must be < 15 and > 3"
+            },
+        )
+
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:

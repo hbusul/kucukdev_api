@@ -66,6 +66,7 @@ const AddSemester = ({ history }) => {
                                                                 placeholder="2020-2021 Spring"
                                                                 name="name"
                                                                 onChange={(e) => setSemesterName(e.target.value)}
+                                                                required
                                                             />
                                                         </div>
                                                         <div className="mb-4 md:flex md:justify-between">
@@ -80,6 +81,7 @@ const AddSemester = ({ history }) => {
                                                                     placeholder="2018-05-18"
                                                                     name="startDate"
                                                                     onChange={(e) => setStartDate(e.target.value)}
+                                                                    required
                                                                 />
                                                             </div>
                                                             <div className="md:w-1/2  md:ml-2 sm:w-full">
@@ -93,6 +95,7 @@ const AddSemester = ({ history }) => {
                                                                     placeholder="2018-02-05"
                                                                     name="endDate"
                                                                     onChange={(e) => setEndDate(e.target.value)}
+                                                                    required
                                                                 />
                                                             </div>
                                                         </div>
@@ -108,6 +111,7 @@ const AddSemester = ({ history }) => {
                                                                     placeholder="08.10"
                                                                     name="startHour"
                                                                     onChange={(e) => setStartHour(e.target.value)}
+                                                                    required
                                                                 />
                                                             </div>
                                                             <div className="md:w-1/2  md:ml-2 sm:w-full">
@@ -123,6 +127,7 @@ const AddSemester = ({ history }) => {
                                                                     min="3"
                                                                     max="15"
                                                                     onChange={(e) => setSlotCount(e.target.value)}
+                                                                    required
                                                                 />
                                                             </div>
                                                         </div>
@@ -138,8 +143,8 @@ const AddSemester = ({ history }) => {
                                                                     placeholder="50"
                                                                     name="dLesson"
                                                                     min="1"
-                                                                    max="60"
                                                                     onChange={(e) => setDLesson(e.target.value)}
+                                                                    required
                                                                 />
                                                             </div>
                                                             <div className="md:w-1/2  md:ml-2 sm:w-full">
@@ -153,8 +158,8 @@ const AddSemester = ({ history }) => {
                                                                     placeholder="10"
                                                                     name="dBreak"
                                                                     min="1"
-                                                                    max="60"
                                                                     onChange={(e) => setDBreak(e.target.value)}
+                                                                    required
                                                                 />
                                                             </div>
                                                         </div>

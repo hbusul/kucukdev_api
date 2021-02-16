@@ -222,6 +222,7 @@ const AddLesson = (props) => {
                                         defaultValue={lesson && lessonName}
                                         name="lessonName"
                                         onChange={(e) => setLessonName(e.target.value)}
+                                        required
                                     />
                                 </div>
                                 <div className="mb-4">
@@ -236,6 +237,7 @@ const AddLesson = (props) => {
                                         defaultValue={lesson && instrutcorName}
                                         name="instructorName"
                                         onChange={(e) => setInstructorName(e.target.value)}
+                                        required
                                     />
                                 </div>
                                 <div className="mb-4">
