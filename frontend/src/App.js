@@ -14,6 +14,7 @@ import AddLesson from './forms/AddUpdateLesson';
 import AddUISLesson from './components/AddUISLesson';
 import ShowLessons from './components/Lessons';
 import LessonDetail from './components/LessonDetail';
+import Overview from './components/Overview';
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
 
         <Switch>
           <Route exact path="/" component={Home} />
+          <Route exact path="/overview" component={Overview} />
           <Route exact path="/semesters" component={Semesters} />
           <Route exact path="/lessons" component={ShowLessons} />
           <Route exact path="/signin" component={Login} />
