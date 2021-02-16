@@ -9,6 +9,8 @@ var Kucukdevapi = require('kucukdevapi');
 const Semesters = (props) => {
     const [semesters, setSemesters] = useState([])
     const [refresh, setRefresh] = useState(0);
+    const [start, setStart] = useState(0)
+    const [end, setEnd] = useState(5)
     const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
 
     let defaultClient = Kucukdevapi.ApiClient.instance;
@@ -63,6 +65,20 @@ const Semesters = (props) => {
     }
 
 
+    const setPrevious = () => {
+        if (start !== 0) {
+            setStart(start - 5)
+            setEnd(end - 5)
+        }
+    }
+
+    const setNext = () => {
+        if ((start + 5) < semesters.length) {
+            setStart(start + 5)
+            setEnd(end + 5)
+        }
+    }
+
 
     return (
         <UserConsumer>
@@ -91,7 +107,7 @@ const Semesters = (props) => {
                                                     </thead>
                                                     <tbody className="bg-white  ">
                                                         {
-                                                            semesters.map(semester => {
+                                                            semesters.slice(start, end).map(semester => {
                                                                 return (
                                                                     <Semester
                                                                         key={semester.id}
@@ -110,29 +126,29 @@ const Semesters = (props) => {
                                                     <div>
                                                         <p className="text-sm leading-5 text-blue-700">
                                                             Showing
-                                                <span className="font-medium mx-1">1</span>
-                                                to
-                                                <span className="font-medium mx-1">5</span>
-                                                of
-                                                <span className="font-medium mx-1">9</span>
-                                                results
-                                            </p>
+                                                            <span className="font-medium mx-1">{start + 1}</span>
+                                                            to
+                                                            <span className="font-medium mx-1">{end < semesters.length ? end : semesters.length}</span>
+                                                            of
+                                                            <span className="font-medium mx-1">{semesters.length}</span>
+                                                            results
+                                                        </p>
                                                     </div>
                                                     <div>
                                                         <nav className="relative z-0 inline-flex shadow-sm">
                                                             <div>
-                                                                <a href="/" className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150" aria-label="Previous">
+                                                                <button onClick={() => setPrevious()} className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150" aria-label="Previous">
                                                                     <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                                         <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                                                                     </svg>
-                                                                </a>
+                                                                </button>
                                                             </div>
                                                             <div v-if="pagination.current_page < pagination.last_page">
-                                                                <a href="/" className="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150" aria-label="Next">
+                                                                <button onClick={() => setNext()} className="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150" aria-label="Next">
                                                                     <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                                         <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                                                                     </svg>
-                                                                </a>
+                                                                </button>
                                                             </div>
                                                         </nav>
                                                     </div>
