@@ -20,9 +20,9 @@ const reducer = (state, action) => {
                 currentSemester: action.payload.currentSemester
             }
         case "SET_FIRST_SEMESTER":
-            localStorage.setItem("CURRENT_SEMESTER", JSON.stringify({ currentSemester: action.payload.id }))
+            localStorage.setItem("CURRENT_SEMESTER", JSON.stringify({ currentSemester: action.payload._id }))
             return {
-                currentSemester: action.payload.id
+                currentSemester: action.payload._id
             }
         case "SET_CURRENT_SEMESTER":
             localStorage.setItem("CURRENT_SEMESTER", JSON.stringify({ currentSemester: action.payload.currentSemester }))

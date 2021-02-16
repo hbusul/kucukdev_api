@@ -19,7 +19,7 @@ router = APIRouter()
     "/{uid}/semesters",
     response_description="Add new semester",
     operation_id="createSemester",
-    response_model=SemesterAPIModel,
+    response_model=List[SemesterModel],
     responses={
         404: {"model": Message},
         403: {"model": Message},
