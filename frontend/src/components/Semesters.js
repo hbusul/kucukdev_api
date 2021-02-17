@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from 'react'
 import Semester from './Semester'
 import UserConsumer from "../Context";
+import Lessons from "./Lessons";
 
 var Kucukdevapi = require('kucukdevapi');
 
@@ -44,6 +45,11 @@ const Semesters = (props) => {
             }
             setRefresh((x) => x + 1);
         });
+
+        if (Lessons.length % 5 === 0 && start !== 0) {
+            setStart(start - 5)
+            setEnd(end - 5)
+        }
     }
 
     const setCurrentSemester = (id, dispatch) => {

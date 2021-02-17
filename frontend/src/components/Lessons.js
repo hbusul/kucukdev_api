@@ -46,6 +46,11 @@ const Lessons = () => {
             }
             setRefresh((x) => x + 1);
         });
+
+        if (Lessons.length % 5 === 0 && start !== 0) {
+            setStart(start - 5)
+            setEnd(end - 5)
+        }
     }
 
     const setPrevious = () => {
