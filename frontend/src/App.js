@@ -15,6 +15,7 @@ import AddUISLesson from './components/AddUISLesson';
 import ShowLessons from './components/Lessons';
 import LessonDetail from './components/LessonDetail';
 import Overview from './components/Overview';
+import Attendance from './components/Attendance.js';
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route exact path="/overview" component={Overview} />
           <Route exact path="/semesters" component={Semesters} />
           <Route exact path="/lessons" component={ShowLessons} />
+          <Route exact path="/attendance" component={Attendance} />
           <Route exact path="/signin" component={Login} />
           <Route exact path="/signup" component={Register} />
           <Route exact path="/add-semester" component={AddSemester} />

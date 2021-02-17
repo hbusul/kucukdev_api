@@ -94,9 +94,9 @@ const Semesters = (props) => {
                         <div>
                             {
                                 USER_LOGIN.isLogin ?
-                                    <div className="flex flex-col my-8 xl:m-16 xl:mx-40">
+                                    <div className="flex flex-col mt-8 xl:mx-40">
                                         <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Your Semesters</h1>
-                                        <div className="my-2 py-2 overflow-x-auto sm:px-6 lg:px-8">
+                                        <div className="mt-2 py-2 overflow-x-auto sm:px-6 lg:px-8">
                                             <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
                                                 <table className="min-w-full">
                                                     <thead>

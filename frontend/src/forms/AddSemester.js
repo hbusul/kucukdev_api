@@ -7,13 +7,16 @@ const AddSemester = ({ history }) => {
     const [semesterName, setSemesterName] = useState("")
     const [startDate, setStartDate] = useState("")
     const [endDate, setEndDate] = useState("")
-    const [startHour, setStartHour] = useState("")
-    const [dLesson, setDLesson] = useState(0)
-    const [dBreak, setDBreak] = useState(0)
-    const [slotCount, setSlotCount] = useState(0)
+    const [startHour, setStartHour] = useState(8)
+    const [startMin, setStartMin] = useState(30)
+    const [dLesson, setDLesson] = useState(50)
+    const [dBreak, setDBreak] = useState(10)
+    const [slotCount, setSlotCount] = useState(14)
 
     const onCreateSemester = async (userToken, userID, dispatch, e) => {
         e.preventDefault();
+
+        const hour = `${startHour}.${startMin}`
 
         let defaultClient = Kucukdevapi.ApiClient.instance;
         let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
@@ -21,7 +24,7 @@ const AddSemester = ({ history }) => {
 
         let apiInstance = new Kucukdevapi.SemestersApi();
         let uid = userID;
-        let semesterModel = new Kucukdevapi.SemesterModel(semesterName, startDate, endDate, startHour, dLesson, dBreak, slotCount);
+        let semesterModel = new Kucukdevapi.SemesterModel(semesterName, startDate, endDate, hour, dLesson, dBreak, slotCount);
         apiInstance.createSemester(uid, semesterModel, (error, data, response) => {
             if (error) {
                 console.error(error);
@@ -104,15 +107,29 @@ const AddSemester = ({ history }) => {
                                                                 <label className="block mb-2 text-md font-bold text-gray-700" htmlFor="password">
                                                                     Start Hour
                                 </label>
-                                                                <input
-                                                                    className="w-full px-3 py-2 mb-3 text-md leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                                                                    id="startHour"
-                                                                    type="text"
-                                                                    placeholder="08.10"
-                                                                    name="startHour"
-                                                                    onChange={(e) => setStartHour(e.target.value)}
-                                                                    required
-                                                                />
+                                                                <div className="flex flex-row">
+                                                                    <input
+                                                                        className="w-full px-3 py-2 mb-3 text-md leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                                        id="startHour"
+                                                                        type="number"
+                                                                        placeholder="8"
+                                                                        name="startHour"
+                                                                        min="1"
+                                                                        max="24"
+                                                                        onChange={(e) => setStartHour(e.target.value)}
+                                                                        required
+                                                                    />
+                                                                    <input
+                                                                        className="w-full px-3 py-2 mb-3 text-md leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                                        id="startMin"
+                                                                        type="number"
+                                                                        placeholder="30"
+                                                                        name="startMin"
+                                                                        min="1"
+                                                                        max="59"
+                                                                        onChange={(e) => setStartMin(e.target.value)}
+                                                                        required
+                                                                    /></div>
                                                             </div>
                                                             <div className="md:w-1/2  md:ml-2 sm:w-full">
                                                                 <label className="block mb-2 text-md font-bold text-gray-700" htmlFor="c_password">
