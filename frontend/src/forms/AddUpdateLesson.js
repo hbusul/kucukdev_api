@@ -71,7 +71,7 @@ const AddLesson = (props) => {
         const periodMin = period % 60
 
         const scheduleArray = []
-        if (!currentLessonID || slots.length !== 0) {
+        if (!currentLessonID || slots.length !== 0 || (slots.length === 0 && currentLessonID)) {
             for (let index = 1; index <= semester.slotCount; index++) {
                 scheduleArray.push(<tr key={index}>
                     <td className="px-6 py-1 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{hour}</td>
