@@ -158,21 +158,23 @@ const SemesterDetail = (props) => {
                     <table className="min-w-full">
                         <thead>
                             <tr className="">
-                                <th className="px-4 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">Lesson Name</th>
+                                <th className="px-1 sm:px-4 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">Lesson Name</th>
                                 <th className="px-4 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Instructor</th>
-                                <th className="px-4 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Absence</th>
-                                <th className="px-4 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Absence Limit</th>
+                                <th className="px-0 sm:px-2 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Absence</th>
+                                <th className="px-2 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Absence Limit</th>
+                                <th className="px-2 py-3 border-b-2 border-gray-300"></th>
                             </tr>
                         </thead>
                         <tbody className="bg-white  ">
                             {
-                                lessons.map((lesson) => {
+                                lessons.map((lesson, index) => {
                                     return (
                                         <tr key={lesson._id}>
-                                            <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 font-bold text-left border-gray-500 text-sm leading-5">{lesson.name}</td>
+                                            <td className="px-1 sm:px-4 py-2 whitespace-no-wrap border-b text-blue-900 font-bold text-left border-gray-500 text-sm leading-5">{lesson.name}</td>
                                             <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{lesson.instructor}</td>
-                                            <td className="px-4 py-2 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">{(lesson.absences).length}</td>
-                                            <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{lesson.absenceLimit}</td>
+                                            <td className="px-0 sm:px-2 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">{(lesson.absences).length}</td>
+                                            <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{lesson.absenceLimit}</td>
+                                            <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5"><div className={`${colorArray[index]} p-2`}></div></td>
                                         </tr>
                                     )
                                 })

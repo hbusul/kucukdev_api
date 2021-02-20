@@ -64,12 +64,12 @@ const Overview = () => {
     const scheduleRows = [];
     for (let index = 1; index <= semester.slotCount; index++) {
         scheduleRows.push(<tr key={index}>
-            <td className="px-6 py-1 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{hour}</td>
-            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`0,${index}`) && `${lessonColors[lessonSlots.indexOf(`0,${index}`)]}`}`}>{lessonSlots.includes(`0,${index}`) && `${lessonNames[lessonSlots.indexOf(`0,${index}`)]}`}</td>
-            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`1,${index}`) && `${lessonColors[lessonSlots.indexOf(`1,${index}`)]}`}`}>{lessonSlots.includes(`1,${index}`) && `${lessonNames[lessonSlots.indexOf(`1,${index}`)]}`}</td>
-            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`2,${index}`) && `${lessonColors[lessonSlots.indexOf(`2,${index}`)]}`}`}>{lessonSlots.includes(`2,${index}`) && `${lessonNames[lessonSlots.indexOf(`2,${index}`)]}`}</td>
-            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`3,${index}`) && `${lessonColors[lessonSlots.indexOf(`3,${index}`)]}`}`}>{lessonSlots.includes(`3,${index}`) && `${lessonNames[lessonSlots.indexOf(`3,${index}`)]}`}</td>
-            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`4,${index}`) && `${lessonColors[lessonSlots.indexOf(`4,${index}`)]}`}`}>{lessonSlots.includes(`4,${index}`) && `${lessonNames[lessonSlots.indexOf(`4,${index}`)]}`}</td>
+            <td className="px-6 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{hour}</td>
+            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonColors[lessonSlots.indexOf(`0,${index}`)]}`}>{lessonSlots.includes(`0,${index}`) && <div className="flex flex-col"><div>{lessonNames[lessonSlots.indexOf(`0,${index}`)]}</div> <div>{lessonNames[lessonSlots.indexOf(`0,${index}`, lessonSlots.indexOf(`0,${index}`) + 1)]}</div></div>}</td>
+            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonColors[lessonSlots.indexOf(`1,${index}`)]}`}>{lessonSlots.includes(`1,${index}`) && <div>{lessonNames[lessonSlots.indexOf(`1,${index}`)]}</div>}</td>
+            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonColors[lessonSlots.indexOf(`2,${index}`)]}`}>{lessonSlots.includes(`2,${index}`) && <div>{lessonNames[lessonSlots.indexOf(`2,${index}`)]}</div>}</td>
+            <td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonColors[lessonSlots.indexOf(`3,${index}`)]}`}>{lessonSlots.includes(`3,${index}`) && <div>{lessonNames[lessonSlots.indexOf(`3,${index}`)]}</div>}</td>
+            <td className={`border-b border-gray-500 text-blue-900 text-sm leading-5 ${lessonColors[lessonSlots.indexOf(`4,${index}`)]}`}>{lessonSlots.includes(`4,${index}`) && <div>{lessonNames[lessonSlots.indexOf(`4,${index}`)]}</div>}</td>
         </tr >);
 
         startHour += periodHour
@@ -91,7 +91,7 @@ const Overview = () => {
         <div className="flex flex-col mt-8 xl:mx-40">
             <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Overview</h1>
             <div className="mt-2 py-2 overflow-x-auto sm:px-6 pr-10 lg:px-8">
-                <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
+                <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 pb-8 rounded-bl-lg rounded-br-lg">
                     <table className="min-w-full">
                         <thead>
                             <tr className="">

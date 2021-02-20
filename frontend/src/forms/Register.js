@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 var Kucukdevapi = require('kucukdevapi');
 
 const Register = ({ history }) => {
+    const [validationError, setValidationError] = useState(false)
+    const [conflictError, setConflictError] = useState(false)
     const [formEmail, setEmail] = useState("")
     const [formPassword, setPassword] = useState("")
     const [formValidatePassword, setValidatePassword] = useState("")
@@ -16,13 +18,19 @@ const Register = ({ history }) => {
             apiInstance.createUser(userModel, (error, data, response) => {
                 if (error) {
                     console.error(error);
+                    if (error.response.status === 409) {
+                        setConflictError(true)
+                    }
                 } else {
                     console.log('API called successfully. Returned data: ' + data);
-                    history.push("/signin")
+                    history.push({
+                        pathname: "/signin",
+                        isNewRegister: true
+                    })
                 }
             });
         } else {
-            alert("Passwords are different!")
+            setValidationError(true)
         }
 
     }
@@ -50,6 +58,7 @@ const Register = ({ history }) => {
                                     placeholder="Email"
                                     name="formEmail"
                                     onChange={(e) => setEmail(e.target.value)}
+                                    required
                                 />
                             </div>
                             <div className="mb-4 md:flex md:justify-between">
@@ -64,6 +73,7 @@ const Register = ({ history }) => {
                                         placeholder="******************"
                                         name="formPassword"
                                         onChange={(e) => setPassword(e.target.value)}
+                                        required
                                     />
                                     <p className="text-xs italic text-red-500">Please choose a password.</p>
                                 </div>
@@ -78,9 +88,25 @@ const Register = ({ history }) => {
                                         placeholder="******************"
                                         name="formValidatePassword"
                                         onChange={(e) => setValidatePassword(e.target.value)}
+                                        required
                                     />
                                 </div>
                             </div>
+                            {
+                                validationError &&
+                                <div className="bg-red-100 border-t border-b border-red-500 text-red-700 px-4 py-3 mb-4 flex flex-row" role="alert">
+                                    <p className="flex-1 font-bold">Passwords do not match!</p>
+                                    <button onClick={() => setValidationError(false)}>X</button>
+                                </div>
+                            }
+                            {
+                                conflictError &&
+                                <div className="bg-yellow-200 border-t border-b border-yellow-500 text-yellow-700 px-4 py-3 mb-4 flex flex-row" role="alert">
+                                    <p className="flex-1 font-bold">
+                                        Email address is already exists!</p>
+                                    <button onClick={() => setConflictError(false)}>X</button>
+                                </div>
+                            }
                             <div className="mb-6 text-center">
                                 <button
                                     className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"

@@ -75,11 +75,11 @@ const AddLesson = (props) => {
             for (let index = 1; index <= semester.slotCount; index++) {
                 scheduleArray.push(<tr key={index}>
                     <td className="px-6 py-1 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{hour}</td>
-                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onChange={() => selectSlots(`0,${index}`)} checked={slots.includes(`0,${index}`)} type="checkbox"></input></td>
-                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onChange={() => selectSlots(`1,${index}`)} checked={slots.includes(`1,${index}`)} type="checkbox"></input></td>
-                    <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onChange={() => selectSlots(`2,${index}`)} checked={slots.includes(`2,${index}`)} type="checkbox"></input></td>
-                    <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onChange={() => selectSlots(`3,${index}`)} checked={slots.includes(`3,${index}`)} type="checkbox"></input></td>
-                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onChange={() => selectSlots(`4,${index}`)} checked={slots.includes(`4,${index}`)} type="checkbox"></input></td>
+                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onChange={() => selectSlots(`0,${index}`)} checked={slots.includes(`0,${index}`)} type="checkbox" /></td>
+                    <td className="border border-gray-500 text-blue-900 text-sm leading-5"><input onChange={() => selectSlots(`1,${index}`)} checked={slots.includes(`1,${index}`)} type="checkbox" /></td>
+                    <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onChange={() => selectSlots(`2,${index}`)} checked={slots.includes(`2,${index}`)} type="checkbox" /></td>
+                    <td className="border text-blue-900 border-gray-500 text-sm leading-5"><input onChange={() => selectSlots(`3,${index}`)} checked={slots.includes(`3,${index}`)} type="checkbox" /></td>
+                    <td className="border-b border-gray-500 text-blue-900 text-sm leading-5"><input onChange={() => selectSlots(`4,${index}`)} checked={slots.includes(`4,${index}`)} type="checkbox" /></td>
                 </tr >);
 
                 startHour += periodHour
@@ -162,9 +162,9 @@ const AddLesson = (props) => {
 
 
     return (
-        <div className="flex flex-col mt-8 xl:mx-40">
+        <div className="flex flex-col mt-4 xl:mx-40">
             <div className="flex flex-row justify-around mb-4">
-                <Link to="/lessons/show-lessons" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Show Lessons</Link>
+                <Link to="/lessons" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Show Lessons</Link>
                 <Link to="/lessons/add-lesson" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Add Lesson</Link>
                 <Link to="/lessons/add-from-uis" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Add from UIS</Link>
             </div>
@@ -238,7 +238,9 @@ const AddLesson = (props) => {
                                             placeholder="20"
                                             value={absenceLimit}
                                             name="absenceLimit"
+                                            min="0"
                                             onChange={(e) => setAbsenceLimit(e.target.value)}
+                                            required
                                         />
                                         <div className="text-right">
                                             <button

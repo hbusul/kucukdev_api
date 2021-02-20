@@ -1,16 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from "react-router-dom";
 import UserConsumer from '../Context';
 
 var Kucukdevapi = require('kucukdevapi');
 
-const Login = ({ history }) => {
+const Login = (props) => {
     const [formEmail, setEmail] = useState("")
     const [formPassword, setPassword] = useState("")
+    const [validationError, setValidationError] = useState(false)
+    const [isNewRegister, setIsNewRegister] = useState(false)
+
+    useEffect(() => {
+        if (props.location.isNewRegister) {
+            setIsNewRegister(true)
+        }
+    }, [isNewRegister])
 
     const onLoginUser = async (dispatch, e) => {
         e.preventDefault();
-
 
         var api = new Kucukdevapi.DefaultApi()
         var username = formEmail;
@@ -22,7 +29,10 @@ const Login = ({ history }) => {
         var callback = function (error, data, response) {
             if (error) {
                 console.error(error);
-
+                console.log(error.response.status)
+                if (error.response.status === 401) {
+                    setValidationError(true)
+                }
             } else {
                 console.log('API called successfully. Returned data: ' + data);
                 dispatch({ type: "LOGIN_USER", payload: data });
@@ -40,16 +50,12 @@ const Login = ({ history }) => {
                         dispatch({
                             type: "CURRENT_USER_ID", payload: response.body
                         });
+                        props.history.push("/")
                     }
                 });
-
-
             }
         };
         api.loginForAccessTokenTokenPost(username, password, opts, callback);
-
-        history.push("/")
-
     }
 
     return (
@@ -98,6 +104,20 @@ const Login = ({ history }) => {
                                                     <p className="text-xs italic text-red-500">Please choose a password.</p>
                                                 </div>
                                             </div>
+                                            {
+                                                validationError &&
+                                                <div className="bg-red-100 border-t border-b border-red-500 text-red-700 px-4 py-3 mb-4 flex flex-row" role="alert">
+                                                    <p className="flex-1 font-bold">Email or password is incorrect!</p>
+                                                    <button onClick={() => setValidationError(false)}>X</button>
+                                                </div>
+                                            }
+                                            {
+                                                isNewRegister &&
+                                                <div className="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 mb-4 flex flex-row" role="alert">
+                                                    <p className="flex-1 font-bold">Account created successfully!</p>
+                                                    <button onClick={() => setIsNewRegister(false)}>X</button>
+                                                </div>
+                                            }
                                             <div className="mb-6 text-center">
                                                 <button
                                                     className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
