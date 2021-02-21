@@ -294,6 +294,7 @@ async def delete_lesson(
     operation_id="createAbsence",
     response_model=AbsenceModel,
     responses={
+        405: {"model": Message},
         404: {"model": Message},
         403: {"model": Message},
         401: {"model": Message},
@@ -314,30 +315,41 @@ async def create_absence(
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
-        update_result = (
-            await request.app.mongodb["users"].update_one(
-                {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid},
-                {
-                    "$push": {
-                        "semesters.$[i].lessons.$[j].absences": absence["absence"],
-                    }
-                },
-                array_filters=[{"i._id": sid}, {"j._id": lid}],
-            ),
-        )
-
         if (
-            existing_user := await request.app.mongodb["users"].find_one(
+            absence_user := await request.app.mongodb["users"].find_one(
                 {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid}
             )
         ) is not None:
-            for semester in existing_user["semesters"]:
+            for semester in absence_user["semesters"]:
                 if semester["_id"] == sid:
                     for lesson in semester["lessons"]:
                         if lesson["_id"] == lid:
+                            if absence["absence"] not in lesson["absences"]:
+                                update_result = (
+                                    await request.app.mongodb["users"].update_one(
+                                        {
+                                            "_id": uid,
+                                            "semesters._id": sid,
+                                            "semesters.lessons._id": lid,
+                                        },
+                                        {
+                                            "$push": {
+                                                "semesters.$[i].lessons.$[j].absences": absence[
+                                                    "absence"
+                                                ],
+                                            }
+                                        },
+                                        array_filters=[{"i._id": sid}, {"j._id": lid}],
+                                    ),
+                                )
+                                return JSONResponse(
+                                    status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                                    content={"message": "Absence created"},
+                                )
+
                             return JSONResponse(
-                                status_code=status.HTTP_200_OK,
-                                content=lesson["absences"],
+                                status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                                content={"message": "Absence is already exists"},
                             )
 
         return JSONResponse(
@@ -356,6 +368,7 @@ async def create_absence(
     operation_id="deleteAbsence",
     response_model=AbsenceModel,
     responses={
+        405: {"model": Message},
         404: {"model": Message},
         403: {"model": Message},
         401: {"model": Message},
@@ -376,13 +389,6 @@ async def delete_absence(
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
-        update_result = (
-            await request.app.mongodb["users"].update_one(
-                {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid},
-                {"$pull": {"semesters.$[i].lessons.$[j].absences": absence["absence"]}},
-                array_filters=[{"i._id": sid}, {"j._id": lid}],
-            ),
-        )
 
         if (
             existing_user := await request.app.mongodb["users"].find_one(
@@ -393,9 +399,31 @@ async def delete_absence(
                 if semester["_id"] == sid:
                     for lesson in semester["lessons"]:
                         if lesson["_id"] == lid:
+                            if absence["absence"] in lesson["absences"]:
+                                update_result = (
+                                    await request.app.mongodb["users"].update_one(
+                                        {
+                                            "_id": uid,
+                                            "semesters._id": sid,
+                                            "semesters.lessons._id": lid,
+                                        },
+                                        {
+                                            "$pull": {
+                                                "semesters.$[i].lessons.$[j].absences": absence[
+                                                    "absence"
+                                                ]
+                                            }
+                                        },
+                                        array_filters=[{"i._id": sid}, {"j._id": lid}],
+                                    ),
+                                )
+                                return JSONResponse(
+                                    status_code=status.HTTP_200_OK,
+                                    content={"message": "Absence deleted"},
+                                )
                             return JSONResponse(
-                                status_code=status.HTTP_200_OK,
-                                content=lesson["absences"],
+                                status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                                content={"message": "Absence not found"},
                             )
 
         return JSONResponse(
