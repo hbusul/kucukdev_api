@@ -86,6 +86,7 @@ const Login = (props) => {
                                                     placeholder="Email"
                                                     name="formEmail"
                                                     onChange={(e) => setEmail(e.target.value)}
+                                                    required
                                                 />
                                             </div>
                                             <div className="mb-4 md:flex md:justify-between">
@@ -100,6 +101,7 @@ const Login = (props) => {
                                                         placeholder="******************"
                                                         name="formPassword"
                                                         onChange={(e) => setPassword(e.target.value)}
+                                                        required
                                                     />
                                                     <p className="text-xs italic text-red-500">Please choose a password.</p>
                                                 </div>

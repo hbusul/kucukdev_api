@@ -70,15 +70,15 @@ const Lessons = () => {
 
     return (
         <div>
-            <div className="flex flex-col mt-8 xl:mx-40">
+            <div className="flex flex-col mt-4 xl:mx-40">
                 <div className="flex flex-row justify-around mb-4">
                     <Link to="/lessons" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Show Lessons</Link>
                     <Link to="/lessons/add-lesson" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Add Lesson</Link>
                     <Link to="/lessons/add-from-uis" className="text-gray-800 text-base font-semibold hover:text-purple-600 mb-1 md:hidden">Add from UIS</Link>
                 </div>
                 <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Your Lessons</h1>
-                <div className="mt-2 py-2 overflow-x-auto sm:px-6 lg:px-8">
-                    <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
+                <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
+                    <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 rounded-bl-lg rounded-br-lg">
                         <table className="min-w-full">
                             <thead>
                                 <tr className="">

@@ -45,23 +45,52 @@ const SemesterDetail = (props) => {
         scheduleHeads.push(<th key={index} className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">{index}</th>);
     }
 
-    const colorArray = ["bg-gray-400", "bg-red-600", "bg-yellow-500", "bg-green-600", "bg-blue-300", "bg-indigo-300", "bg-purple-600", "bg-pink-600", "bg-gray-900", "bg-green-900", "bg-indigo-900", "bg-purple-900", "bg-pink-900"]
-    let lessonNames = []
-    let lessonSlots = []
-    let lessonColors = []
+    const colorArray = [
+        "bg-gray-400",
+        "bg-red-600",
+        "bg-yellow-500",
+        "bg-green-600",
+        "bg-blue-300",
+        "bg-indigo-300",
+        "bg-purple-600",
+        "bg-pink-600",
+        "bg-gray-900",
+        "bg-green-900",
+        "bg-indigo-900",
+        "bg-purple-900",
+        "bg-pink-900",
+    ];
+    let lessonSlots = {
+        0: {},
+        1: {},
+        2: {},
+        3: {},
+        4: {},
+    };
 
     for (let i = 0; i < lessons.length; i++) {
-        for (let j = 0; j < (lessons[i].slots).length; j++) {
-            lessonNames.push(lessons[i].name)
-            lessonSlots.push(lessons[i].slots[j])
-            lessonColors.push(colorArray[i])
+        for (let j = 0; j < lessons[i].slots.length; j++) {
+            const day_hour = lessons[i].slots[j].split(",");
+            if (!lessonSlots[day_hour[0]][day_hour[1]])
+                lessonSlots[day_hour[0]][day_hour[1]] = [];
+            lessonSlots[day_hour[0]][day_hour[1]].push({
+                name: lessons[i].name,
+                color: colorArray[i % colorArray.length],
+            });
         }
     }
 
     const setScheduleDays = (index) => {
         const scheduleRows = []
         for (let j = 1; j <= semester.slotCount; j++) {
-            scheduleRows.push(<td className={`border border-gray-500 text-blue-900 text-sm leading-5 ${lessonSlots.includes(`${index},${j}`) && `${lessonColors[lessonSlots.indexOf(`${index},${j}`)]}`}`}></td>)
+            scheduleRows.push(<td
+                className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+            >
+                {lessonSlots[index][j] &&
+                    lessonSlots[index][j].map((e) => (
+                        <div key={Math.random(1000)} className={`${e.color} p-2`}></div>
+                    ))}
+            </td>)
         }
         return scheduleRows
     }

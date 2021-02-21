@@ -110,23 +110,10 @@ const AddLesson = (props) => {
         }
     }
 
-    const setLessonSlots = () => {
-        // If slots didn't selected in order
-        for (let i = 0; i < slots.length; i++) {
-            for (let j = i + 1; j < slots.length; j++) {
-                if (slots[j] < slots[i]) {
-                    let temp = slots[j]
-                    slots[j] = slots[i]
-                    slots[i] = temp
-                }
-            }
-        }
-    }
-
     const addLesson = (e) => {
         e.preventDefault()
 
-        setLessonSlots()
+        slots.sort()
 
         let apiInstance = new Kucukdevapi.LessonsApi();
         let lessonModel = new Kucukdevapi.LessonModel(lessonName, instrutcorName, absenceLimit, slots);
@@ -144,7 +131,7 @@ const AddLesson = (props) => {
     const updateLesson = (e) => {
         e.preventDefault()
 
-        setLessonSlots()
+        slots.sort()
 
         let apiInstance = new Kucukdevapi.LessonsApi();
         let lid = currentLessonID;
