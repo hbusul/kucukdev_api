@@ -131,6 +131,9 @@ const AddLesson = ({ history, match }) => {
         apiInstance.createLesson(uid, sid, lessonModel, (error, data, response) => {
             if (error) {
                 console.error(error);
+                if (error.response.status === 401) {
+                    setLogin(false)
+                }
             } else {
                 console.log('API called successfully. Returned data: ' + data);
             }
@@ -150,6 +153,9 @@ const AddLesson = ({ history, match }) => {
         apiInstance.updateLesson(uid, sid, lid, updateLessonModel, (error, data, response) => {
             if (error) {
                 console.error(error);
+                if (error.response.status === 401) {
+                    setLogin(false)
+                }
             } else {
                 console.log('API called successfully. Returned data: ' + data);
             }

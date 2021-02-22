@@ -47,6 +47,9 @@ const Lessons = ({ history }) => {
         apiInstance.deleteLesson(uid, sid, lid, (error, data, response) => {
             if (error) {
                 console.error(error);
+                if (error.response.status === 401) {
+                    setLogin(false)
+                }
             } else {
                 console.log('API called successfully. Returned data: ' + data);
             }
