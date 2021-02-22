@@ -20,22 +20,29 @@ const AddSemester = ({ history }) => {
 
         const hour = `${startHour}.${startMin}`
 
-        let defaultClient = Kucukdevapi.ApiClient.instance;
-        let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-        OAuth2PasswordBearer.accessToken = login.userToken;
+        if (login) {
+            let defaultClient = Kucukdevapi.ApiClient.instance;
+            let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
+            OAuth2PasswordBearer.accessToken = login.userToken;
 
-        let apiInstance = new Kucukdevapi.SemestersApi();
-        let uid = login.userID;
-        let semesterModel = new Kucukdevapi.SemesterModel(semesterName, startDate, endDate, hour, dLesson, dBreak, slotCount);
-        apiInstance.createSemester(uid, semesterModel, (error, data, response) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('API called successfully. Returned data: ' + data);
-                setLogin({ userToken: login.userToken, userID: login.userID, semesterID: data[0]._id })
-            }
-            history.push("/semesters")
-        });
+            let apiInstance = new Kucukdevapi.SemestersApi();
+            let uid = login.userID;
+            let semesterModel = new Kucukdevapi.SemesterModel(semesterName, startDate, endDate, hour, dLesson, dBreak, slotCount);
+            apiInstance.createSemester(uid, semesterModel, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                    if (error.response.status === 401) {
+                        setLogin(false)
+                    }
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                    setLogin({ userToken: login.userToken, userID: login.userID, semesterID: data[0]._id })
+                }
+                history.push("/semesters")
+            });
+        } else {
+            history.push("/signin")
+        }
     }
 
     return (

@@ -5,8 +5,8 @@ import { UserContext } from '../Context';
 var Kucukdevapi = require('kucukdevapi');
 
 
-const AddLesson = (props) => {
-    const [login] = useContext(UserContext);
+const AddLesson = ({ history, match }) => {
+    const [login, setLogin] = useContext(UserContext);
 
     const [semester, setSemester] = useState({})
     const [calculateModal, setCalculateModal] = useState(false);
@@ -20,7 +20,7 @@ const AddLesson = (props) => {
     const [maxPercentage, setMaxPercentage] = useState(30)
     const [scheduleRows, setScheduleRows] = useState([])
 
-    const lessonID = props.match.params.id
+    const lessonID = match.params.id
 
     let defaultClient = Kucukdevapi.ApiClient.instance;
     let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
@@ -29,36 +29,46 @@ const AddLesson = (props) => {
     let sid = login.semesterID;
 
     useEffect(() => {
-        if (lessonID) {
-            let apiInstance = new Kucukdevapi.LessonsApi();
-            let lid = lessonID;
-            apiInstance.getSingleLesson(uid, sid, lid, (error, data, response) => {
+        if (login) {
+            if (lessonID) {
+                let apiInstance = new Kucukdevapi.LessonsApi();
+                let lid = lessonID;
+                apiInstance.getSingleLesson(uid, sid, lid, (error, data, response) => {
+                    if (error) {
+                        console.error(error);
+                        if (error.response.status === 401) {
+                            setLogin(false)
+                        }
+                    } else {
+                        console.log('API called successfully. Returned data: ' + data);
+                        setAbsenceLimit(data.absenceLimit)
+                        setLessonName(data.name)
+                        setInstructorName(data.instructor)
+                        setSlots(data.slots)
+                    }
+                });
+            } else {
+                setSlots([])
+                setAbsenceLimit(0)
+            }
+
+            let apiInstance = new Kucukdevapi.SemestersApi();
+            apiInstance.getSingleSemester(uid, sid, (error, data, response) => {
                 if (error) {
                     console.error(error);
+                    if (error.response.status === 401) {
+                        setLogin(false)
+                    }
                 } else {
                     console.log('API called successfully. Returned data: ' + data);
-                    setAbsenceLimit(data.absenceLimit)
-                    setLessonName(data.name)
-                    setInstructorName(data.instructor)
-                    setSlots(data.slots)
+                    setSemester(data)
                 }
             });
         } else {
-            setSlots([])
-            setAbsenceLimit(0)
+            history.push("/signin")
         }
 
-        let apiInstance = new Kucukdevapi.SemestersApi();
-        apiInstance.getSingleSemester(uid, sid, (error, data, response) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('API called successfully. Returned data: ' + data);
-                setSemester(data)
-            }
-        });
-
-    }, [lessonID, uid, sid])
+    }, [lessonID, uid, sid, login, setLogin, history])
 
 
     useEffect(() => {
@@ -126,7 +136,7 @@ const AddLesson = (props) => {
             }
         });
 
-        props.history.push("/lessons")
+        history.push("/lessons")
     }
 
     const updateLesson = (e) => {
@@ -145,7 +155,7 @@ const AddLesson = (props) => {
             }
         });
 
-        props.history.push("/lessons")
+        history.push("/lessons")
     }
 
 

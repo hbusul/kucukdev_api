@@ -1,4 +1,3 @@
-import React, { useContext } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Navbar from "./layout/Navbar";
@@ -16,12 +15,9 @@ import ShowLessons from './components/Lessons';
 import LessonDetail from './components/LessonDetail';
 import Overview from './components/Overview';
 import Attendance from './components/Attendance.js';
-import { UserContext } from './Context';
 
 
 function App() {
-
-  const [login] = useContext(UserContext);
 
   return (
     <Router>

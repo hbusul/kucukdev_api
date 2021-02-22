@@ -4,13 +4,13 @@ import { UserContext } from '../Context';
 var Kucukdevapi = require('kucukdevapi');
 
 
-const SemesterDetail = (props) => {
-    const [login] = useContext(UserContext);
+const SemesterDetail = ({ history, match }) => {
+    const [login, setLogin] = useContext(UserContext);
 
     const [lessons, setLessons] = useState([])
     const [semester, setSemester] = useState({})
 
-    const semesterID = props.match.params.id;
+    const semesterID = match.params.id;
 
     let defaultClient = Kucukdevapi.ApiClient.instance;
     let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
@@ -20,27 +20,36 @@ const SemesterDetail = (props) => {
     let sid = semesterID;
 
     useEffect(() => {
+        if (login) {
+            let semesterApiInstance = new Kucukdevapi.SemestersApi();
+            semesterApiInstance.getSingleSemester(uid, sid, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                    if (error.response.status === 401) {
+                        setLogin(false)
+                    }
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                    setSemester(data)
+                }
+            });
 
-        let semesterApiInstance = new Kucukdevapi.SemestersApi();
-        semesterApiInstance.getSingleSemester(uid, sid, (error, data, response) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('API called successfully. Returned data: ' + data);
-                setSemester(data)
-            }
-        });
-
-        let lessonApiInstance = new Kucukdevapi.LessonsApi();
-        lessonApiInstance.listLessonsOfSemester(uid, sid, (error, data, response) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('API called successfully. Returned data: ' + data);
-                setLessons(data)
-            }
-        });
-    }, [uid, sid])
+            let lessonApiInstance = new Kucukdevapi.LessonsApi();
+            lessonApiInstance.listLessonsOfSemester(uid, sid, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                    if (error.response.status === 401) {
+                        setLogin(false)
+                    }
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                    setLessons(data)
+                }
+            });
+        } else {
+            history.push("/signin")
+        }
+    }, [uid, sid, login, setLogin, history])
 
     const scheduleHeads = [];
     for (let index = 1; index <= semester.slotCount; index++) {

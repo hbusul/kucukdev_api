@@ -3,8 +3,8 @@ import { UserContext } from '../Context';
 
 var Kucukdevapi = require('kucukdevapi');
 
-const Attendance = () => {
-    const [login] = useContext(UserContext);
+const Attendance = ({ history }) => {
+    const [login, setLogin] = useContext(UserContext);
 
     const [semester, setSemester] = useState({});
     const [lessons, setLessons] = useState([]);
@@ -17,32 +17,43 @@ const Attendance = () => {
     let sid = login.semesterID;
 
     useEffect(() => {
-        let smestersApiInstance = new Kucukdevapi.SemestersApi();
-        smestersApiInstance.getSingleSemester(uid, sid, (error, data, response) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log("API called successfully. Returned data: " + data);
-                setSemester(data);
-                const curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000))
-                setWeek(curWeek > 0 ? String(curWeek) : String(1))
-            }
-        });
-
-        let lessonsApiInstance = new Kucukdevapi.LessonsApi();
-        lessonsApiInstance.listLessonsOfSemester(
-            uid,
-            sid,
-            (error, data, response) => {
+        if (login) {
+            let smestersApiInstance = new Kucukdevapi.SemestersApi();
+            smestersApiInstance.getSingleSemester(uid, sid, (error, data, response) => {
                 if (error) {
                     console.error(error);
+                    if (error.response.status === 401) {
+                        setLogin(false)
+                    }
                 } else {
                     console.log("API called successfully. Returned data: " + data);
-                    setLessons(data);
+                    setSemester(data);
+                    const curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000))
+                    setWeek(curWeek > 0 ? String(curWeek) : String(1))
                 }
-            }
-        );
-    }, [uid, sid]);
+            });
+
+            let lessonsApiInstance = new Kucukdevapi.LessonsApi();
+            lessonsApiInstance.listLessonsOfSemester(
+                uid,
+                sid,
+                (error, data, response) => {
+                    if (error) {
+                        console.error(error);
+                        if (error.response.status === 401) {
+                            setLogin(false)
+                        }
+                    } else {
+                        console.log("API called successfully. Returned data: " + data);
+                        setLessons(data);
+                    }
+                }
+            );
+        } else {
+            history.push("/signin")
+        }
+
+    }, [uid, sid, login, setLogin, history]);
 
     const colorArray = [
         "bg-gray-400",

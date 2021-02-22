@@ -5,7 +5,7 @@ import { UserContext } from '../Context';
 var Kucukdevapi = require('kucukdevapi');
 
 const Login = (props) => {
-    const [login, setLogin] = useContext(UserContext);
+    const [, setLogin] = useContext(UserContext);
 
     const [formEmail, setEmail] = useState("")
     const [formPassword, setPassword] = useState("")

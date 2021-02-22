@@ -5,7 +5,7 @@ import { UserContext } from "../Context";
 
 var Kucukdevapi = require('kucukdevapi');
 
-const Semesters = () => {
+const Semesters = ({ history }) => {
     const [login, setLogin] = useContext(UserContext);
 
     const [semesters, setSemesters] = useState([])
@@ -19,17 +19,23 @@ const Semesters = () => {
     let uid = login.userID;
 
     useEffect(() => {
-
-        let apiInstance = new Kucukdevapi.SemestersApi();
-        apiInstance.listSemestersOfUser(uid, (error, data, response) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('API called successfully. Returned data: ' + data);
-                setSemesters(data)
-            }
-        });
-    }, [refresh, uid])
+        if (login) {
+            let apiInstance = new Kucukdevapi.SemestersApi();
+            apiInstance.listSemestersOfUser(uid, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                    if (error.response.status === 401) {
+                        setLogin(false)
+                    }
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                    setSemesters(data)
+                }
+            });
+        } else {
+            history.push("/signin")
+        }
+    }, [refresh, uid, login, setLogin, history])
 
     const deleteSemester = (id) => {
 

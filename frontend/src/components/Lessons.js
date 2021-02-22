@@ -7,8 +7,8 @@ import Lesson from './Lesson'
 var Kucukdevapi = require('kucukdevapi');
 
 
-const Lessons = () => {
-    const [login] = useContext(UserContext);
+const Lessons = ({ history }) => {
+    const [login, setLogin] = useContext(UserContext);
 
     const [lessons, setLessons] = useState([])
     const [refresh, setRefresh] = useState(0);
@@ -22,17 +22,23 @@ const Lessons = () => {
     let sid = login.semesterID;
 
     useEffect(() => {
-
-        let apiInstance = new Kucukdevapi.LessonsApi();
-        apiInstance.listLessonsOfSemester(uid, sid, (error, data, response) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('API called successfully. Returned data: ' + data);
-                setLessons(data)
-            }
-        });
-    }, [refresh, sid, uid])
+        if (login) {
+            let apiInstance = new Kucukdevapi.LessonsApi();
+            apiInstance.listLessonsOfSemester(uid, sid, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                    if (error.response.status === 401) {
+                        setLogin(false)
+                    }
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                    setLessons(data)
+                }
+            });
+        } else {
+            history.push("/signin")
+        }
+    }, [refresh, sid, uid, login, setLogin, history])
 
     const deleteLesson = (id) => {
 

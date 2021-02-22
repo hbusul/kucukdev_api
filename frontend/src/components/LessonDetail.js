@@ -4,15 +4,15 @@ import { UserContext } from '../Context';
 
 var Kucukdevapi = require('kucukdevapi');
 
-const LessonDetail = (props) => {
-    const [login] = useContext(UserContext);
+const LessonDetail = ({ history, match }) => {
+    const [login, setLogin] = useContext(UserContext);
 
     const [lesson, setLesson] = useState({})
     const [absences, setAbsences] = useState([])
     const [lessonDeleteModal, setLessonDeleteModal] = useState(false);
 
 
-    const currentLessonID = props.match.params.id
+    const lessonID = match.params.id
 
     let defaultClient = Kucukdevapi.ApiClient.instance;
     let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
@@ -22,18 +22,26 @@ const LessonDetail = (props) => {
     let sid = login.semesterID;
 
     useEffect(() => {
-        let apiInstance = new Kucukdevapi.LessonsApi();
-        let lid = currentLessonID;
-        apiInstance.getSingleLesson(uid, sid, lid, (error, data, response) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('API called successfully. Returned data: ' + data);
-                setLesson(data)
-                setAbsences(data.absences)
-            }
-        });
-    }, [currentLessonID, uid, sid])
+        if (login) {
+            let apiInstance = new Kucukdevapi.LessonsApi();
+            let lid = lessonID;
+            apiInstance.getSingleLesson(uid, sid, lid, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                    if (error.response.status === 401) {
+                        setLogin(false)
+                    }
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                    setLesson(data)
+                    setAbsences(data.absences)
+                }
+            });
+        } else {
+            history.push("/signin")
+        }
+
+    }, [lessonID, uid, sid, login, setLogin, history])
 
     const deleteLesson = (id) => {
 
@@ -44,7 +52,7 @@ const LessonDetail = (props) => {
                 console.error(error);
             } else {
                 console.log('API called successfully. Returned data: ' + data);
-                props.history.push("/lessons")
+                history.push("/lessons")
             }
         });
     }
