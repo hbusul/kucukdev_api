@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { Link } from "react-router-dom";
+import { UserContext } from '../Context';
 
 var Kucukdevapi = require('kucukdevapi');
 
 
 const AddLesson = (props) => {
+    const [login] = useContext(UserContext);
+
     const [semester, setSemester] = useState({})
     const [calculateModal, setCalculateModal] = useState(false);
 
@@ -17,20 +20,18 @@ const AddLesson = (props) => {
     const [maxPercentage, setMaxPercentage] = useState(30)
     const [scheduleRows, setScheduleRows] = useState([])
 
-    const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
-    const CURRENT_SEMESTER = JSON.parse(localStorage.getItem("CURRENT_SEMESTER"))
-    const currentLessonID = props.match.params.id
+    const lessonID = props.match.params.id
 
     let defaultClient = Kucukdevapi.ApiClient.instance;
     let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-    OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
-    let uid = USER_LOGIN.userID;
-    let sid = CURRENT_SEMESTER.currentSemester;
+    OAuth2PasswordBearer.accessToken = login.userToken;
+    let uid = login.userID;
+    let sid = login.semesterID;
 
     useEffect(() => {
-        if (currentLessonID) {
+        if (lessonID) {
             let apiInstance = new Kucukdevapi.LessonsApi();
-            let lid = currentLessonID;
+            let lid = lessonID;
             apiInstance.getSingleLesson(uid, sid, lid, (error, data, response) => {
                 if (error) {
                     console.error(error);
@@ -57,7 +58,7 @@ const AddLesson = (props) => {
             }
         });
 
-    }, [currentLessonID, uid, sid])
+    }, [lessonID, uid, sid])
 
 
     useEffect(() => {
@@ -71,7 +72,7 @@ const AddLesson = (props) => {
         const periodMin = period % 60
 
         const scheduleArray = []
-        if (!currentLessonID || slots.length !== 0 || (slots.length === 0 && currentLessonID)) {
+        if (!lessonID || slots.length !== 0 || (slots.length === 0 && lessonID)) {
             for (let index = 1; index <= semester.slotCount; index++) {
                 scheduleArray.push(<tr key={index}>
                     <td className="px-6 py-1 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{hour}</td>
@@ -100,7 +101,7 @@ const AddLesson = (props) => {
 
         setScheduleRows(scheduleArray)
 
-    }, [slots, semester, currentLessonID])
+    }, [slots, semester, lessonID])
 
     const selectSlots = (newSlot) => {
         if (slots.includes(newSlot)) {
@@ -134,7 +135,7 @@ const AddLesson = (props) => {
         slots.sort()
 
         let apiInstance = new Kucukdevapi.LessonsApi();
-        let lid = currentLessonID;
+        let lid = lessonID;
         let updateLessonModel = new Kucukdevapi.UpdateLessonModel(lessonName, instrutcorName, absenceLimit, slots);
         apiInstance.updateLesson(uid, sid, lid, updateLessonModel, (error, data, response) => {
             if (error) {
@@ -160,7 +161,7 @@ const AddLesson = (props) => {
                     <div className="w-full flex flex-col md:flex-row">
                         <div
                             className="w-full h-auto lg:block lg:w-7/12 bg-cover rounded-l-lg">
-                            <h1 className="flex justify-center md:justify-start text-2xl ml-4 my-2">{currentLessonID ? "Select Updated Hours" : "Select Hours"}</h1>
+                            <h1 className="flex justify-center md:justify-start text-2xl ml-4 my-2">{lessonID ? "Select Updated Hours" : "Select Hours"}</h1>
                             <table className="min-w-full">
                                 <thead>
                                     <tr className="">
@@ -181,8 +182,8 @@ const AddLesson = (props) => {
 
                         </div>
                         <div className="w-full lg:w-5/12 bg-white p-5 rounded-lg lg:rounded-l-none mx-auto">
-                            <h3 className="pt-4 text-2xl text-center">{currentLessonID ? "Update Lesson" : "Add Lesson!"}</h3>
-                            <form onSubmit={currentLessonID ? (e) => updateLesson(e) : (e) => addLesson(e)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
+                            <h3 className="pt-4 text-2xl text-center">{lessonID ? "Update Lesson" : "Add Lesson!"}</h3>
+                            <form onSubmit={lessonID ? (e) => updateLesson(e) : (e) => addLesson(e)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
                                 <div className="mb-4">
                                     <label className="block mb-2 text-base font-bold text-gray-700">
                                         Lesson Name
@@ -192,7 +193,7 @@ const AddLesson = (props) => {
                                         id="lessonName"
                                         type="text"
                                         placeholder="EE213"
-                                        defaultValue={currentLessonID && lessonName}
+                                        defaultValue={lessonID && lessonName}
                                         name="lessonName"
                                         onChange={(e) => setLessonName(e.target.value)}
                                         required
@@ -207,7 +208,7 @@ const AddLesson = (props) => {
                                         id="instructorName"
                                         type="text"
                                         placeholder="John Doe"
-                                        defaultValue={currentLessonID && instrutcorName}
+                                        defaultValue={lessonID && instrutcorName}
                                         name="instructorName"
                                         onChange={(e) => setInstructorName(e.target.value)}
                                         required
@@ -243,10 +244,10 @@ const AddLesson = (props) => {
                                 </div>
                                 <div className="mb-6 text-center">
                                     <button
-                                        className={`w-full px-4 py-2 font-bold text-white ${currentLessonID ? "bg-yellow-400 hover:bg-yellow-500" : "bg-blue-500 hover:bg-blue-700"} rounded-full  focus:outline-none focus:shadow-outline`}
+                                        className={`w-full px-4 py-2 font-bold text-white ${lessonID ? "bg-yellow-400 hover:bg-yellow-500" : "bg-blue-500 hover:bg-blue-700"} rounded-full  focus:outline-none focus:shadow-outline`}
                                         type="submit"
                                     >
-                                        {currentLessonID ? "Update The Lesson" : "Add The Lesson"}
+                                        {lessonID ? "Update The Lesson" : "Add The Lesson"}
                                     </button>
                                 </div>
                                 <hr className="mb-6 border-t" />

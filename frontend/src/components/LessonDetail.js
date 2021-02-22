@@ -1,24 +1,25 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
+import { UserContext } from '../Context';
 
 var Kucukdevapi = require('kucukdevapi');
 
 const LessonDetail = (props) => {
+    const [login] = useContext(UserContext);
+
     const [lesson, setLesson] = useState({})
     const [absences, setAbsences] = useState([])
     const [lessonDeleteModal, setLessonDeleteModal] = useState(false);
 
 
     const currentLessonID = props.match.params.id
-    const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
-    const CURRENT_SEMESTER = JSON.parse(localStorage.getItem("CURRENT_SEMESTER"))
 
     let defaultClient = Kucukdevapi.ApiClient.instance;
     let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-    OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
+    OAuth2PasswordBearer.accessToken = login.userToken;
 
-    let uid = USER_LOGIN.userID;
-    let sid = CURRENT_SEMESTER.currentSemester;
+    let uid = login.userID;
+    let sid = login.semesterID;
 
     useEffect(() => {
         let apiInstance = new Kucukdevapi.LessonsApi();
@@ -43,10 +44,9 @@ const LessonDetail = (props) => {
                 console.error(error);
             } else {
                 console.log('API called successfully. Returned data: ' + data);
+                props.history.push("/lessons")
             }
         });
-
-        props.history("/lessons")
     }
 
     return (
@@ -160,7 +160,7 @@ const LessonDetail = (props) => {
                                         style={{ transition: "all .15s ease" }}
                                         onClick={() => {
                                             setLessonDeleteModal(false)
-                                            deleteLesson()
+                                            deleteLesson(lesson._id)
                                         }
                                         }
                                     >

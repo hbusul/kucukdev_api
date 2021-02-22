@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import { UserContext } from '../Context';
 
 var Kucukdevapi = require('kucukdevapi');
 
 
 const SemesterDetail = (props) => {
+    const [login] = useContext(UserContext);
+
     const [lessons, setLessons] = useState([])
     const [semester, setSemester] = useState({})
 
     const semesterID = props.match.params.id;
-    const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
 
     let defaultClient = Kucukdevapi.ApiClient.instance;
     let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-    OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
+    OAuth2PasswordBearer.accessToken = login.userToken;
 
-    let uid = USER_LOGIN.userID;
+    let uid = login.userID;
     let sid = semesterID;
 
     useEffect(() => {
@@ -88,7 +90,7 @@ const SemesterDetail = (props) => {
             >
                 {lessonSlots[index][j] &&
                     lessonSlots[index][j].map((e) => (
-                        <div key={Math.random(1000)} className={`${e.color} p-2`}></div>
+                        <div className={`${e.color} p-2`}></div>
                     ))}
             </td>)
         }

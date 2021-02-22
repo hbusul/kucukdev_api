@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
+import { UserContext } from '../Context';
 
 var Kucukdevapi = require('kucukdevapi');
 
 const Attendance = () => {
+    const [login] = useContext(UserContext);
+
     const [semester, setSemester] = useState({});
     const [lessons, setLessons] = useState([]);
     const [week, setWeek] = useState(1)
 
-    const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"));
-    const CURRENT_SEMESTER = JSON.parse(localStorage.getItem("CURRENT_SEMESTER"));
     let defaultClient = Kucukdevapi.ApiClient.instance;
-    let OAuth2PasswordBearer =
-        defaultClient.authentications["OAuth2PasswordBearer"];
-    OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
-    let uid = USER_LOGIN.userID;
-    let sid = CURRENT_SEMESTER.currentSemester;
+    let OAuth2PasswordBearer = defaultClient.authentications["OAuth2PasswordBearer"];
+    OAuth2PasswordBearer.accessToken = login.userToken;
+    let uid = login.userID;
+    let sid = login.semesterID;
 
     useEffect(() => {
         let smestersApiInstance = new Kucukdevapi.SemestersApi();
@@ -155,7 +155,7 @@ const Attendance = () => {
 
     return (
         <div className="flex flex-col mt-8 xl:mx-40">
-            <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Your Attendance <h1 className="font-extralight ml-2">Week {week}</h1></h1>
+            <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Your Attendance <div className="font-extralight ml-2">Week {week}</div></h1>
             <div className="mt-2 py-2 overflow-x-auto sm:px-6 pr-10 lg:px-8">
                 <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
                     <table className="min-w-full">

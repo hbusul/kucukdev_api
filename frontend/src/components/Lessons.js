@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { Link } from 'react-router-dom'
+import { UserContext } from "../Context";
 
 import Lesson from './Lesson'
 
@@ -7,19 +8,18 @@ var Kucukdevapi = require('kucukdevapi');
 
 
 const Lessons = () => {
+    const [login] = useContext(UserContext);
 
     const [lessons, setLessons] = useState([])
     const [refresh, setRefresh] = useState(0);
     const [start, setStart] = useState(0)
     const [end, setEnd] = useState(5)
-    const USER_LOGIN = JSON.parse(localStorage.getItem("USER_LOGIN"))
-    const CURRENT_SEMESTER = JSON.parse(localStorage.getItem("CURRENT_SEMESTER"))
 
     let defaultClient = Kucukdevapi.ApiClient.instance;
     let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-    OAuth2PasswordBearer.accessToken = USER_LOGIN.userToken;
-    let uid = USER_LOGIN.userID;
-    let sid = CURRENT_SEMESTER.currentSemester;
+    OAuth2PasswordBearer.accessToken = login.userToken;
+    let uid = login.userID;
+    let sid = login.semesterID;
 
     useEffect(() => {
 
