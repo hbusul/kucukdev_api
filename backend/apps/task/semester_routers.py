@@ -203,7 +203,7 @@ async def update_semester(
     """Update a semester with given userID and semesterID"""
 
     semester = {k: v for k, v in semester.dict().items() if v is not None}
-
+    semester = jsonable_encoder(semester)
     if (
         auth_user := await models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
