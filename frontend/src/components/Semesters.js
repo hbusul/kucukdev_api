@@ -158,7 +158,7 @@ const Semesters = ({ history }) => {
                 </div>
                 <div className="flex justify-center md:justify-end text-xs md:text-base my-8 mx-4">
                     <Link
-                        to="/add-semester"
+                        to="/semesters/add-semester"
                         className="w-1/2 md:w-1/3 lg:w-1/5 px-8 py-2 font-bold text-white bg-green-500 rounded-full hover:bg-green-700 focus:outline-none focus:shadow-outline"
 
                     >

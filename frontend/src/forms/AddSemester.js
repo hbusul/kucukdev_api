@@ -1,34 +1,85 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { UserContext } from '../Context';
 
 var Kucukdevapi = require('kucukdevapi');
 
-const AddSemester = ({ history }) => {
+const AddSemester = ({ history, match }) => {
     const [login, setLogin] = useContext(UserContext);
 
     const [semesterName, setSemesterName] = useState("")
     const [startDate, setStartDate] = useState("")
     const [endDate, setEndDate] = useState("")
-    const [startHour, setStartHour] = useState(8)
-    const [startMin, setStartMin] = useState(30)
-    const [dLesson, setDLesson] = useState(50)
-    const [dBreak, setDBreak] = useState(10)
-    const [slotCount, setSlotCount] = useState(14)
+    const [startHour, setStartHour] = useState()
+    const [startMin, setStartMin] = useState()
+    const [dLesson, setDLesson] = useState()
+    const [dBreak, setDBreak] = useState()
+    const [slotCount, setSlotCount] = useState()
 
-    const onCreateSemester = (e) => {
-        e.preventDefault();
+    const [start, setStart] = useState()
+    const [end, setEnd] = useState()
 
-        const hour = `${startHour}.${startMin}`
+    const semesterID = match.params.id
 
+    let defaultClient = Kucukdevapi.ApiClient.instance;
+    let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
+    OAuth2PasswordBearer.accessToken = login.userToken;
+
+    let apiInstance = new Kucukdevapi.SemestersApi();
+    let uid = login.userID;
+
+    useEffect(() => {
         if (login) {
-            let defaultClient = Kucukdevapi.ApiClient.instance;
-            let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
-            OAuth2PasswordBearer.accessToken = login.userToken;
+            if (semesterID) {
+                let sid = semesterID;
+                apiInstance.getSingleSemester(uid, sid, (error, data, response) => {
+                    if (error) {
+                        console.error(error);
+                        if (error.response.status === 401) {
+                            setLogin(false)
+                        }
+                    } else {
+                        console.log('API called successfully. Returned data: ' + data);
+                        setSemesterName(data.name)
+                        const inputStart = `${data.startDate.getFullYear()}-${((data.startDate.getMonth() + 1) > 9 ? (data.startDate.getMonth() + 1) : `0${(data.startDate.getMonth() + 1)}`)}-${(data.startDate.getDate() > 9 ? data.startDate.getDate() : `0${data.startDate.getDate()}`)}`
+                        const inputEnd = `${data.endDate.getFullYear()}-${((data.endDate.getMonth() + 1) > 9 ? (data.endDate.getMonth() + 1) : `0${(data.endDate.getMonth() + 1)}`)}-${(data.endDate.getDate() > 9 ? data.endDate.getDate() : `0${data.endDate.getDate()}`)}`
+                        setStart(inputStart)
+                        setEnd(inputEnd)
+
+                        const newStart = `${String(inputStart)}T00:00:00+00:00`
+                        const newEnd = `${String(inputEnd)}T00:00:00+00:00`
+
+                        setStartDate(inputStart)
+                        setEndDate(inputEnd)
+
+                        const resHour = data.startHour.split(".")
+                        setStartHour(resHour[0])
+                        setStartMin(resHour[1])
+
+                        setDLesson(data.dLesson)
+                        setDBreak(data.dBreak)
+                        setSlotCount(data.slotCount)
+                    }
+                });
+            }
+        } else {
+            history.push("/signin")
+        }
+    }, [semesterID])
+
+    const addSemester = (e) => {
+        e.preventDefault();
+        if (login) {
+            const hour = `${startHour}.${startMin}`
+
+            const newStart = `${String(startDate)}T00:00:00+00:00`
+            const newEnd = `${String(endDate)}T00:00:00+00:00`
+
+            console.log(startDate)
+            console.log(newStart)
 
             let apiInstance = new Kucukdevapi.SemestersApi();
-            let uid = login.userID;
-            let semesterModel = new Kucukdevapi.SemesterModel(semesterName, startDate, endDate, hour, dLesson, dBreak, slotCount);
-            apiInstance.createSemester(uid, semesterModel, (error, data, response) => {
+            let userSemesterModel = new Kucukdevapi.UserSemesterModel(semesterName, newStart, newEnd, hour, dLesson, dBreak, slotCount);
+            apiInstance.createSemester(uid, userSemesterModel, (error, data, response) => {
                 if (error) {
                     console.error(error);
                     if (error.response.status === 401) {
@@ -36,9 +87,49 @@ const AddSemester = ({ history }) => {
                     }
                 } else {
                     console.log('API called successfully. Returned data: ' + data);
-                    setLogin({ userToken: login.userToken, userID: login.userID, semesterID: data[0]._id })
+                    if (data.length === 1) {
+                        setLogin({ userToken: login.userToken, userID: login.userID, semesterID: data[0]._id })
+
+                        let updateSemesterModel = new Kucukdevapi.UpdateSemesterModel(data[0]._id);
+                        let apiInstance = new Kucukdevapi.UsersApi();
+                        apiInstance.updateCurrentSemester(uid, updateSemesterModel, (error, data, response) => {
+                            if (error) {
+                                console.error(error);
+                            } else {
+                                console.log('API called successfully. Returned data: ' + data);
+                            }
+                        });
+                    }
+                    history.push("/semesters")
                 }
-                history.push("/semesters")
+            });
+        } else {
+            history.push("/signin")
+        }
+    }
+
+    const updateSemester = (e) => {
+        e.preventDefault();
+
+        if (login) {
+            const hour = `${startHour}.${startMin}`
+
+            const newStart = `${String(startDate)}T00:00:00+00:00`
+            const newEnd = `${String(endDate)}T00:00:00+00:00`
+
+            console.log(startDate)
+            console.log(newStart)
+
+            let apiInstance = new Kucukdevapi.SemestersApi();
+            let sid = semesterID;
+            let updateUserSemesterModel = new Kucukdevapi.UpdateUserSemesterModel(semesterName, newStart, newEnd, hour, dLesson, dBreak, slotCount);
+            apiInstance.updateSemester(uid, sid, updateUserSemesterModel, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                    history.push("/semesters")
+                }
             });
         } else {
             history.push("/signin")
@@ -55,8 +146,8 @@ const AddSemester = ({ history }) => {
                             style={{ backgroundImage: `url("https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1950&q=80")` }}>
                         </div>
                         <div className="w-full lg:w-7/12 bg-white p-5 rounded-lg lg:rounded-l-none mx-auto">
-                            <h3 className="pt-4 text-xl text-center">Add Semester</h3>
-                            <form onSubmit={onCreateSemester.bind(this)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
+                            <h3 className="pt-4 text-xl text-center">{semesterID ? "Update Semester" : "Add Semester"}</h3>
+                            <form onSubmit={semesterID ? updateSemester.bind(this) : addSemester.bind(this)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
                                 <div className="mb-4">
                                     <label className="block mb-2 text-md font-bold text-gray-700" htmlFor="email">
                                         Semester Name
@@ -67,6 +158,7 @@ const AddSemester = ({ history }) => {
                                         type="text"
                                         placeholder="2020-2021 Spring"
                                         name="name"
+                                        defaultValue={semesterID && semesterName}
                                         onChange={(e) => setSemesterName(e.target.value)}
                                         required
                                     />
@@ -82,6 +174,7 @@ const AddSemester = ({ history }) => {
                                             type="date"
                                             placeholder="2018-05-18"
                                             name="startDate"
+                                            defaultValue={semesterID && start}
                                             onChange={(e) => setStartDate(e.target.value)}
                                             required
                                         />
@@ -96,6 +189,7 @@ const AddSemester = ({ history }) => {
                                             type="date"
                                             placeholder="2018-02-05"
                                             name="endDate"
+                                            defaultValue={semesterID && end}
                                             onChange={(e) => setEndDate(e.target.value)}
                                             required
                                         />
@@ -113,6 +207,7 @@ const AddSemester = ({ history }) => {
                                                 type="number"
                                                 placeholder="8"
                                                 name="startHour"
+                                                defaultValue={semesterID && startHour}
                                                 min="1"
                                                 max="24"
                                                 onChange={(e) => setStartHour(e.target.value)}
@@ -124,6 +219,7 @@ const AddSemester = ({ history }) => {
                                                 type="number"
                                                 placeholder="30"
                                                 name="startMin"
+                                                defaultValue={semesterID && startMin}
                                                 min="1"
                                                 max="59"
                                                 onChange={(e) => setStartMin(e.target.value)}
@@ -140,6 +236,7 @@ const AddSemester = ({ history }) => {
                                             type="number"
                                             placeholder="14"
                                             name="slotCount"
+                                            defaultValue={semesterID && slotCount}
                                             min="3"
                                             max="15"
                                             onChange={(e) => setSlotCount(e.target.value)}
@@ -158,6 +255,7 @@ const AddSemester = ({ history }) => {
                                             type="number"
                                             placeholder="50"
                                             name="dLesson"
+                                            defaultValue={semesterID && dLesson}
                                             min="1"
                                             onChange={(e) => setDLesson(e.target.value)}
                                             required
@@ -173,6 +271,7 @@ const AddSemester = ({ history }) => {
                                             type="number"
                                             placeholder="10"
                                             name="dBreak"
+                                            defaultValue={semesterID && dBreak}
                                             min="1"
                                             onChange={(e) => setDBreak(e.target.value)}
                                             required
@@ -184,11 +283,11 @@ const AddSemester = ({ history }) => {
 
                                 <div className="mb-6 text-center">
                                     <button
-                                        className="w-full px-4 py-2 font-bold text-white bg-green-500 rounded-full hover:bg-green-700 focus:outline-none focus:shadow-outline"
+                                        className={`w-full px-4 py-2 font-bold text-white ${semesterID ? "bg-yellow-400 hover:bg-yellow-500" : "bg-blue-500 hover:bg-blue-700"} rounded-full focus:outline-none focus:shadow-outline`}
                                         type="submit"
                                     >
-                                        Add Semester
-                            </button>
+                                        {semesterID ? "Update The Semester" : "Add The Semester"}
+                                    </button>
                                 </div>
                                 <hr className="mb-6 border-t" />
                             </form>

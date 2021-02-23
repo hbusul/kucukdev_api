@@ -2,9 +2,10 @@ from fastapi import APIRouter, Body, Request, HTTPException, status, Depends, Re
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import List
+import json
 
 from .models import (
-    SemesterModel,
+    UserSemesterModel,
     UpdateSemesterModel,
     SemesterAPIModel,
     UpdateUserSemesterModel,
@@ -19,7 +20,7 @@ router = APIRouter()
     "/{uid}/semesters",
     response_description="Add new semester",
     operation_id="createSemester",
-    response_model=List[SemesterModel],
+    response_model=List[UserSemesterModel],
     responses={
         404: {"model": Message},
         403: {"model": Message},
@@ -29,7 +30,7 @@ router = APIRouter()
 async def create_semester(
     uid: str,
     request: Request,
-    semester: SemesterModel = Body(...),
+    semester: UserSemesterModel = Body(...),
     token: str = Depends(models.oauth2_scheme),
 ):
     """Create a semester for a user with given userID"""
@@ -59,44 +60,13 @@ async def create_semester(
         if update_result.modified_count == 1:
             if (
                 created_semester := await request.app.mongodb["users"].find_one(
-                    {"_id": uid}, {"semesters": {"$slice": -1}}
+                    {"_id": uid}
                 )
             ) is not None:
-                for semester in created_semester["semesters"]:
-                    if auth_user["currentSemester"] == "null":
-                        set_current_semester = await request.app.mongodb[
-                            "users"
-                        ].update_one(
-                            {"_id": uid},
-                            {"$set": {"currentSemester": semester["_id"]}},
-                        )
-
-                    # sid = semester["_id"]
-                    # lessons_url = (
-                    #     f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
-                    # )
-                    # semesterAPI = SemesterAPIModel(
-                    #     id=sid,
-                    #     name=semester["name"],
-                    #     startDate=semester["startDate"],
-                    #     endDate=semester["endDate"],
-                    #     startHour=semester["startHour"],
-                    #     dLesson=semester["dLesson"],
-                    #     dBreak=semester["dBreak"],
-                    #     slotCount=semester["slotCount"],
-                    #     lessons_url=lessons_url,
-                    # )
-
-                    # jsonable_semesterAPI = jsonable_encoder(semesterAPI)
-
-                    created_semester = await request.app.mongodb["users"].find_one(
-                        {"_id": uid}
-                    )
-
-                    return JSONResponse(
-                        status_code=status.HTTP_200_OK,
-                        content=created_semester["semesters"],
-                    )
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content=created_semester["semesters"],
+                )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

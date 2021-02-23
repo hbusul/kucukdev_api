@@ -3,7 +3,7 @@ from fastapi import HTTPException, status, Request, Depends
 from typing import Optional, List, Dict
 import uuid
 from pydantic import BaseModel, Field, EmailStr
-from datetime import date, timedelta, datetime
+from datetime import timedelta, datetime
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 
@@ -65,11 +65,11 @@ class AbsenceModel(BaseModel):
         }
 
 
-class SemesterModel(BaseModel):
+class UserSemesterModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
-    startDate: date = Field(...)
-    endDate: date = Field(...)
+    startDate: datetime = Field(...)
+    endDate: datetime = Field(...)
     startHour: str = Field(...)
     dLesson: int = Field(...)
     dBreak: int = Field(...)
@@ -81,8 +81,8 @@ class SemesterModel(BaseModel):
         schema_extra = {
             "example": {
                 "name": "2020-21 Spring",
-                "startDate": "2016-02-18",
-                "endDate": "2016-06-18",
+                "startDate": "2016-02-18T00:00:00Z",
+                "endDate": "2016-06-18T00:00:00Z",
                 "startHour": "8.10",
                 "dLesson": 50,
                 "dBreak": 10,
@@ -110,22 +110,21 @@ class SemesterModel(BaseModel):
 
 
 class UpdateUserSemesterModel(BaseModel):
-    name: Optional[str]
-    startDate: Optional[date]
-    endDate: Optional[date]
-    startHour: Optional[str]
-    dLesson: Optional[int]
-    dBreak: Optional[int]
-    slotCount: Optional[int]
-    lessons: Optional[List[LessonModel]]
+    name: str = Field(...)
+    startDate: datetime = Field(...)
+    endDate: datetime = Field(...)
+    startHour: str = Field(...)
+    dLesson: int = Field(...)
+    dBreak: int = Field(...)
+    slotCount: int = Field(...)
 
     class Config:
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
                 "name": "2020-21 Spring",
-                "startDate": "2016-02-18",
-                "endDate": "2016-06-18",
+                "startDate": "2016-02-18T00:00:00Z",
+                "endDate": "2016-06-18T00:00:00Z",
                 "startHour": "8.10",
                 "dLesson": 50,
                 "dBreak": 10,
@@ -144,8 +143,8 @@ class UpdateUserSemesterModel(BaseModel):
 class SemesterAPIModel(BaseModel):
     id: Optional[str]
     name: Optional[str]
-    startDate: Optional[date]
-    endDate: Optional[date]
+    startDate: Optional[datetime]
+    endDate: Optional[datetime]
     startHour: Optional[str]
     dLesson: Optional[int]
     dBreak: Optional[int]
@@ -158,7 +157,7 @@ class UserModel(BaseModel):
     email: EmailStr = Field(...)
     password: str = Field(...)
     currentSemester: str = Field(...)
-    semesters: List[SemesterModel] = []
+    semesters: List[UserSemesterModel] = []
 
     class Config:
         allow_population_by_field_name = True

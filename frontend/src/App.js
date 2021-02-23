@@ -33,7 +33,9 @@ function App() {
           <Route exact path="/semesters" component={Semesters} />
           <Route exact path="/lessons" component={ShowLessons} />
           <Route exact path="/attendance" component={Attendance} />
-          <Route exact path="/add-semester" component={AddSemester} />
+
+          <Route exact path="/semesters/add-semester" component={AddSemester} />
+          <Route exact path="/semesters/update-semester/:id" component={AddSemester} />
 
           <Route exact path="/lessons/add-lesson" component={AddUpdateLesson} />
           <Route exact path="/lessons/update-lesson/:id" component={AddUpdateLesson} />

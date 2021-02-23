@@ -27,14 +27,17 @@ const Semester = ({ semester, onDeleteSemester, onCurrentSemester, currentSemest
                 <div className="flex justify-evenly flex-col md:flex-row">
                     <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
                         <span aria-hidden className="absolute inset-0 bg-yellow-300 rounded-full"></span>
-                        <button onClick={onCurrentSemester} className="relative text-xs font-bold">{currentSemester === semester.id ? "Current" : "Set Current"}</button>
-
+                        <Link to={{ pathname: `/semesters/update-semester/${semester.id}` }} className="relative text-xs font-bold">Edit</Link>
                     </span>
                     <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
                         <span aria-hidden className="absolute inset-0 bg-red-500 opacity-90 rounded-full"></span>
                         <button onClick={() => setSemesterDeleteModal(true)} type="button"
                             style={{ transition: "all .15s ease" }}
                             className="relative text-xs font-bold">Delete</button>
+                    </span>
+                    <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                        <span aria-hidden className="absolute inset-0 bg-green-500 rounded-full"></span>
+                        <button onClick={onCurrentSemester} className={`relative text-xs font-bold ${currentSemester === semester.id && "px-2.5"}`}>{currentSemester === semester.id ? "Current" : "Set Current"}</button>
                     </span>
                     {semesterDeleteModal ? (
                         <div>
