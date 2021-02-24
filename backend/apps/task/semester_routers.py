@@ -25,6 +25,7 @@ router = APIRouter()
         404: {"model": Message},
         403: {"model": Message},
         401: {"model": Message},
+        400: {"model": Message},
     },
 )
 async def create_semester(
@@ -44,7 +45,7 @@ async def create_semester(
         or semester["slotCount"] > 15
     ):
         return JSONResponse(
-            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content={
                 "message": "Lesson, break duration must be > 0 and slot count must be < 15 and > 3"
             },
@@ -268,10 +269,10 @@ async def update_semester(
     operation_id="deleteSemester",
     response_model=SemesterAPIModel,
     responses={
-        405: {"model": Message},
         404: {"model": Message},
         403: {"model": Message},
         401: {"model": Message},
+        400: {"model": Message},
     },
 )
 async def delete_semester(
@@ -288,7 +289,7 @@ async def delete_semester(
 
         if auth_user["currentSemester"] == sid:
             return JSONResponse(
-                status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                status_code=status.HTTP_400_BAD_REQUEST,
                 content={"message": "Current semester cannot be deleted"},
             )
 

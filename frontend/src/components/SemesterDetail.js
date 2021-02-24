@@ -8,6 +8,7 @@ const SemesterDetail = ({ history, match }) => {
     const [login, setLogin] = useContext(UserContext);
 
     const [lessons, setLessons] = useState([])
+    const [absences, setAbsences] = useState()
     const [semester, setSemester] = useState({})
 
     const semesterID = match.params.id;
@@ -51,6 +52,42 @@ const SemesterDetail = ({ history, match }) => {
         }
     }, [uid, sid, login, setLogin, history])
 
+
+    useEffect(() => {
+        const days = ["M", "Tu", "W", "Th", "F"]
+
+        const absences = []
+        for (let i = 0; i < lessons.length; i++) {
+            for (let j = 0; j < lessons[i].absences.length; j++) {
+                const resAbs = lessons[i].absences[j].split(",")
+                absences.push({
+                    id: lessons[i]._id,
+                    name: lessons[i].name,
+                    week: resAbs[0],
+                    day: resAbs[1],
+                    slot: resAbs[2]
+                })
+            }
+        }
+
+        const absenceRows = []
+        for (let k = 0; k < absences.length; k++) {
+            absenceRows.push(
+                <tr key={k}>
+                    <td className="px-1 sm:px-4 py-2 whitespace-no-wrap border-b text-blue-900 text-left border-gray-500 text-sm leading-5">{absences[k].name}</td>
+                    <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{days[absences[k].day]}</td>
+                    <td className="px-0 sm:px-2 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">{absences[k].slot}</td>
+                    <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{absences[k].week}</td>
+                    <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">Date</td>
+                </tr>
+            )
+
+        }
+
+        setAbsences(absenceRows)
+
+    }, [lessons])
+
     const scheduleHeads = [];
     for (let index = 1; index <= semester.slotCount; index++) {
         scheduleHeads.push(<th key={index} className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">{index}</th>);
@@ -71,6 +108,8 @@ const SemesterDetail = ({ history, match }) => {
         "bg-purple-900",
         "bg-pink-900",
     ];
+
+
     let lessonSlots = {
         0: {},
         1: {},
@@ -111,7 +150,6 @@ const SemesterDetail = ({ history, match }) => {
     const scheduleWed = setScheduleDays(2);
     const scheduleThu = setScheduleDays(3);
     const scheduleFri = setScheduleDays(4);
-
 
     const weeksBetween = (d1, d2) => {
         return String(Math.round((d2 - d1) / (7 * 24 * 60 * 60 * 1000)));
@@ -236,7 +274,7 @@ const SemesterDetail = ({ history, match }) => {
                             </tr>
                         </thead>
                         <tbody className="bg-white  ">
-
+                            {absences}
                         </tbody>
                     </table>
                 </div>

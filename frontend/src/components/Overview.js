@@ -139,7 +139,7 @@ const Overview = ({ history }) => {
                         ))}
                 </td>
                 <td
-                    className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    className={`border-b border-gray-500 text-blue-900 text-sm leading-5`}
                 >
                     {lessonSlots[4][index] &&
                         lessonSlots[4][index].map((e) => (

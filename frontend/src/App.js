@@ -7,7 +7,7 @@ import Home from "./components/Home"
 import Login from "./forms/Login"
 import Register from "./forms/Register"
 import ResetPassword from './components/ResetPassword';
-import AddSemester from './forms/AddSemester';
+import AddUpdateSemester from './forms/AddUpdateSemester';
 import SemesterDetail from './components/SemesterDetail';
 import AddUpdateLesson from './forms/AddUpdateLesson';
 import AddUISLesson from './components/AddUISLesson';
@@ -34,8 +34,8 @@ function App() {
           <Route exact path="/lessons" component={ShowLessons} />
           <Route exact path="/attendance" component={Attendance} />
 
-          <Route exact path="/semesters/add-semester" component={AddSemester} />
-          <Route exact path="/semesters/update-semester/:id" component={AddSemester} />
+          <Route exact path="/semesters/add-semester" component={AddUpdateSemester} />
+          <Route exact path="/semesters/update-semester/:id" component={AddUpdateSemester} />
 
           <Route exact path="/lessons/add-lesson" component={AddUpdateLesson} />
           <Route exact path="/lessons/update-lesson/:id" component={AddUpdateLesson} />

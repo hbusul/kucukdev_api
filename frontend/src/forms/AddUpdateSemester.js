@@ -23,13 +23,12 @@ const AddSemester = ({ history, match }) => {
     let defaultClient = Kucukdevapi.ApiClient.instance;
     let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
     OAuth2PasswordBearer.accessToken = login.userToken;
-
-    let apiInstance = new Kucukdevapi.SemestersApi();
     let uid = login.userID;
 
     useEffect(() => {
         if (login) {
             if (semesterID) {
+                let apiInstance = new Kucukdevapi.SemestersApi();
                 let sid = semesterID;
                 apiInstance.getSingleSemester(uid, sid, (error, data, response) => {
                     if (error) {
@@ -44,9 +43,6 @@ const AddSemester = ({ history, match }) => {
                         const inputEnd = `${data.endDate.getFullYear()}-${((data.endDate.getMonth() + 1) > 9 ? (data.endDate.getMonth() + 1) : `0${(data.endDate.getMonth() + 1)}`)}-${(data.endDate.getDate() > 9 ? data.endDate.getDate() : `0${data.endDate.getDate()}`)}`
                         setStart(inputStart)
                         setEnd(inputEnd)
-
-                        const newStart = `${String(inputStart)}T00:00:00+00:00`
-                        const newEnd = `${String(inputEnd)}T00:00:00+00:00`
 
                         setStartDate(inputStart)
                         setEndDate(inputEnd)
@@ -64,7 +60,7 @@ const AddSemester = ({ history, match }) => {
         } else {
             history.push("/signin")
         }
-    }, [semesterID])
+    }, [semesterID, history, login, setLogin, uid])
 
     const addSemester = (e) => {
         e.preventDefault();

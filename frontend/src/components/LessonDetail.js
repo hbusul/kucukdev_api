@@ -9,6 +9,7 @@ const LessonDetail = ({ history, match }) => {
 
     const [lesson, setLesson] = useState({})
     const [absences, setAbsences] = useState([])
+    const [absenceStr, setAbsenceStr] = useState([])
     const [lessonDeleteModal, setLessonDeleteModal] = useState(false);
 
 
@@ -42,6 +43,39 @@ const LessonDetail = ({ history, match }) => {
         }
 
     }, [lessonID, uid, sid, login, setLogin, history])
+
+    useEffect(() => {
+        const days = ["M", "Tu", "W", "Th", "F"]
+
+        const absenceStructs = []
+        for (let j = 0; j < absences.length; j++) {
+            const resAbs = lesson.absences[j].split(",")
+            absenceStructs.push({
+                id: lesson._id,
+                name: lesson.name,
+                week: resAbs[0],
+                day: resAbs[1],
+                slot: resAbs[2]
+            })
+        }
+
+        const absenceRows = []
+        for (let k = 0; k < absenceStructs.length; k++) {
+            absenceRows.push(
+                <tr key={k}>
+                    <td className="px-1 sm:px-4 py-2 whitespace-no-wrap border-b text-blue-900 text-left border-gray-500 text-sm leading-5">{absenceStructs[k].name}</td>
+                    <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{days[absenceStructs[k].day]}</td>
+                    <td className="px-0 sm:px-2 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">{absenceStructs[k].slot}</td>
+                    <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{absenceStructs[k].week}</td>
+                    <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">Date</td>
+                </tr>
+            )
+
+        }
+
+        setAbsenceStr(absenceRows)
+
+    }, [absences, lesson])
 
     const deleteLesson = (id) => {
 
@@ -127,7 +161,7 @@ const LessonDetail = ({ history, match }) => {
                             </tr>
                         </thead>
                         <tbody className="bg-white  ">
-
+                            {absenceStr}
                         </tbody>
                     </table>
                 </div>

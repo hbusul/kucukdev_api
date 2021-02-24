@@ -18,6 +18,7 @@ router = APIRouter()
         404: {"model": Message},
         403: {"model": Message},
         401: {"model": Message},
+        400: {"model": Message},
     },
 )
 async def create_lesson(
@@ -33,7 +34,7 @@ async def create_lesson(
 
     if lesson["name"] == "" or lesson["instructor"] == "":
         return JSONResponse(
-            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content={"message": "Lesson and instructor name must be filled"},
         )
 
@@ -292,12 +293,12 @@ async def delete_lesson(
     "/{uid}/semesters/{sid}/lessons/{lid}/absences",
     response_description="Add absence into a lesson",
     operation_id="createAbsence",
-    response_model=AbsenceModel,
+    response_model=Message,
     responses={
-        405: {"model": Message},
         404: {"model": Message},
         403: {"model": Message},
         401: {"model": Message},
+        400: {"model": Message},
     },
 )
 async def create_absence(
@@ -343,12 +344,12 @@ async def create_absence(
                                     ),
                                 )
                                 return JSONResponse(
-                                    status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                                    status_code=status.HTTP_200_OK,
                                     content={"message": "Absence created"},
                                 )
 
                             return JSONResponse(
-                                status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                                status_code=status.HTTP_400_BAD_REQUEST,
                                 content={"message": "Absence is already exists"},
                             )
 
@@ -366,12 +367,12 @@ async def create_absence(
     "/{uid}/semesters/{sid}/lessons/{lid}/absences",
     response_description="Delete absence into a lesson",
     operation_id="deleteAbsence",
-    response_model=AbsenceModel,
+    response_model=Message,
     responses={
-        405: {"model": Message},
         404: {"model": Message},
         403: {"model": Message},
         401: {"model": Message},
+        400: {"model": Message},
     },
 )
 async def delete_absence(
@@ -422,7 +423,7 @@ async def delete_absence(
                                     content={"message": "Absence deleted"},
                                 )
                             return JSONResponse(
-                                status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                                status_code=status.HTTP_400_BAD_REQUEST,
                                 content={"message": "Absence not found"},
                             )
 

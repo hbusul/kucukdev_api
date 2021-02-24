@@ -10,6 +10,14 @@ const Attendance = ({ history }) => {
     const [lessons, setLessons] = useState([]);
     const [week, setWeek] = useState(1)
 
+    const [oldAbsences, setOldAbsences] = useState([])
+    const [oldAbsenceIDs, setOldAbsenceIDs] = useState([])
+    const [scheduleRows, setScheduleRows] = useState([])
+    const [absenceIDs, setAbsenceIDs] = useState([])
+    const [absences, setAbsences] = useState([])
+    const [presenceIDs, setPresenceIDs] = useState([])
+    const [presences, setPresences] = useState([])
+
     let defaultClient = Kucukdevapi.ApiClient.instance;
     let OAuth2PasswordBearer = defaultClient.authentications["OAuth2PasswordBearer"];
     OAuth2PasswordBearer.accessToken = login.userToken;
@@ -46,6 +54,20 @@ const Attendance = ({ history }) => {
                     } else {
                         console.log("API called successfully. Returned data: " + data);
                         setLessons(data);
+
+                        const absenceArray = []
+                        const absenceIDArray = []
+                        for (let i = 0; i < data.length; i++) {
+                            for (let j = 0; j < data[i].absences.length; j++) {
+                                absenceArray.push(data[i].absences[j])
+                                absenceIDArray.push(data[i]._id)
+                            }
+                        }
+
+                        setOldAbsences(absenceArray)
+                        setOldAbsenceIDs(absenceIDArray)
+                        setAbsences(absenceArray)
+                        setAbsenceIDs(absenceIDArray)
                     }
                 }
             );
@@ -54,6 +76,9 @@ const Attendance = ({ history }) => {
         }
 
     }, [uid, sid, login, setLogin, history]);
+
+    let strCol = "240,196,196x240,230,196x219,240,196x196,240,229x196,224,240x220,196,240x240,196,215x255,194,126x255,240,126x243,255,126x202,255,126x126,255,128x126,255,219x126,246,255x126,200,255x126,128,255x184,126,255x238,126,255x255,126,194"
+    let arrayCol = strCol.split("x")
 
     const colorArray = [
         "bg-gray-400",
@@ -70,105 +95,201 @@ const Attendance = ({ history }) => {
         "bg-purple-900",
         "bg-pink-900",
     ];
-    let lessonSlots = {
-        0: {},
-        1: {},
-        2: {},
-        3: {},
-        4: {},
-    };
 
-    for (let i = 0; i < lessons.length; i++) {
-        for (let j = 0; j < lessons[i].slots.length; j++) {
-            const day_hour = lessons[i].slots[j].split(",");
-            if (!lessonSlots[day_hour[0]][day_hour[1]])
-                lessonSlots[day_hour[0]][day_hour[1]] = [];
-            lessonSlots[day_hour[0]][day_hour[1]].push({
-                name: lessons[i].name,
-                color: colorArray[i % colorArray.length],
+    useEffect(() => {
+        let lessonSlots = {
+            0: {},
+            1: {},
+            2: {},
+            3: {},
+            4: {},
+        };
+
+        for (let i = 0; i < lessons.length; i++) {
+            for (let j = 0; j < lessons[i].slots.length; j++) {
+                const day_hour = lessons[i].slots[j].split(",");
+                if (!lessonSlots[day_hour[0]][day_hour[1]])
+                    lessonSlots[day_hour[0]][day_hour[1]] = [];
+                const arr = absences.filter((absence, index) => absence === `${week},${day_hour[0]},${day_hour[1]}` && absenceIDs[index] === lessons[i]._id)
+                const flag = arr.length > 0
+                lessonSlots[day_hour[0]][day_hour[1]].push({
+                    id: lessons[i]._id,
+                    name: lessons[i].name,
+                    color: colorArray[i % colorArray.length],
+                    flag: !flag
+                });
+            }
+        }
+
+        let hour = String(semester.startHour);
+        let resStart = hour.split(".");
+        let startHour = Number(resStart[0]);
+        let startMin = Number(resStart[1]);
+
+        const period = semester.dLesson + semester.dBreak;
+        const periodHour = parseInt(period / 60);
+        const periodMin = period % 60;
+
+        const scheduleArray = [];
+        for (let index = 1; index <= semester.slotCount; index++) {
+            scheduleArray.push(
+                <tr key={index}>
+                    <td className="px-6 pb-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                        {hour}
+                    </td>
+                    <td
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    >
+                        {lessonSlots[0][index] &&
+                            lessonSlots[0][index].map((l) => (
+                                <div className={`${l.color} py-1 m-1`}>{l.name} <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},0,${index}`, l)} checked={l.flag} type="checkbox" /></div>
+                            ))}
+                    </td>
+                    <td
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    >
+                        {lessonSlots[1][index] &&
+                            lessonSlots[1][index].map((l) => (
+                                <div className={`${l.color} py-1 m-1`}>{l.name} <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},1,${index}`, l)} checked={l.flag} type="checkbox" /></div>
+                            ))}
+                    </td>
+                    <td
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    >
+                        {lessonSlots[2][index] &&
+                            lessonSlots[2][index].map((l) => (
+                                <div className={`${l.color} py-1 m-1`}>{l.name} <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},2,${index}`, l)} checked={l.flag} type="checkbox" /></div>
+                            ))}
+                    </td>
+                    <td
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    >
+                        {lessonSlots[3][index] &&
+                            lessonSlots[3][index].map((l) => (
+                                <div className={`${l.color} py-1 m-1`}>{l.name} <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},3,${index}`, l)} checked={l.flag} type="checkbox" /></div>
+                            ))}
+                    </td>
+                    <td
+                        className={`border-b border-gray-500 text-blue-900 text-sm leading-5`}
+                    >
+                        {lessonSlots[4][index] &&
+                            lessonSlots[4][index].map((l) => (
+                                <div className={`${l.color} py-1 m-1`}>{l.name} <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},4,${index}`, l)} checked={l.flag} type="checkbox" /></div>
+                            ))}
+                    </td>
+                </tr>
+            );
+
+            startHour += periodHour;
+            startMin += periodMin;
+
+            if (startMin >= 60) {
+                startHour += 1;
+                startMin = startMin % 60;
+            }
+
+            if (startMin < 10) {
+                hour = startHour + ".0" + startMin;
+            } else {
+                hour = startHour + "." + startMin;
+            }
+        }
+
+        setScheduleRows(scheduleArray)
+
+    }, [semester, lessons, absenceIDs, week, absences, presences])
+
+
+    const selectAbsences = (e, newAbs, l) => {
+        if (e.target.checked) {
+            let place;
+            for (let i = 0; i < absences.length; i++) {
+                if (absences[i] === newAbs && absenceIDs[i] === l.id) {
+                    place = i
+                }
+            }
+            setAbsenceIDs(absenceIDs.filter((id, index) => index !== place))
+            setAbsences(absences.filter((absence, index) => index !== place))
+            setPresenceIDs([...presenceIDs, l.id])
+            setPresences([...presences, newAbs])
+        } else {
+            let place;
+            for (let i = 0; i < presences.length; i++) {
+                if (presences[i] === newAbs && presenceIDs[i] === l.id) {
+                    place = i
+                }
+            }
+            setAbsenceIDs([...absenceIDs, l.id])
+            setAbsences([...absences, newAbs])
+            setPresenceIDs(presenceIDs.filter((id, index) => index !== place))
+            setPresences(presences.filter((presence, index) => index !== place))
+        }
+    }
+
+    const weeksBetween = Math.round((semester.endDate - semester.startDate) / (7 * 24 * 60 * 60 * 1000))
+
+    const setNext = () => {
+        if (week + 1 <= weeksBetween) {
+            setWeek(week + 1)
+        }
+    }
+
+    const setPrevious = () => {
+        if (week - 1 > 0) {
+            setWeek(week - 1)
+        }
+    }
+
+    const saveWeek = () => {
+        const indexes = []
+        for (let i = 0; i < absences.length; i++) {
+            for (let j = 0; j < oldAbsences.length; j++) {
+                if (absences[i] === oldAbsences[j] && absenceIDs[i] === oldAbsenceIDs[j]) {
+                    indexes.push(i)
+                }
+            }
+        }
+
+        let indexAbsence = [...absences]
+        let indexID = [...absenceIDs]
+
+        indexAbsence = indexAbsence.filter((absence, index) => -1 === indexes.indexOf((index)))
+        indexID = indexID.filter((id, index) => -1 === indexes.indexOf((index)))
+
+        let apiInstance = new Kucukdevapi.LessonsApi();
+
+        for (let k = 0; k < indexAbsence.length; k++) {
+            let lid = indexID[k];
+            let absenceModel = new Kucukdevapi.AbsenceModel(indexAbsence[k]);
+            apiInstance.createAbsence(uid, sid, lid, absenceModel, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                }
             });
         }
-    }
 
-    let hour = String(semester.startHour);
-    let resStart = hour.split(".");
-    let startHour = Number(resStart[0]);
-    let startMin = Number(resStart[1]);
-
-    const period = semester.dLesson + semester.dBreak;
-    const periodHour = parseInt(period / 60);
-    const periodMin = period % 60;
-
-    const scheduleRows = [];
-    for (let index = 1; index <= semester.slotCount; index++) {
-        scheduleRows.push(
-            <tr key={index}>
-                <td className="px-6 pb-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                    {hour}
-                </td>
-                <td
-                    className={`border border-gray-500 text-blue-900 text-sm leading-5`}
-                >
-                    {lessonSlots[0][index] &&
-                        lessonSlots[0][index].map((e) => (
-                            <div key={Math.random(1000)} className={`${e.color} py-1 m-1`}>{e.name} <input className="ml-2" type="checkbox" /></div>
-                        ))}
-                </td>
-                <td
-                    className={`border border-gray-500 text-blue-900 text-sm leading-5`}
-                >
-                    {lessonSlots[1][index] &&
-                        lessonSlots[1][index].map((e) => (
-                            <div key={Math.random(1000)} className={`${e.color} py-1 m-1`}>{e.name} <input className="ml-2" type="checkbox" /></div>
-                        ))}
-                </td>
-                <td
-                    className={`border border-gray-500 text-blue-900 text-sm leading-5`}
-                >
-                    {lessonSlots[2][index] &&
-                        lessonSlots[2][index].map((e) => (
-                            <div key={Math.random(1000)} className={`${e.color} py-1 m-1`}>{e.name} <input className="ml-2" type="checkbox" /></div>
-                        ))}
-                </td>
-                <td
-                    className={`border border-gray-500 text-blue-900 text-sm leading-5`}
-                >
-                    {lessonSlots[3][index] &&
-                        lessonSlots[3][index].map((e) => (
-                            <div key={Math.random(1000)} className={`${e.color} py-1 m-1`}>{e.name} <input className="ml-2" type="checkbox" /></div>
-                        ))}
-                </td>
-                <td
-                    className={`border border-gray-500 text-blue-900 text-sm leading-5`}
-                >
-                    {lessonSlots[4][index] &&
-                        lessonSlots[4][index].map((e) => (
-                            <div key={Math.random(1000)} className={`${e.color} py-1 m-1`}>{e.name} <input className="ml-2" type="checkbox" /></div>
-                        ))}
-                </td>
-            </tr>
-        );
-
-        startHour += periodHour;
-        startMin += periodMin;
-
-        if (startMin >= 60) {
-            startHour += 1;
-            startMin = startMin % 60;
+        for (let l = 0; l < presences.length; l++) {
+            let lid = presenceIDs[l];
+            let absenceModel = new Kucukdevapi.AbsenceModel(presences[l]);
+            apiInstance.deleteAbsence(uid, sid, lid, absenceModel, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                }
+            });
         }
 
-        if (startMin < 10) {
-            hour = startHour + ".0" + startMin;
-        } else {
-            hour = startHour + "." + startMin;
-        }
     }
+
 
     return (
         <div className="flex flex-col mt-8 xl:mx-40">
             <h1 className="flex justify-start text-2xl ml-8 md:ml-4">Your Attendance <div className="font-extralight ml-2">Week {week}</div></h1>
-            <div className="mt-2 py-2 overflow-x-auto sm:px-6 pr-10 lg:px-8">
-                <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
+            <div className="py-2 overflow-x-auto sm:px-6 pr-10 lg:px-8">
+                <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 rounded-bl-lg rounded-br-lg">
                     <table className="min-w-full">
                         <thead>
                             <tr className="">
@@ -187,7 +308,7 @@ const Attendance = ({ history }) => {
                     </table>
                     <div className="flex flex-row justify-between">
                         <div className="flex text-xs md:text-base my-4">
-                            <button
+                            <button onClick={() => saveWeek()}
 
                                 className="px-8 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
 
@@ -200,14 +321,14 @@ const Attendance = ({ history }) => {
                             <div>
                                 <nav className="relative z-0 inline-flex shadow-sm">
                                     <div>
-                                        <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150" aria-label="Previous">
+                                        <button onClick={() => setPrevious()} className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150" aria-label="Previous">
                                             <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                                             </svg>
                                         </button>
                                     </div>
                                     <div v-if="pagination.current_page < pagination.last_page">
-                                        <button className="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150" aria-label="Next">
+                                        <button onClick={() => setNext()} className="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150" aria-label="Next">
                                             <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                                             </svg>
