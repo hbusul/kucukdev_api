@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react";
+import { Link } from 'react-router-dom'
 import { UserContext } from "../Context";
 
 var Kucukdevapi = require("kucukdevapi");
@@ -63,21 +64,25 @@ const Overview = ({ history }) => {
         }
     }, [uid, sid, login, setLogin, history]);
 
-    const colorArray = [
-        "bg-gray-400",
-        "bg-red-600",
-        "bg-yellow-500",
-        "bg-green-600",
-        "bg-blue-300",
-        "bg-indigo-300",
-        "bg-purple-600",
-        "bg-pink-600",
-        "bg-gray-900",
-        "bg-green-900",
-        "bg-indigo-900",
-        "bg-purple-900",
-        "bg-pink-900",
-    ];
+    let strCol = "240,196,196x240,230,196x219,240,196x196,240,229x196,224,240x220,196,240x240,196,215x255,194,126x255,240,126x243,255,126x202,255,126x126,255,128x126,255,219x126,246,255x126,200,255x126,128,255x184,126,255x238,126,255x255,126,194"
+    let colorArray = strCol.split("x")
+
+    // const colorArray = [
+    //     "bg-gray-400",
+    //     "bg-red-600",
+    //     "bg-yellow-500",
+    //     "bg-green-600",
+    //     "bg-blue-300",
+    //     "bg-indigo-300",
+    //     "bg-purple-600",
+    //     "bg-pink-600",
+    //     "bg-gray-900",
+    //     "bg-green-900",
+    //     "bg-indigo-900",
+    //     "bg-purple-900",
+    //     "bg-pink-900",
+    // ];
+
     let lessonSlots = {
         0: {},
         1: {},
@@ -92,6 +97,7 @@ const Overview = ({ history }) => {
             if (!lessonSlots[day_hour[0]][day_hour[1]])
                 lessonSlots[day_hour[0]][day_hour[1]] = [];
             lessonSlots[day_hour[0]][day_hour[1]].push({
+                id: lessons[i]._id,
                 name: lessons[i].name,
                 color: colorArray[i % colorArray.length],
             });
@@ -119,7 +125,7 @@ const Overview = ({ history }) => {
                 >
                     {lessonSlots[0][index] &&
                         lessonSlots[0][index].map((e) => (
-                            <div className={`${e.color} py-1 m-1`}>{e.name}</div>
+                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{e.name}</Link></div>
                         ))}
                 </td>
                 <td
@@ -127,7 +133,7 @@ const Overview = ({ history }) => {
                 >
                     {lessonSlots[1][index] &&
                         lessonSlots[1][index].map((e) => (
-                            <div className={`${e.color} py-1 m-1`}>{e.name}</div>
+                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{e.name}</Link></div>
                         ))}
                 </td>
                 <td
@@ -135,7 +141,7 @@ const Overview = ({ history }) => {
                 >
                     {lessonSlots[2][index] &&
                         lessonSlots[2][index].map((e) => (
-                            <div className={`${e.color} py-1 m-1`}>{e.name}</div>
+                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{e.name}</Link></div>
                         ))}
                 </td>
                 <td
@@ -143,7 +149,7 @@ const Overview = ({ history }) => {
                 >
                     {lessonSlots[3][index] &&
                         lessonSlots[3][index].map((e) => (
-                            <div className={`${e.color} py-1 m-1`}>{e.name}</div>
+                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{e.name}</Link></div>
                         ))}
                 </td>
                 <td
@@ -151,7 +157,7 @@ const Overview = ({ history }) => {
                 >
                     {lessonSlots[4][index] &&
                         lessonSlots[4][index].map((e) => (
-                            <div className={`${e.color} py-1 m-1`}>{e.name}</div>
+                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{e.name}</Link></div>
                         ))}
                 </td>
             </tr>

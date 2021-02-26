@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react'
+import { Link } from 'react-router-dom'
 import { UserContext } from '../Context';
 
 var Kucukdevapi = require('kucukdevapi');
@@ -87,23 +88,23 @@ const Attendance = ({ history }) => {
     }, [uid, sid, login, setLogin, history, weeksBetween]);
 
     let strCol = "240,196,196x240,230,196x219,240,196x196,240,229x196,224,240x220,196,240x240,196,215x255,194,126x255,240,126x243,255,126x202,255,126x126,255,128x126,255,219x126,246,255x126,200,255x126,128,255x184,126,255x238,126,255x255,126,194"
-    let arrayCol = strCol.split("x")
+    let colorArray = strCol.split("x")
 
-    const colorArray = [
-        "bg-gray-400",
-        "bg-red-600",
-        "bg-yellow-500",
-        "bg-green-600",
-        "bg-blue-300",
-        "bg-indigo-300",
-        "bg-purple-600",
-        "bg-pink-600",
-        "bg-gray-900",
-        "bg-green-900",
-        "bg-indigo-900",
-        "bg-purple-900",
-        "bg-pink-900",
-    ];
+    // const colorArray = [
+    //     "bg-gray-400",
+    //     "bg-red-600",
+    //     "bg-yellow-500",
+    //     "bg-green-600",
+    //     "bg-blue-300",
+    //     "bg-indigo-300",
+    //     "bg-purple-600",
+    //     "bg-pink-600",
+    //     "bg-gray-900",
+    //     "bg-green-900",
+    //     "bg-indigo-900",
+    //     "bg-purple-900",
+    //     "bg-pink-900",
+    // ];
 
     useEffect(() => {
         let lessonSlots = {
@@ -151,7 +152,7 @@ const Attendance = ({ history }) => {
                     >
                         {lessonSlots[0][index] &&
                             lessonSlots[0][index].map((l) => (
-                                <div className={`${l.color} py-1 m-1`}>{l.name} <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},0,${index}`, l)} checked={l.flag} type="checkbox" /></div>
+                                <div style={{ backgroundColor: `rgb(${l.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${l.id}`}>{l.name}</Link> <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},0,${index}`, l)} checked={l.flag} type="checkbox" /></div>
                             ))}
                     </td>
                     <td
@@ -159,7 +160,7 @@ const Attendance = ({ history }) => {
                     >
                         {lessonSlots[1][index] &&
                             lessonSlots[1][index].map((l) => (
-                                <div className={`${l.color} py-1 m-1`}>{l.name} <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},1,${index}`, l)} checked={l.flag} type="checkbox" /></div>
+                                <div style={{ backgroundColor: `rgb(${l.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${l.id}`}>{l.name}</Link> <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},1,${index}`, l)} checked={l.flag} type="checkbox" /></div>
                             ))}
                     </td>
                     <td
@@ -167,7 +168,7 @@ const Attendance = ({ history }) => {
                     >
                         {lessonSlots[2][index] &&
                             lessonSlots[2][index].map((l) => (
-                                <div className={`${l.color} py-1 m-1`}>{l.name} <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},2,${index}`, l)} checked={l.flag} type="checkbox" /></div>
+                                <div style={{ backgroundColor: `rgb(${l.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${l.id}`}>{l.name}</Link> <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},2,${index}`, l)} checked={l.flag} type="checkbox" /></div>
                             ))}
                     </td>
                     <td
@@ -175,7 +176,7 @@ const Attendance = ({ history }) => {
                     >
                         {lessonSlots[3][index] &&
                             lessonSlots[3][index].map((l) => (
-                                <div className={`${l.color} py-1 m-1`}>{l.name} <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},3,${index}`, l)} checked={l.flag} type="checkbox" /></div>
+                                <div style={{ backgroundColor: `rgb(${l.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${l.id}`}>{l.name}</Link> <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},3,${index}`, l)} checked={l.flag} type="checkbox" /></div>
                             ))}
                     </td>
                     <td
@@ -183,7 +184,7 @@ const Attendance = ({ history }) => {
                     >
                         {lessonSlots[4][index] &&
                             lessonSlots[4][index].map((l) => (
-                                <div className={`${l.color} py-1 m-1`}>{l.name} <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},4,${index}`, l)} checked={l.flag} type="checkbox" /></div>
+                                <div style={{ backgroundColor: `rgb(${l.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${l.id}`}>{l.name}</Link> <input className="ml-2" onChange={(e) => selectAbsences(e, `${week},4,${index}`, l)} checked={l.flag} type="checkbox" /></div>
                             ))}
                     </td>
                 </tr>
