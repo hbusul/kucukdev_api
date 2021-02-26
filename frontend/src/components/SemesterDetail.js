@@ -10,6 +10,7 @@ const SemesterDetail = ({ history, match }) => {
     const [lessons, setLessons] = useState([])
     const [absences, setAbsences] = useState()
     const [semester, setSemester] = useState({})
+    const [semStartDate, setSemStartDate] = useState(Date.now())
 
     const semesterID = match.params.id;
 
@@ -32,6 +33,7 @@ const SemesterDetail = ({ history, match }) => {
                 } else {
                     console.log('API called successfully. Returned data: ' + data);
                     setSemester(data)
+                    setSemStartDate(data.startDate)
                 }
             });
 
@@ -54,18 +56,29 @@ const SemesterDetail = ({ history, match }) => {
 
 
     useEffect(() => {
-        const days = ["M", "Tu", "W", "Th", "F"]
+        const days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+
+        const addDays = (date, days) => {
+            const copy = new Date(Number(date))
+            copy.setDate(date.getDate() + days)
+            return copy
+        }
 
         const absences = []
         for (let i = 0; i < lessons.length; i++) {
+            lessons[i].absences.sort()
             for (let j = 0; j < lessons[i].absences.length; j++) {
                 const resAbs = lessons[i].absences[j].split(",")
+                let date = addDays(semStartDate, ((Number(resAbs[0]) - 1) * 7) + (Number(resAbs[1]) + 1))
+                let resDate = String(date).split(" ");
+                const finalDate = resDate[1] + " " + resDate[2] + ", " + resDate[3]
                 absences.push({
                     id: lessons[i]._id,
                     name: lessons[i].name,
                     week: resAbs[0],
                     day: resAbs[1],
-                    slot: resAbs[2]
+                    slot: resAbs[2],
+                    date: finalDate
                 })
             }
         }
@@ -75,10 +88,10 @@ const SemesterDetail = ({ history, match }) => {
             absenceRows.push(
                 <tr key={k}>
                     <td className="px-1 sm:px-4 py-2 whitespace-no-wrap border-b text-blue-900 text-left border-gray-500 text-sm leading-5">{absences[k].name}</td>
-                    <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{days[absences[k].day]}</td>
+                    <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{days[absences[k].day]}</td>
                     <td className="px-0 sm:px-2 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">{absences[k].slot}</td>
                     <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{absences[k].week}</td>
-                    <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">Date</td>
+                    <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{absences[k].date}</td>
                 </tr>
             )
 
@@ -86,7 +99,7 @@ const SemesterDetail = ({ history, match }) => {
 
         setAbsences(absenceRows)
 
-    }, [lessons])
+    }, [lessons, semStartDate])
 
     const scheduleHeads = [];
     for (let index = 1; index <= semester.slotCount; index++) {

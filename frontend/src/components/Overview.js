@@ -29,8 +29,16 @@ const Overview = ({ history }) => {
                 } else {
                     console.log("API called successfully. Returned data: " + data);
                     setSemester(data);
-                    const curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000))
-                    setWeek(curWeek > 0 ? String(curWeek) : String(1))
+                    const weeksBetween = Math.round((data.endDate - data.startDate) / (7 * 24 * 60 * 60 * 1000))
+                    let curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000))
+                    if (curWeek < 0) {
+                        curWeek = String(1)
+                    } else if (curWeek > weeksBetween) {
+                        curWeek = String(weeksBetween)
+                    } else {
+                        curWeek = String(curWeek)
+                    }
+                    setWeek(curWeek)
                 }
             });
 

@@ -24,6 +24,8 @@ const Attendance = ({ history }) => {
     let uid = login.userID;
     let sid = login.semesterID;
 
+    const weeksBetween = Math.round((semester.endDate - semester.startDate) / (7 * 24 * 60 * 60 * 1000))
+
     useEffect(() => {
         if (login) {
             let smestersApiInstance = new Kucukdevapi.SemestersApi();
@@ -36,8 +38,15 @@ const Attendance = ({ history }) => {
                 } else {
                     console.log("API called successfully. Returned data: " + data);
                     setSemester(data);
-                    const curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000))
-                    setWeek(curWeek > 0 ? String(curWeek) : String(1))
+                    let curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000))
+                    if (curWeek < 0) {
+                        curWeek = String(1)
+                    } else if (curWeek > weeksBetween) {
+                        curWeek = String(weeksBetween)
+                    } else {
+                        curWeek = String(curWeek)
+                    }
+                    setWeek(curWeek)
                 }
             });
 
@@ -75,7 +84,7 @@ const Attendance = ({ history }) => {
             history.push("/signin")
         }
 
-    }, [uid, sid, login, setLogin, history]);
+    }, [uid, sid, login, setLogin, history, weeksBetween]);
 
     let strCol = "240,196,196x240,230,196x219,240,196x196,240,229x196,224,240x220,196,240x240,196,215x255,194,126x255,240,126x243,255,126x202,255,126x126,255,128x126,255,219x126,246,255x126,200,255x126,128,255x184,126,255x238,126,255x255,126,194"
     let arrayCol = strCol.split("x")
@@ -226,17 +235,17 @@ const Attendance = ({ history }) => {
         }
     }
 
-    const weeksBetween = Math.round((semester.endDate - semester.startDate) / (7 * 24 * 60 * 60 * 1000))
-
     const setNext = () => {
-        if (week + 1 <= weeksBetween) {
-            setWeek(week + 1)
+        if (Number(week) + 1 <= weeksBetween) {
+            let cWeek = Number(week) + 1
+            setWeek(String(cWeek))
         }
     }
 
     const setPrevious = () => {
-        if (week - 1 > 0) {
-            setWeek(week - 1)
+        if (Number(week) - 1 > 0) {
+            let cWeek = Number(week) - 1
+            setWeek(String(cWeek))
         }
     }
 
@@ -313,7 +322,7 @@ const Attendance = ({ history }) => {
                                 className="px-8 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
 
                             >
-                                Save The Week
+                                Save All Changes
                 </button>
                         </div>
 

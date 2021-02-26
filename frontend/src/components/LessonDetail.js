@@ -10,7 +10,10 @@ const LessonDetail = ({ history, match }) => {
     const [lesson, setLesson] = useState({})
     const [absences, setAbsences] = useState([])
     const [absenceStr, setAbsenceStr] = useState([])
-    const [lessonDeleteModal, setLessonDeleteModal] = useState(false);
+    const [slots, setSlots] = useState([])
+    const [fixedSlots, setFixedSlots] = useState([])
+    const [semStartDate, setSemStartDate] = useState(Date.now())
+    const [lessonDeleteModal, setLessonDeleteModal] = useState(false)
 
 
     const lessonID = match.params.id
@@ -24,6 +27,20 @@ const LessonDetail = ({ history, match }) => {
 
     useEffect(() => {
         if (login) {
+
+            let semesterApiInstance = new Kucukdevapi.SemestersApi();
+            semesterApiInstance.getSingleSemester(uid, sid, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                    if (error.response.status === 401) {
+                        setLogin(false)
+                    }
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                    setSemStartDate(data.startDate)
+                }
+            });
+
             let apiInstance = new Kucukdevapi.LessonsApi();
             let lid = lessonID;
             apiInstance.getSingleLesson(uid, sid, lid, (error, data, response) => {
@@ -36,6 +53,7 @@ const LessonDetail = ({ history, match }) => {
                     console.log('API called successfully. Returned data: ' + data);
                     setLesson(data)
                     setAbsences(data.absences)
+                    setSlots(data.slots)
                 }
             });
         } else {
@@ -45,17 +63,28 @@ const LessonDetail = ({ history, match }) => {
     }, [lessonID, uid, sid, login, setLogin, history])
 
     useEffect(() => {
-        const days = ["M", "Tu", "W", "Th", "F"]
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+
+        const addDays = (date, days) => {
+            const copy = new Date(Number(date))
+            copy.setDate(date.getDate() + days)
+            return copy
+        }
 
         const absenceStructs = []
+        absences.sort()
         for (let j = 0; j < absences.length; j++) {
             const resAbs = lesson.absences[j].split(",")
+            let date = addDays(semStartDate, ((Number(resAbs[0]) - 1) * 7) + (Number(resAbs[1]) + 1))
+            let resDate = String(date).split(" ");
+            const finalDate = resDate[1] + " " + resDate[2] + ", " + resDate[3]
             absenceStructs.push({
                 id: lesson._id,
                 name: lesson.name,
                 week: resAbs[0],
                 day: resAbs[1],
-                slot: resAbs[2]
+                slot: resAbs[2],
+                date: finalDate
             })
         }
 
@@ -63,11 +92,11 @@ const LessonDetail = ({ history, match }) => {
         for (let k = 0; k < absenceStructs.length; k++) {
             absenceRows.push(
                 <tr key={k}>
-                    <td className="px-1 sm:px-4 py-2 whitespace-no-wrap border-b text-blue-900 text-left border-gray-500 text-sm leading-5">{absenceStructs[k].name}</td>
-                    <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{days[absenceStructs[k].day]}</td>
+                    <td className="px-1 sm:px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{absenceStructs[k].name}</td>
+                    <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{days[absenceStructs[k].day]}</td>
                     <td className="px-0 sm:px-2 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">{absenceStructs[k].slot}</td>
                     <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{absenceStructs[k].week}</td>
-                    <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">Date</td>
+                    <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{absenceStructs[k].date}</td>
                 </tr>
             )
 
@@ -75,7 +104,28 @@ const LessonDetail = ({ history, match }) => {
 
         setAbsenceStr(absenceRows)
 
-    }, [absences, lesson])
+        let daySlot = [[], [], [], [], []]
+
+        let day = 0
+        for (let i = 0; i < slots.length; i++) {
+            const resSlot = slots[i].split(",")
+            daySlot[resSlot[0]].push(resSlot[1])
+        }
+
+        let cDay;
+        const fixedSlot = []
+        for (let j = 0; j < daySlot.length; j++) {
+            daySlot[j].length > 0 ? cDay = `${days[j]} ` : cDay = "null"
+            for (let k = 0; k < daySlot[j].length; k++) {
+                cDay += `${daySlot[j][k]}`
+                if (k < daySlot[j].length - 1) cDay += ","
+            }
+            cDay !== "null" && fixedSlot.push(cDay)
+        }
+
+        setFixedSlots(fixedSlot)
+
+    }, [absences, lesson, slots, semStartDate])
 
     const deleteLesson = (id) => {
 
@@ -108,27 +158,27 @@ const LessonDetail = ({ history, match }) => {
                         </thead>
                         <tbody className="bg-white  ">
                             <tr>
-                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Name</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left font-bold leading-5">Name</td>
                                 <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.name}</td>
                             </tr>
                             <tr>
-                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Instructor</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left font-bold leading-5">Instructor</td>
                                 <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.instructor}</td>
                             </tr>
                             <tr>
-                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Absence Limit</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left font-bold leading-5">Absence Limit</td>
                                 <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.absenceLimit}</td>
                             </tr>
                             <tr>
-                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Current Absent Number</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left font-bold leading-5">Current Absent Number</td>
                                 <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{absences.length}</td>
                             </tr>
                             <tr>
-                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Weekly Schedule</td>
-                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{lesson.slots}</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left font-bold leading-5">Weekly Schedule</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{fixedSlots.map((slot, index) => <p key={index}>{slot}</p>)}</td>
                             </tr>
                             <tr>
-                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">Quick Actions</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left font-bold leading-5">Quick Actions</td>
                                 <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                     <div className="flex justify-around flex-col md:flex-row">
                                         <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">

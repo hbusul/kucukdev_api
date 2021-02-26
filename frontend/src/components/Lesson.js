@@ -1,17 +1,43 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 const Lesson = ({ lesson, onDeleteLesson }) => {
     const [lessonDeleteModal, setLessonDeleteModal] = useState(false);
+    const [slots] = useState(lesson.slots)
+    const [fixedSlots, setFixedSlots] = useState([])
 
-    // const days = ["M", "Tu", "W", "Th", "F"]
+    useEffect(() => {
+        const days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+
+        let daySlot = [[], [], [], [], []]
+
+        let day = 0
+        for (let i = 0; i < slots.length; i++) {
+            const resSlot = slots[i].split(",")
+            daySlot[resSlot[0]].push(resSlot[1])
+        }
+
+        let cDay;
+        const fixedSlot = []
+        for (let j = 0; j < daySlot.length; j++) {
+            daySlot[j].length > 0 ? cDay = `${days[j]} ` : cDay = "null"
+            for (let k = 0; k < daySlot[j].length; k++) {
+                cDay += `${daySlot[j][k]}`
+                if (k < daySlot[j].length - 1) cDay += ","
+            }
+            cDay !== "null" && fixedSlot.push(`${cDay} `)
+        }
+
+        setFixedSlots(fixedSlot)
+
+    }, [lesson])
 
     return (
         <tr>
             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
                 <div className="text-sm text-left leading-5 text-blue-900">{lesson.name}</div>
             </td>
-            <td className="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{lesson.slots}</td>
+            <td className="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{fixedSlots.map((slot, index) => <p key={index}>{slot}</p>)}</td>
             <td className="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{(lesson.absences).length}</td>
             <td className="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">
                 <div className="flex justify-evenly flex-col md:flex-row">
