@@ -106,22 +106,24 @@ const SemesterDetail = ({ history, match }) => {
         scheduleHeads.push(<th key={index} className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">{index}</th>);
     }
 
-    const colorArray = [
-        "bg-gray-400",
-        "bg-red-600",
-        "bg-yellow-500",
-        "bg-green-600",
-        "bg-blue-300",
-        "bg-indigo-300",
-        "bg-purple-600",
-        "bg-pink-600",
-        "bg-gray-900",
-        "bg-green-900",
-        "bg-indigo-900",
-        "bg-purple-900",
-        "bg-pink-900",
-    ];
+    let strCol = "240,196,196x220,196,240x255,194,126x255,240,126x202,255,126x126,246,255x126,200,255x184,126,255x238,126,255x126,128,255x255,126,194x196,224,240x126,255,219x196,240,229x243,255,126x126,255,128"
+    let colorArray = strCol.split("x")
 
+    // const colorArray = [
+    //     "bg-gray-400",
+    //     "bg-red-600",
+    //     "bg-yellow-500",
+    //     "bg-green-600",
+    //     "bg-blue-300",
+    //     "bg-indigo-300",
+    //     "bg-purple-600",
+    //     "bg-pink-600",
+    //     "bg-gray-900",
+    //     "bg-green-900",
+    //     "bg-indigo-900",
+    //     "bg-purple-900",
+    //     "bg-pink-900",
+    // ];
 
     let lessonSlots = {
         0: {},
@@ -150,8 +152,8 @@ const SemesterDetail = ({ history, match }) => {
                 className={`border border-gray-500 text-blue-900 text-sm leading-5`}
             >
                 {lessonSlots[index][j] &&
-                    lessonSlots[index][j].map((e) => (
-                        <div className={`${e.color} p-2`}></div>
+                    lessonSlots[index][j].map((l) => (
+                        <div style={{ backgroundColor: `rgb(${l.color})` }} className="p-2"></div>
                     ))}
             </td>)
         }
@@ -265,7 +267,7 @@ const SemesterDetail = ({ history, match }) => {
                                             <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{lesson.instructor}</td>
                                             <td className="px-0 sm:px-2 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">{(lesson.absences).length}</td>
                                             <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{lesson.absenceLimit}</td>
-                                            <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5"><div className={`${colorArray[index]} p-2`}></div></td>
+                                            <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5"><div style={{ backgroundColor: `rgb(${colorArray[index % colorArray.length]})` }} className="p-2"></div></td>
                                         </tr>
                                     )
                                 })

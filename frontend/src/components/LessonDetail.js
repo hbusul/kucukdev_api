@@ -106,21 +106,20 @@ const LessonDetail = ({ history, match }) => {
 
         let daySlot = [[], [], [], [], []]
 
-        let day = 0
         for (let i = 0; i < slots.length; i++) {
             const resSlot = slots[i].split(",")
             daySlot[resSlot[0]].push(resSlot[1])
         }
 
-        let cDay;
+        let day;
         const fixedSlot = []
         for (let j = 0; j < daySlot.length; j++) {
-            daySlot[j].length > 0 ? cDay = `${days[j]} ` : cDay = "null"
+            daySlot[j].length > 0 ? day = `${days[j]} ` : day = "null"
             for (let k = 0; k < daySlot[j].length; k++) {
-                cDay += `${daySlot[j][k]}`
-                if (k < daySlot[j].length - 1) cDay += ","
+                day += `${daySlot[j][k]}`
+                if (k < daySlot[j].length - 1) day += ","
             }
-            cDay !== "null" && fixedSlot.push(cDay)
+            day !== "null" && fixedSlot.push(day)
         }
 
         setFixedSlots(fixedSlot)
