@@ -36,8 +36,8 @@ const Semester = ({ semester, onDeleteSemester, onCurrentSemester, currentSemest
                             className="relative text-xs font-bold">Delete</button>
                     </span>
                     <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                        <span aria-hidden className="absolute inset-0 bg-green-500 rounded-full"></span>
-                        <button onClick={onCurrentSemester} className={`relative text-xs font-bold ${currentSemester === semester.id && "px-2.5"}`}>{currentSemester === semester.id ? "Current" : "Set Current"}</button>
+                        <span aria-hidden className="absolute inset-0 bg-green-500 opacity-90 rounded-full"></span>
+                        <Link to={`/semesters/${semester.id}`} className="relative text-xs font-bold">View</Link>
                     </span>
                     {semesterDeleteModal ? (
                         <div>
@@ -94,7 +94,7 @@ const Semester = ({ semester, onDeleteSemester, onCurrentSemester, currentSemest
                 </div>
             </td>
             <td className="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-500 text-sm leading-5">
-                <Link to={`/semesters/${semester.id}`} className="px-5 py-2 border-blue-500 border text-blue-500 rounded transition duration-300 hover:bg-blue-700 hover:text-white focus:outline-none">Details</Link>
+                <button onClick={onCurrentSemester} className={`px-5 py-2 border-blue-500 border text-blue-500 rounded transition duration-300 hover:bg-blue-700 hover:text-white focus:outline-none ${currentSemester === semester.id && "px-8"}`}>{currentSemester === semester.id ? "Current" : "Set Current"}</button>
             </td>
         </tr>
     )

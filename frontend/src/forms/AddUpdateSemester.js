@@ -70,9 +70,6 @@ const AddSemester = ({ history, match }) => {
             const newStart = `${String(startDate)}T00:00:00+00:00`
             const newEnd = `${String(endDate)}T00:00:00+00:00`
 
-            console.log(startDate)
-            console.log(newStart)
-
             let apiInstance = new Kucukdevapi.SemestersApi();
             let userSemesterModel = new Kucukdevapi.UserSemesterModel(semesterName, newStart, newEnd, hour, dLesson, dBreak, slotCount);
             apiInstance.createSemester(uid, userSemesterModel, (error, data, response) => {
@@ -113,9 +110,6 @@ const AddSemester = ({ history, match }) => {
             const newStart = `${String(startDate)}T00:00:00+00:00`
             const newEnd = `${String(endDate)}T00:00:00+00:00`
 
-            console.log(startDate)
-            console.log(newStart)
-
             let apiInstance = new Kucukdevapi.SemestersApi();
             let sid = semesterID;
             let updateUserSemesterModel = new Kucukdevapi.UpdateUserSemesterModel(semesterName, newStart, newEnd, hour, dLesson, dBreak, slotCount);
@@ -152,9 +146,8 @@ const AddSemester = ({ history, match }) => {
                                         className="w-full px-3 py-2 mb-3 text-md leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                         id="name"
                                         type="text"
-                                        placeholder="2020-2021 Spring"
                                         name="name"
-                                        defaultValue={semesterID && semesterName}
+                                        defaultValue={semesterID ? semesterName : "2020-2021 Spring"}
                                         onChange={(e) => setSemesterName(e.target.value)}
                                         required
                                     />
@@ -201,9 +194,8 @@ const AddSemester = ({ history, match }) => {
                                                 className="w-full px-3 py-2 mb-3 text-md leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                                 id="startHour"
                                                 type="number"
-                                                placeholder="8"
                                                 name="startHour"
-                                                defaultValue={semesterID && startHour}
+                                                defaultValue={semesterID ? startHour : 8}
                                                 min="1"
                                                 max="24"
                                                 onChange={(e) => setStartHour(e.target.value)}
@@ -213,9 +205,8 @@ const AddSemester = ({ history, match }) => {
                                                 className="w-full px-3 py-2 mb-3 text-md leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                                 id="startMin"
                                                 type="number"
-                                                placeholder="30"
                                                 name="startMin"
-                                                defaultValue={semesterID && startMin}
+                                                defaultValue={semesterID ? startMin : 10}
                                                 min="1"
                                                 max="59"
                                                 onChange={(e) => setStartMin(e.target.value)}
@@ -230,9 +221,8 @@ const AddSemester = ({ history, match }) => {
                                             className="w-full px-3 py-2 mb-3 text-md leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                             id="slotCount"
                                             type="number"
-                                            placeholder="14"
                                             name="slotCount"
-                                            defaultValue={semesterID && slotCount}
+                                            defaultValue={semesterID ? slotCount : 12}
                                             min="3"
                                             max="15"
                                             onChange={(e) => setSlotCount(e.target.value)}
@@ -249,9 +239,8 @@ const AddSemester = ({ history, match }) => {
                                             className="w-full px-3 py-2 mb-3 text-md leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                             id="dLesson"
                                             type="number"
-                                            placeholder="50"
                                             name="dLesson"
-                                            defaultValue={semesterID && dLesson}
+                                            defaultValue={semesterID ? dLesson : 50}
                                             min="1"
                                             onChange={(e) => setDLesson(e.target.value)}
                                             required
@@ -265,9 +254,8 @@ const AddSemester = ({ history, match }) => {
                                             className="w-full px-3 py-2 mb-3 text-md leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                             id="dBreak"
                                             type="number"
-                                            placeholder="10"
                                             name="dBreak"
-                                            defaultValue={semesterID && dBreak}
+                                            defaultValue={semesterID ? dBreak : 10}
                                             min="1"
                                             onChange={(e) => setDBreak(e.target.value)}
                                             required
