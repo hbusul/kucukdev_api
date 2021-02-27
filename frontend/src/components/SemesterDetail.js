@@ -56,11 +56,13 @@ const SemesterDetail = ({ history, match }) => {
 
 
     useEffect(() => {
+        const abvDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        let startDay = abvDays.indexOf((String(semStartDate).split(" "))[0])
         const days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 
         const addDays = (date, days) => {
             const copy = new Date(Number(date))
-            copy.setDate(date.getDate() + days)
+            copy.setDate(date.getDate() + days - startDay)
             return copy
         }
 
@@ -69,7 +71,7 @@ const SemesterDetail = ({ history, match }) => {
             lessons[i].absences.sort()
             for (let j = 0; j < lessons[i].absences.length; j++) {
                 const resAbs = lessons[i].absences[j].split(",")
-                let date = addDays(semStartDate, ((Number(resAbs[0]) - 1) * 7) + (Number(resAbs[1]) + 1))
+                let date = addDays(semStartDate, ((Number(resAbs[0]) - 1) * 7) + (Number(resAbs[1])))
                 let resDate = String(date).split(" ");
                 const finalDate = resDate[1] + " " + resDate[2] + ", " + resDate[3]
                 absences.push({

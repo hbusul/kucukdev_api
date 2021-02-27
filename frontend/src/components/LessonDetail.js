@@ -63,11 +63,13 @@ const LessonDetail = ({ history, match }) => {
     }, [lessonID, uid, sid, login, setLogin, history])
 
     useEffect(() => {
+        const abvDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        let startDay = abvDays.indexOf((String(semStartDate).split(" "))[0])
         const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 
         const addDays = (date, days) => {
             const copy = new Date(Number(date))
-            copy.setDate(date.getDate() + days)
+            copy.setDate(date.getDate() + days - startDay)
             return copy
         }
 
@@ -75,7 +77,7 @@ const LessonDetail = ({ history, match }) => {
         absences.sort()
         for (let j = 0; j < absences.length; j++) {
             const resAbs = lesson.absences[j].split(",")
-            let date = addDays(semStartDate, ((Number(resAbs[0]) - 1) * 7) + (Number(resAbs[1]) + 1))
+            let date = addDays(semStartDate, ((Number(resAbs[0]) - 1) * 7) + (Number(resAbs[1])))
             let resDate = String(date).split(" ");
             const finalDate = resDate[1] + " " + resDate[2] + ", " + resDate[3]
             absenceStructs.push({

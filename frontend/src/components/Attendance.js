@@ -10,10 +10,10 @@ const Attendance = ({ history }) => {
     const [semester, setSemester] = useState({});
     const [lessons, setLessons] = useState([]);
     const [week, setWeek] = useState(1)
+    const [scheduleRows, setScheduleRows] = useState([])
 
     const [oldAbsences, setOldAbsences] = useState([])
     const [oldAbsenceIDs, setOldAbsenceIDs] = useState([])
-    const [scheduleRows, setScheduleRows] = useState([])
     const [absenceIDs, setAbsenceIDs] = useState([])
     const [absences, setAbsences] = useState([])
     const [presenceIDs, setPresenceIDs] = useState([])
@@ -39,7 +39,7 @@ const Attendance = ({ history }) => {
                 } else {
                     console.log("API called successfully. Returned data: " + data);
                     setSemester(data);
-                    let curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000))
+                    let curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000) + 0.15)
                     if (curWeek < 0) {
                         curWeek = String(1)
                     } else if (curWeek > weeksBetween) {
