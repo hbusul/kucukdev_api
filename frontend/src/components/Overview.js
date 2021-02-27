@@ -10,10 +10,10 @@ const Overview = ({ history }) => {
     const [semester, setSemester] = useState({});
     const [lessons, setLessons] = useState([]);
     const [week, setWeek] = useState(1)
+    const [dates, setDates] = useState([])
 
     let defaultClient = Kucukdevapi.ApiClient.instance;
-    let OAuth2PasswordBearer =
-        defaultClient.authentications["OAuth2PasswordBearer"];
+    let OAuth2PasswordBearer = defaultClient.authentications["OAuth2PasswordBearer"];
     OAuth2PasswordBearer.accessToken = login.userToken;
     let uid = login.userID;
     let sid = login.semesterID;
@@ -40,6 +40,21 @@ const Overview = ({ history }) => {
                         curWeek = String(curWeek)
                     }
                     setWeek(curWeek)
+
+                    const abvDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                    let startDay = abvDays.indexOf((String(data.startDate).split(" "))[0])
+
+                    const addDays = (date, days) => {
+                        const copy = new Date(Number(date))
+                        copy.setDate(date.getDate() + days - startDay)
+                        let resDate = String(copy).split(" ")
+                        return `${resDate[1]} ${resDate[2]}`
+                    }
+                    const dateArray = []
+                    for (let i = 0; i < 5; i++) {
+                        dateArray.push(addDays(data.startDate, ((Number(curWeek) - 1) * 7) + i))
+                    }
+                    setDates(dateArray)
                 }
             });
 
@@ -83,6 +98,9 @@ const Overview = ({ history }) => {
     //     "bg-pink-900",
     // ];
 
+    const abvDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    let curDay = abvDays.indexOf((String(new Date()).split(" "))[0])
+
     let lessonSlots = {
         0: {},
         1: {},
@@ -121,7 +139,7 @@ const Overview = ({ history }) => {
                     {hour}
                 </td>
                 <td
-                    className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    className={`border border-gray-500 text-blue-900 text-sm leading-5 ${(curDay === 0 || curDay > 4) && "bg-gray-200"}`}
                 >
                     {lessonSlots[0][index] &&
                         lessonSlots[0][index].map((e) => (
@@ -129,7 +147,7 @@ const Overview = ({ history }) => {
                         ))}
                 </td>
                 <td
-                    className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    className={`border border-gray-500 text-blue-900 text-sm leading-5 ${curDay === 1 && "bg-gray-200"}`}
                 >
                     {lessonSlots[1][index] &&
                         lessonSlots[1][index].map((e) => (
@@ -137,7 +155,7 @@ const Overview = ({ history }) => {
                         ))}
                 </td>
                 <td
-                    className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    className={`border border-gray-500 text-blue-900 text-sm leading-5 ${curDay === 2 && "bg-gray-200"}`}
                 >
                     {lessonSlots[2][index] &&
                         lessonSlots[2][index].map((e) => (
@@ -145,7 +163,7 @@ const Overview = ({ history }) => {
                         ))}
                 </td>
                 <td
-                    className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    className={`border border-gray-500 text-blue-900 text-sm leading-5 ${curDay === 3 && "bg-gray-200"}`}
                 >
                     {lessonSlots[3][index] &&
                         lessonSlots[3][index].map((e) => (
@@ -153,7 +171,7 @@ const Overview = ({ history }) => {
                         ))}
                 </td>
                 <td
-                    className={`border-b border-gray-500 text-blue-900 text-sm leading-5`}
+                    className={`border-b border-gray-500 text-blue-900 text-sm leading-5 ${curDay === 4 && "bg-gray-200"}`}
                 >
                     {lessonSlots[4][index] &&
                         lessonSlots[4][index].map((e) => (
@@ -186,24 +204,12 @@ const Overview = ({ history }) => {
                     <table className="min-w-full">
                         <thead>
                             <tr className="">
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">
-                                    #
-                </th>
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                    Monday
-                </th>
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                    Tuesday
-                </th>
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                    Wednesday
-                </th>
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                    Thursday
-                </th>
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                    Friday
-                </th>
+                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">#</th>
+                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"><div className="text-gray-600">{dates[0]}</div> Monday</th>
+                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"><div className="text-gray-600">{dates[1]}</div> Tuesday</th>
+                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"><div className="text-gray-600">{dates[2]}</div> Wednesday</th>
+                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"><div className="text-gray-600">{dates[3]}</div> Thursday</th>
+                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"><div className="text-gray-600">{dates[4]}</div> Friday</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white  ">{scheduleRows}</tbody>

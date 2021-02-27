@@ -11,6 +11,8 @@ const Attendance = ({ history }) => {
     const [lessons, setLessons] = useState([]);
     const [week, setWeek] = useState(1)
     const [scheduleRows, setScheduleRows] = useState([])
+    const [semStartDate, setSemStartDate] = useState(new Date())
+    const [dates, setDates] = useState([])
 
     const [oldAbsences, setOldAbsences] = useState([])
     const [oldAbsenceIDs, setOldAbsenceIDs] = useState([])
@@ -39,6 +41,7 @@ const Attendance = ({ history }) => {
                 } else {
                     console.log("API called successfully. Returned data: " + data);
                     setSemester(data);
+                    setSemStartDate(data.startDate)
                     let curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000) + 0.15)
                     if (curWeek < 0) {
                         curWeek = String(1)
@@ -106,7 +109,24 @@ const Attendance = ({ history }) => {
     //     "bg-pink-900",
     // ];
 
+
     useEffect(() => {
+        const abvDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        let curDay = abvDays.indexOf((String(new Date()).split(" "))[0])
+        let startDay = abvDays.indexOf((String(semStartDate).split(" "))[0])
+
+        const addDays = (date, days) => {
+            const copy = new Date(Number(date))
+            copy.setDate(date.getDate() + days - startDay)
+            let resDate = String(copy).split(" ")
+            return `${resDate[1]} ${resDate[2]}`
+        }
+        const dateArray = []
+        for (let i = 0; i < 5; i++) {
+            dateArray.push(addDays(semStartDate, ((Number(week) - 1) * 7) + i))
+        }
+        setDates(dateArray)
+
         let lessonSlots = {
             0: {},
             1: {},
@@ -148,7 +168,7 @@ const Attendance = ({ history }) => {
                         {hour}
                     </td>
                     <td
-                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5 ${(curDay === 0 || curDay > 4) && "bg-gray-200"}`}
                     >
                         {lessonSlots[0][index] &&
                             lessonSlots[0][index].map((l) => (
@@ -156,7 +176,7 @@ const Attendance = ({ history }) => {
                             ))}
                     </td>
                     <td
-                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5 ${curDay === 1 && "bg-gray-200"}`}
                     >
                         {lessonSlots[1][index] &&
                             lessonSlots[1][index].map((l) => (
@@ -164,7 +184,7 @@ const Attendance = ({ history }) => {
                             ))}
                     </td>
                     <td
-                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5 ${curDay === 2 && "bg-gray-200"}`}
                     >
                         {lessonSlots[2][index] &&
                             lessonSlots[2][index].map((l) => (
@@ -172,7 +192,7 @@ const Attendance = ({ history }) => {
                             ))}
                     </td>
                     <td
-                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5 ${curDay === 3 && "bg-gray-200"}`}
                     >
                         {lessonSlots[3][index] &&
                             lessonSlots[3][index].map((l) => (
@@ -180,7 +200,7 @@ const Attendance = ({ history }) => {
                             ))}
                     </td>
                     <td
-                        className={`border-b border-gray-500 text-blue-900 text-sm leading-5`}
+                        className={`border-b border-gray-500 text-blue-900 text-sm leading-5 ${curDay === 4 && "bg-gray-200"}`}
                     >
                         {lessonSlots[4][index] &&
                             lessonSlots[4][index].map((l) => (
@@ -207,7 +227,7 @@ const Attendance = ({ history }) => {
 
         setScheduleRows(scheduleArray)
 
-    }, [semester, lessons, absenceIDs, week, absences, presences])
+    }, [semester, lessons, absenceIDs, week, absences, presences, semStartDate])
 
 
     const selectAbsences = (e, newAbs, l) => {
@@ -304,12 +324,11 @@ const Attendance = ({ history }) => {
                         <thead>
                             <tr className="">
                                 <th className="px-6 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">#</th>
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Monday</th>
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Tuesday</th>
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Wednesday</th>
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Thursday</th>
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Friday</th>
-
+                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"><div className="text-gray-600">{dates[0]}</div> Monday</th>
+                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"><div className="text-gray-600">{dates[1]}</div> Tuesday</th>
+                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"><div className="text-gray-600">{dates[2]}</div> Wednesday</th>
+                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"><div className="text-gray-600">{dates[3]}</div> Thursday</th>
+                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"><div className="text-gray-600">{dates[4]}</div> Friday</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white  ">

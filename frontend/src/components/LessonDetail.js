@@ -12,7 +12,7 @@ const LessonDetail = ({ history, match }) => {
     const [absenceStr, setAbsenceStr] = useState([])
     const [slots, setSlots] = useState([])
     const [fixedSlots, setFixedSlots] = useState([])
-    const [semStartDate, setSemStartDate] = useState(Date.now())
+    const [semStartDate, setSemStartDate] = useState(new Date())
     const [lessonDeleteModal, setLessonDeleteModal] = useState(false)
 
 

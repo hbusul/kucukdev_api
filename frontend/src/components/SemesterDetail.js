@@ -10,7 +10,7 @@ const SemesterDetail = ({ history, match }) => {
     const [lessons, setLessons] = useState([])
     const [absences, setAbsences] = useState()
     const [semester, setSemester] = useState({})
-    const [semStartDate, setSemStartDate] = useState(Date.now())
+    const [semStartDate, setSemStartDate] = useState(new Date())
 
     const semesterID = match.params.id;
 
