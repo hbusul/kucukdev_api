@@ -10,8 +10,11 @@ const AddLesson = ({ history, match }) => {
 
     const [semester, setSemester] = useState({})
     const [calculateModal, setCalculateModal] = useState(false);
+    const [absenceChangeModal, setAbsenceChangeModal] = useState(false)
+    const [changedAbsences, setChangedAbsences] = useState([])
 
     const [slots, setSlots] = useState([])
+    const [absences, setAbsences] = useState([])
     const [lessonName, setLessonName] = useState("")
     const [instrutcorName, setInstructorName] = useState("")
     const [absenceLimit, setAbsenceLimit] = useState(0)
@@ -45,6 +48,7 @@ const AddLesson = ({ history, match }) => {
                         setLessonName(data.name)
                         setInstructorName(data.instructor)
                         setSlots(data.slots)
+                        setAbsences(data.absences)
                     }
                 });
             } else {
@@ -142,13 +146,29 @@ const AddLesson = ({ history, match }) => {
         history.push("/lessons")
     }
 
-    const updateLesson = (e) => {
+    const updateLesson = (e, isDelete) => {
         e.preventDefault()
+
+        let lid = lessonID;
+
+        if (isDelete) {
+            let apiInstance = new Kucukdevapi.LessonsApi();
+            for (let i = 0; i < changedAbsences.length; i++) {
+                let absenceModel = new Kucukdevapi.AbsenceModel(changedAbsences[i]);
+                apiInstance.deleteAbsence(uid, sid, lid, absenceModel, (error, data, response) => {
+                    if (error) {
+                        console.error(error);
+                    } else {
+                        console.log('API called successfully. Returned data: ' + data);
+                    }
+                });
+
+            }
+        }
 
         slots.sort()
 
         let apiInstance = new Kucukdevapi.LessonsApi();
-        let lid = lessonID;
         let updateLessonModel = new Kucukdevapi.UpdateLessonModel(lessonName, instrutcorName, absenceLimit, slots);
         apiInstance.updateLesson(uid, sid, lid, updateLessonModel, (error, data, response) => {
             if (error) {
@@ -162,6 +182,25 @@ const AddLesson = ({ history, match }) => {
         });
 
         history.push("/lessons")
+    }
+
+    const controlAbsences = (e) => {
+        e.preventDefault()
+
+        const changedSlots = []
+        for (let i = 0; i < absences.length; i++) {
+            let resAbsence = absences[i].split(",")
+            if (!slots.includes(`${resAbsence[1]},${resAbsence[2]}`)) {
+                changedSlots.push(absences[i])
+            }
+        }
+
+        if (changedSlots.length > 0) {
+            setChangedAbsences(changedSlots)
+            setAbsenceChangeModal(true)
+        } else {
+            updateLesson(e)
+        }
     }
 
 
@@ -199,7 +238,7 @@ const AddLesson = ({ history, match }) => {
                         </div>
                         <div className="w-full lg:w-5/12 bg-white p-5 rounded-lg lg:rounded-l-none mx-auto">
                             <h3 className="pt-4 text-2xl text-center">{lessonID ? "Update Lesson" : "Add Lesson!"}</h3>
-                            <form onSubmit={lessonID ? (e) => updateLesson(e) : (e) => addLesson(e)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
+                            <form onSubmit={lessonID ? (e) => controlAbsences(e) : (e) => addLesson(e)} className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
                                 <div className="mb-4">
                                     <label className="block mb-2 text-base font-bold text-gray-700">
                                         Lesson Name
@@ -365,6 +404,82 @@ const AddLesson = ({ history, match }) => {
                                         }
                                     >
                                         Use This Value
+                  </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+                </div>
+            ) : null}
+
+            {absenceChangeModal ? (
+                <div>
+                    <div
+                        className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
+                    >
+                        <div className="relative w-auto my-6 mx-auto max-w-3xl">
+                            {/*content*/}
+                            <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                                {/*header*/}
+                                <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
+                                    <h3 className="pt-4 text-2xl text-center">Absence Slots Missing!</h3>
+
+                                    <button
+                                        className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                                        onClick={() => setCalculateModal(false)}
+                                    >
+                                        <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
+                                            ×
+                    </span>
+                                    </button>
+                                </div>
+                                {/*body*/}
+                                <div className="text-left my-4 mx-8">
+                                    <p>After slot changes following absence(s) do(es) not have any slot to fit:*</p>
+                                    <div className="flex flex-row flex-wrap mx-8">
+                                        {
+                                            changedAbsences.map((absence) => <div className="mt-2 bg-gray-300 py-2 px-4 mr-2 rounded-full">{absence}</div>)
+                                        }
+                                    </div>
+                                    <p className="mt-4">If you click keep, the absence(s) will be kept and can not be changed from the absence table. However, if you prefer, you can delete them inside the lesson detail page.</p>
+                                    <p className="mt-4">If you click delete, the absence(s) will be deleted irreversibly.</p>
+                                </div>
+                                <p className="mx-8 text-left text-xs italic text-red-500 my-2">*The absence format is (Week, Day, Hour). Days: Monday: 0, Tuesday: 1, Wednesday: 2, Thursday: 3, Friday: 4.</p>
+
+                                {/*footer*/}
+                                <div className="flex items-center justify-end p-6 border-t border-solid border-gray-300 rounded-b">
+                                    <button
+                                        className="text-black background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1"
+                                        type="button"
+                                        style={{ transition: "all .15s ease" }}
+                                        onClick={() => setAbsenceChangeModal(false)}
+                                    >
+                                        Close
+                  </button>
+                                    <button
+                                        className="bg-green-500 text-white active:bg-green-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
+                                        type="button"
+                                        style={{ transition: "all .15s ease" }}
+                                        onClick={(e) => {
+                                            updateLesson(e, false)
+                                            setAbsenceChangeModal(false)
+                                        }
+                                        }
+                                    >
+                                        Keep &Update
+                  </button>
+                                    <button
+                                        className="bg-red-500 text-white active:bg-red-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
+                                        type="button"
+                                        style={{ transition: "all .15s ease" }}
+                                        onClick={(e) => {
+                                            updateLesson(e, true)
+                                            setAbsenceChangeModal(false)
+                                        }
+                                        }
+                                    >
+                                        Delete &Update
                   </button>
                                 </div>
                             </div>

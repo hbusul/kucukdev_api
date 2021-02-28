@@ -29,7 +29,7 @@ const Lesson = ({ lesson, onDeleteLesson }) => {
 
         setFixedSlots(fixedSlot)
 
-    }, [lesson])
+    }, [lesson, slots])
 
     return (
         <tr>

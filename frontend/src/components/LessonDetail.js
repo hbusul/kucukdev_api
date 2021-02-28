@@ -6,6 +6,7 @@ var Kucukdevapi = require('kucukdevapi');
 
 const LessonDetail = ({ history, match }) => {
     const [login, setLogin] = useContext(UserContext);
+    const [refresh, setRefresh] = useState(0);
 
     const [lesson, setLesson] = useState({})
     const [absences, setAbsences] = useState([])
@@ -24,10 +25,10 @@ const LessonDetail = ({ history, match }) => {
 
     let uid = login.userID;
     let sid = login.semesterID;
+    let lid = lessonID;
 
     useEffect(() => {
         if (login) {
-
             let semesterApiInstance = new Kucukdevapi.SemestersApi();
             semesterApiInstance.getSingleSemester(uid, sid, (error, data, response) => {
                 if (error) {
@@ -59,8 +60,7 @@ const LessonDetail = ({ history, match }) => {
         } else {
             history.push("/signin")
         }
-
-    }, [lessonID, uid, sid, login, setLogin, history])
+    }, [lessonID, uid, sid, login, setLogin, history, refresh])
 
     useEffect(() => {
         const abvDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -76,13 +76,13 @@ const LessonDetail = ({ history, match }) => {
         const absenceStructs = []
         absences.sort()
         for (let j = 0; j < absences.length; j++) {
-            const resAbs = lesson.absences[j].split(",")
+            const resAbs = absences[j].split(",")
             let date = addDays(semStartDate, ((Number(resAbs[0]) - 1) * 7) + (Number(resAbs[1])))
             let resDate = String(date).split(" ");
             const finalDate = resDate[1] + " " + resDate[2] + ", " + resDate[3]
             absenceStructs.push({
-                id: lesson._id,
                 name: lesson.name,
+                absence: absences[j],
                 week: resAbs[0],
                 day: resAbs[1],
                 slot: resAbs[2],
@@ -93,12 +93,13 @@ const LessonDetail = ({ history, match }) => {
         const absenceRows = []
         for (let k = 0; k < absenceStructs.length; k++) {
             absenceRows.push(
-                <tr key={k}>
+                <tr key={k} className={!slots.includes(`${absenceStructs[k].day},${absenceStructs[k].slot}`) && "bg-gray-300"}>
                     <td className="px-1 sm:px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{absenceStructs[k].name}</td>
                     <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{days[absenceStructs[k].day]}</td>
                     <td className="px-0 sm:px-2 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">{absenceStructs[k].slot}</td>
                     <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{absenceStructs[k].week}</td>
                     <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{absenceStructs[k].date}</td>
+                    <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5"><button onClick={(e) => deleteAbsence(e, absenceStructs[k].absence)}><i class="fas fa-times"></i></button></td>
                 </tr>
             )
 
@@ -128,10 +129,9 @@ const LessonDetail = ({ history, match }) => {
 
     }, [absences, lesson, slots, semStartDate])
 
-    const deleteLesson = (id) => {
+    const deleteLesson = () => {
 
         let apiInstance = new Kucukdevapi.LessonsApi();
-        let lid = id;
         apiInstance.deleteLesson(uid, sid, lid, (error, data, response) => {
             if (error) {
                 console.error(error);
@@ -141,6 +141,21 @@ const LessonDetail = ({ history, match }) => {
             } else {
                 console.log('API called successfully. Returned data: ' + data);
                 history.push("/lessons")
+            }
+        });
+    }
+
+    const deleteAbsence = (e, absence) => {
+        e.preventDefault()
+
+        let apiInstance = new Kucukdevapi.LessonsApi();
+        let absenceModel = new Kucukdevapi.AbsenceModel(absence);
+        apiInstance.deleteAbsence(uid, sid, lid, absenceModel, (error, data, response) => {
+            if (error) {
+                console.error(error);
+            } else {
+                console.log('API called successfully. Returned data: ' + data);
+                setRefresh((x) => x + 1);
             }
         });
     }
@@ -209,6 +224,7 @@ const LessonDetail = ({ history, match }) => {
                                 <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Slot</th>
                                 <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Week</th>
                                 <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">Date</th>
+                                <th className="px-2 py-3 border-b-2 border-gray-300"></th>
                             </tr>
                         </thead>
                         <tbody className="bg-white  ">
@@ -256,7 +272,7 @@ const LessonDetail = ({ history, match }) => {
                                         style={{ transition: "all .15s ease" }}
                                         onClick={() => {
                                             setLessonDeleteModal(false)
-                                            deleteLesson(lesson._id)
+                                            deleteLesson()
                                         }
                                         }
                                     >
