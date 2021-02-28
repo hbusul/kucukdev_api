@@ -6,14 +6,14 @@ var Kucukdevapi = require('kucukdevapi');
 const AddSemester = ({ history, match }) => {
     const [login, setLogin] = useContext(UserContext);
 
-    const [semesterName, setSemesterName] = useState("")
+    const [semesterName, setSemesterName] = useState("2020-2021 Spring")
     const [startDate, setStartDate] = useState("")
     const [endDate, setEndDate] = useState("")
-    const [startHour, setStartHour] = useState()
-    const [startMin, setStartMin] = useState()
-    const [dLesson, setDLesson] = useState()
-    const [dBreak, setDBreak] = useState()
-    const [slotCount, setSlotCount] = useState()
+    const [startHour, setStartHour] = useState(8)
+    const [startMin, setStartMin] = useState(10)
+    const [dLesson, setDLesson] = useState(50)
+    const [dBreak, setDBreak] = useState(10)
+    const [slotCount, setSlotCount] = useState(12)
 
     const [start, setStart] = useState()
     const [end, setEnd] = useState()
@@ -147,7 +147,7 @@ const AddSemester = ({ history, match }) => {
                                         id="name"
                                         type="text"
                                         name="name"
-                                        defaultValue={semesterID ? semesterName : "2020-2021 Spring"}
+                                        defaultValue={semesterName}
                                         onChange={(e) => setSemesterName(e.target.value)}
                                         required
                                     />
@@ -195,7 +195,7 @@ const AddSemester = ({ history, match }) => {
                                                 id="startHour"
                                                 type="number"
                                                 name="startHour"
-                                                defaultValue={semesterID ? startHour : 8}
+                                                defaultValue={startHour}
                                                 min="1"
                                                 max="24"
                                                 onChange={(e) => setStartHour(e.target.value)}
@@ -206,7 +206,7 @@ const AddSemester = ({ history, match }) => {
                                                 id="startMin"
                                                 type="number"
                                                 name="startMin"
-                                                defaultValue={semesterID ? startMin : 10}
+                                                defaultValue={startMin}
                                                 min="1"
                                                 max="59"
                                                 onChange={(e) => setStartMin(e.target.value)}
@@ -222,7 +222,7 @@ const AddSemester = ({ history, match }) => {
                                             id="slotCount"
                                             type="number"
                                             name="slotCount"
-                                            defaultValue={semesterID ? slotCount : 12}
+                                            defaultValue={slotCount}
                                             min="3"
                                             max="15"
                                             onChange={(e) => setSlotCount(e.target.value)}
@@ -240,7 +240,7 @@ const AddSemester = ({ history, match }) => {
                                             id="dLesson"
                                             type="number"
                                             name="dLesson"
-                                            defaultValue={semesterID ? dLesson : 50}
+                                            defaultValue={dLesson}
                                             min="1"
                                             onChange={(e) => setDLesson(e.target.value)}
                                             required
@@ -255,7 +255,7 @@ const AddSemester = ({ history, match }) => {
                                             id="dBreak"
                                             type="number"
                                             name="dBreak"
-                                            defaultValue={semesterID ? dBreak : 10}
+                                            defaultValue={dBreak}
                                             min="1"
                                             onChange={(e) => setDBreak(e.target.value)}
                                             required
