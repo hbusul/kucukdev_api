@@ -42,7 +42,10 @@ const Attendance = ({ history }) => {
                     console.log("API called successfully. Returned data: " + data);
                     setSemester(data);
                     setSemStartDate(data.startDate)
-                    let curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000) + 0.15)
+                    const abvDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                    let startDay = abvDays.indexOf((String(data.startDate).split(" "))[0])
+
+                    let curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000) + (startDay * 0.15))
                     if (curWeek < 0) {
                         curWeek = String(1)
                     } else if (curWeek > weeksBetween) {

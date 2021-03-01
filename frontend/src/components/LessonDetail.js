@@ -93,13 +93,13 @@ const LessonDetail = ({ history, match }) => {
         const absenceRows = []
         for (let k = 0; k < absenceStructs.length; k++) {
             absenceRows.push(
-                <tr key={k} className={!slots.includes(`${absenceStructs[k].day},${absenceStructs[k].slot}`) && "bg-gray-300"}>
+                <tr key={k} className={`${!slots.includes(`${absenceStructs[k].day},${absenceStructs[k].slot}`) && "bg-gray-300"}`}>
                     <td className="px-1 sm:px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">{absenceStructs[k].name}</td>
                     <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm xl:text-left leading-5">{days[absenceStructs[k].day]}</td>
                     <td className="px-0 sm:px-2 border-b border-gray-500 text-blue-900 text-sm leading-5">{absenceStructs[k].slot}</td>
                     <td className="px-2 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">{absenceStructs[k].week}</td>
                     <td className="px-2 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">{absenceStructs[k].date}</td>
-                    <td className="px-2 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5"><button onClick={(e) => deleteAbsence(e, absenceStructs[k].absence)}><i class="fas fa-times"></i></button></td>
+                    <td className="px-2 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5"><button onClick={(e) => deleteAbsence(e, absenceStructs[k].absence)}><i className="fas fa-times"></i></button></td>
                 </tr>
             )
 

@@ -30,8 +30,11 @@ const Overview = ({ history }) => {
                 } else {
                     console.log("API called successfully. Returned data: " + data);
                     setSemester(data);
+                    const abvDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                    let startDay = abvDays.indexOf((String(data.startDate).split(" "))[0])
+
                     const weeksBetween = Math.round((data.endDate - data.startDate) / (7 * 24 * 60 * 60 * 1000))
-                    let curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000) + 0.15)
+                    let curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000) + (startDay * 0.15))
                     if (curWeek < 0) {
                         curWeek = String(1)
                     } else if (curWeek > weeksBetween) {
@@ -40,9 +43,6 @@ const Overview = ({ history }) => {
                         curWeek = String(curWeek)
                     }
                     setWeek(curWeek)
-
-                    const abvDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-                    let startDay = abvDays.indexOf((String(data.startDate).split(" "))[0])
 
                     const addDays = (date, days) => {
                         const copy = new Date(Number(date))
