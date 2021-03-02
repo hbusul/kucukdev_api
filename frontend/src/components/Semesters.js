@@ -53,7 +53,7 @@ const Semesters = ({ history }) => {
             setRefresh((x) => x + 1);
         });
 
-        if ((semesters.length % 5) === 1 && start !== 0) {
+        if ((semesters.length % 5) === 1 && start !== 0 && parseInt(semesters.length / 5) * 5 === start) {
             setStart(start - 5)
             setEnd(end - 5)
         }

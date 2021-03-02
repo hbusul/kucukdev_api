@@ -216,7 +216,7 @@ const AddLesson = ({ history, match }) => {
                     <div className="w-full flex flex-col md:flex-row">
                         <div
                             className="w-full h-auto lg:block lg:w-7/12 bg-cover rounded-l-lg">
-                            <h1 className="flex justify-center md:justify-start text-2xl ml-4 my-2">{lessonID ? "Select Updated Hours" : "Select Hours"}</h1>
+                            <h1 className="flex justify-center md:justify-start text-2xl ml-4 my-2">{lessonID ? "Select Updated Hours" : "Select Hours"} <button onClick={() => setSlots([])} className="mx-2 px-3 text-sm bg-gray-300 rounded-full">Clear All</button></h1>
                             <table className="min-w-full">
                                 <thead>
                                     <tr className="">
