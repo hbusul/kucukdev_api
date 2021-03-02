@@ -11,9 +11,11 @@ const AddLesson = ({ history, match }) => {
     const [semester, setSemester] = useState({})
     const [calculateModal, setCalculateModal] = useState(false);
     const [absenceChangeModal, setAbsenceChangeModal] = useState(false)
+    const [labModal, setLabModal] = useState(false)
     const [changedAbsences, setChangedAbsences] = useState([])
 
     const [slots, setSlots] = useState([])
+    const [isLabSlots, setIsLabSlots] = useState([])
     const [absences, setAbsences] = useState([])
     const [lessonName, setLessonName] = useState("")
     const [instrutcorName, setInstructorName] = useState("")
@@ -47,7 +49,22 @@ const AddLesson = ({ history, match }) => {
                         setAbsenceLimit(data.absenceLimit)
                         setLessonName(data.name)
                         setInstructorName(data.instructor)
-                        setSlots(data.slots)
+                        const slotArray = []
+                        for (let i = 0; i < data.slots.length; i++) {
+                            let resSlot = data.slots[i].split(",")
+                            slotArray.push(`${resSlot[0]},${resSlot[1]}`)
+                        }
+                        setSlots(slotArray)
+
+                        const labArray = []
+                        for (let i = 0; i < data.slots.length; i++) {
+                            let resSlot = data.slots[i].split(",")
+                            console.log(resSlot)
+                            if (resSlot[2] === "1") {
+                                labArray.push(data.slots[i])
+                            }
+                        }
+                        setIsLabSlots(labArray)
                         setAbsences(data.absences)
                     }
                 });
@@ -125,13 +142,33 @@ const AddLesson = ({ history, match }) => {
         }
     }
 
+    const selectLabHours = (newSlot) => {
+        if (isLabSlots.includes(newSlot)) {
+            setIsLabSlots(isLabSlots.filter((labSlot) => labSlot !== newSlot))
+        } else {
+            setIsLabSlots([...isLabSlots, newSlot])
+        }
+    }
+
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+
     const addLesson = (e) => {
         e.preventDefault()
 
         slots.sort()
 
+        const finalSlots = []
+        for (let i = 0; i < slots.length; i++) {
+            let resSlot = slots[i].split(",")
+            if (isLabSlots.includes(`${resSlot[0]},${resSlot[1]},1`)) {
+                finalSlots.push(`${resSlot[0]},${resSlot[1]},1`)
+            } else {
+                finalSlots.push(`${resSlot[0]},${resSlot[1]},0`)
+            }
+        }
+
         let apiInstance = new Kucukdevapi.LessonsApi();
-        let lessonModel = new Kucukdevapi.LessonModel(lessonName, instrutcorName, absenceLimit, slots);
+        let lessonModel = new Kucukdevapi.LessonModel(lessonName, instrutcorName, absenceLimit, finalSlots);
         apiInstance.createLesson(uid, sid, lessonModel, (error, data, response) => {
             if (error) {
                 console.error(error);
@@ -168,8 +205,18 @@ const AddLesson = ({ history, match }) => {
 
         slots.sort()
 
+        const finalSlots = []
+        for (let i = 0; i < slots.length; i++) {
+            let resSlot = slots[i].split(",")
+            if (isLabSlots.includes(`${resSlot[0]},${resSlot[1]},1`)) {
+                finalSlots.push(`${resSlot[0]},${resSlot[1]},1`)
+            } else {
+                finalSlots.push(`${resSlot[0]},${resSlot[1]},0`)
+            }
+        }
+
         let apiInstance = new Kucukdevapi.LessonsApi();
-        let updateLessonModel = new Kucukdevapi.UpdateLessonModel(lessonName, instrutcorName, absenceLimit, slots);
+        let updateLessonModel = new Kucukdevapi.UpdateLessonModel(lessonName, instrutcorName, absenceLimit, finalSlots);
         apiInstance.updateLesson(uid, sid, lid, updateLessonModel, (error, data, response) => {
             if (error) {
                 console.error(error);
@@ -216,7 +263,20 @@ const AddLesson = ({ history, match }) => {
                     <div className="w-full flex flex-col md:flex-row">
                         <div
                             className="w-full h-auto lg:block lg:w-7/12 bg-cover rounded-l-lg">
-                            <h1 className="flex justify-center md:justify-start text-2xl ml-4 my-2">{lessonID ? "Select Updated Hours" : "Select Hours"} <button onClick={() => setSlots([])} className="mx-2 px-3 text-sm bg-gray-300 rounded-full">Clear All</button></h1>
+                            <div className="flex justify-between my-2 mx-4 md:mx-0 md:ml-4">
+                                <h1 className="flex justify-start text-2xl">{lessonID ? "Select Updated Hours*" : "Select Hours*"}</h1>
+                                <div>
+                                    <button onClick={() => setSlots([])} className="mx-2 px-3 py-1 text-sm bg-gray-300 rounded-full hover:bg-gray-400">Clear Slot Table</button>
+                                    <button
+                                        type="button"
+                                        style={{ transition: "all .15s ease" }}
+                                        onClick={() => setLabModal(true)}
+                                        className="mx-2 px-3 py-1 text-sm bg-gray-300 rounded-full hover:bg-gray-400"
+                                    >
+                                        Specify Lab Hours
+            </button>
+                                </div>
+                            </div>
                             <table className="min-w-full">
                                 <thead>
                                     <tr className="">
@@ -233,7 +293,7 @@ const AddLesson = ({ history, match }) => {
                                     {scheduleRows}
                                 </tbody>
                             </table>
-                            <p className="flex justify-center md:justify-end text-xs italic text-red-500 ml-4 my-2">*You can select slots of the lesson from the table.</p>
+                            <p className="flex justify-center md:justify-end text-xs italic text-red-500 ml-4 my-2">*You can select slots of the lesson from the slot table.</p>
 
                         </div>
                         <div className="w-full lg:w-5/12 bg-white p-5 rounded-lg lg:rounded-l-none mx-auto">
@@ -244,7 +304,7 @@ const AddLesson = ({ history, match }) => {
                                         Lesson Name
                                     </label>
                                     <input
-                                        className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                        className="w-full px-3 py-2 mb-2 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                         id="lessonName"
                                         type="text"
                                         placeholder="EE213"
@@ -259,7 +319,7 @@ const AddLesson = ({ history, match }) => {
                                         Instructor Name
             </label>
                                     <input
-                                        className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                        className="w-full px-3 py-2 mb-2 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                         id="instructorName"
                                         type="text"
                                         placeholder="John Doe"
@@ -275,7 +335,7 @@ const AddLesson = ({ history, match }) => {
                                             Absence Limit
                 </label>
                                         <input
-                                            className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                            className="w-full px-3 py-2 mb-2 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                             id="absenceLimit"
                                             type="number"
                                             placeholder="20"
@@ -290,9 +350,9 @@ const AddLesson = ({ history, match }) => {
                                                 type="button"
                                                 style={{ transition: "all .15s ease" }}
                                                 onClick={() => setCalculateModal(true)}
-                                                className="inline-block text-sm text-blue-500 align-baseline hover:text-blue-800"
+                                                className="inline-block text-sm text-blue-500 align-baseline hover:text-blue-800 hover:underline"
                                             >
-                                                Calculate!
+                                                Calculate
             </button>
                                         </div>
                                     </div>
@@ -314,6 +374,7 @@ const AddLesson = ({ history, match }) => {
                     </div>
                 </div>
             </div >
+
             {calculateModal ? (
                 <div>
                     <div
@@ -324,7 +385,7 @@ const AddLesson = ({ history, match }) => {
                             <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                                 {/*header*/}
                                 <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
-                                    <h3 className="pt-4 text-2xl text-center">Calculate Absence Limit!</h3>
+                                    <h3 className="pt-4 text-2xl text-center">Calculate Absence Limit</h3>
 
                                     <button
                                         className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
@@ -439,13 +500,19 @@ const AddLesson = ({ history, match }) => {
                                     <p>After slot changes following absence(s) do(es) not have any slot to fit:*</p>
                                     <div className="flex flex-row flex-wrap mx-8">
                                         {
-                                            changedAbsences.map((absence) => <div className="mt-2 bg-gray-300 py-2 px-4 mr-2 rounded-full">{absence}</div>)
+                                            changedAbsences.map((absence, index) => {
+                                                let resAbs = absence.split(",")
+                                                return (
+                                                    <div key={index} className="mt-2 bg-gray-300 py-2 px-4 mr-2 rounded-full">{`${resAbs[0]}, ${days[resAbs[1]]}, ${resAbs[2]}`}</div>
+                                                )
+                                            }
+                                            )
                                         }
                                     </div>
                                     <p className="mt-4">If you click keep, the absence(s) will be kept and can not be changed from the absence table. However, if you prefer, you can delete them inside the lesson detail page.</p>
                                     <p className="mt-4">If you click delete, the absence(s) will be deleted irreversibly.</p>
                                 </div>
-                                <p className="mx-8 text-left text-xs italic text-red-500 my-2">*The absence format is (Week, Day, Hour). Days: Monday: 0, Tuesday: 1, Wednesday: 2, Thursday: 3, Friday: 4.</p>
+                                <p className="mx-8 text-left text-xs italic text-red-500 my-2">*The absence format is (Week, Day, Hour).</p>
 
                                 {/*footer*/}
                                 <div className="flex items-center justify-end p-6 border-t border-solid border-gray-300 rounded-b">
@@ -480,6 +547,63 @@ const AddLesson = ({ history, match }) => {
                                         }
                                     >
                                         Delete &Update
+                  </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+                </div>
+            ) : null}
+
+            {labModal ? (
+                <div>
+                    <div
+                        className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
+                    >
+                        <div className="relative w-auto my-6 mx-auto max-w-3xl">
+                            {/*content*/}
+                            <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                                {/*header*/}
+                                <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
+                                    <h3 className="pt-4 text-2xl text-center">Lab Hours</h3>
+
+                                    <button
+                                        className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                                        onClick={() => setCalculateModal(false)}
+                                    >
+                                        <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
+                                            ×
+                    </span>
+                                    </button>
+                                </div>
+                                {/*body*/}
+                                <div className="text-left my-4 mx-8">
+                                    <p>After you finished selecting slots of the lesson, you can specify the lab hours if exists.</p>
+                                    <div className="flex flex-row flex-wrap mx-8">
+                                        {
+                                            slots.map((slot, index) => {
+                                                let resSlot = slot.split(",")
+                                                return (
+                                                    <div key={index} className="mt-2 bg-gray-300 py-2 px-4 mr-2 rounded-full">{`${days[resSlot[0]]}, ${resSlot[1]}`} <input onChange={() => selectLabHours(`${resSlot[0]},${resSlot[1]},1`)} checked={isLabSlots.includes(`${resSlot[0]},${resSlot[1]},1`)} className="ml-2" type="checkbox" /></div>
+                                                )
+                                            })
+                                        }
+                                    </div>
+                                </div>
+
+                                {/*footer*/}
+                                <div className="flex items-center justify-end p-6 border-t border-solid border-gray-300 rounded-b">
+                                    <button
+                                        className="bg-green-500 text-white active:bg-green-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
+                                        type="button"
+                                        style={{ transition: "all .15s ease" }}
+                                        onClick={(e) => {
+                                            setLabModal(false)
+                                        }
+                                        }
+                                    >
+                                        Finish
                   </button>
                                 </div>
                             </div>

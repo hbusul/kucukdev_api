@@ -112,12 +112,14 @@ const Overview = ({ history }) => {
     for (let i = 0; i < lessons.length; i++) {
         for (let j = 0; j < lessons[i].slots.length; j++) {
             const day_hour = lessons[i].slots[j].split(",");
+            const isLab = day_hour[2] === "1" ? true : false;
             if (!lessonSlots[day_hour[0]][day_hour[1]])
                 lessonSlots[day_hour[0]][day_hour[1]] = [];
             lessonSlots[day_hour[0]][day_hour[1]].push({
                 id: lessons[i]._id,
                 name: lessons[i].name,
                 color: colorArray[i % colorArray.length],
+                lab: isLab
             });
         }
     }
@@ -143,7 +145,7 @@ const Overview = ({ history }) => {
                 >
                     {lessonSlots[0][index] &&
                         lessonSlots[0][index].map((e) => (
-                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{e.name}</Link></div>
+                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{`${e.name} ${e.lab ? " LAB" : ""}`}</Link></div>
                         ))}
                 </td>
                 <td
@@ -151,7 +153,7 @@ const Overview = ({ history }) => {
                 >
                     {lessonSlots[1][index] &&
                         lessonSlots[1][index].map((e) => (
-                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{e.name}</Link></div>
+                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{`${e.name} ${e.lab ? " LAB" : ""}`}</Link></div>
                         ))}
                 </td>
                 <td
@@ -159,7 +161,7 @@ const Overview = ({ history }) => {
                 >
                     {lessonSlots[2][index] &&
                         lessonSlots[2][index].map((e) => (
-                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{e.name}</Link></div>
+                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{`${e.name} ${e.lab ? " LAB" : ""}`}</Link></div>
                         ))}
                 </td>
                 <td
@@ -167,7 +169,7 @@ const Overview = ({ history }) => {
                 >
                     {lessonSlots[3][index] &&
                         lessonSlots[3][index].map((e) => (
-                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{e.name}</Link></div>
+                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{`${e.name} ${e.lab ? " LAB" : ""}`}</Link></div>
                         ))}
                 </td>
                 <td
@@ -175,7 +177,7 @@ const Overview = ({ history }) => {
                 >
                     {lessonSlots[4][index] &&
                         lessonSlots[4][index].map((e) => (
-                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{e.name}</Link></div>
+                            <div style={{ backgroundColor: `rgb(${e.color})` }} className="py-1 m-1"><Link className="hover:underline" to={`/lessons/${e.id}`}>{`${e.name} ${e.lab ? " LAB" : ""}`}</Link></div>
                         ))}
                 </td>
             </tr>

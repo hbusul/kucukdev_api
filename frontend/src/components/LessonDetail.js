@@ -11,6 +11,7 @@ const LessonDetail = ({ history, match }) => {
     const [lesson, setLesson] = useState({})
     const [absences, setAbsences] = useState([])
     const [absenceStr, setAbsenceStr] = useState([])
+    const [hasLabs, setHasLabs] = useState("No")
     const [slots, setSlots] = useState([])
     const [fixedSlots, setFixedSlots] = useState([])
     const [semStartDate, setSemStartDate] = useState(new Date())
@@ -55,6 +56,13 @@ const LessonDetail = ({ history, match }) => {
                     setLesson(data)
                     setAbsences(data.absences)
                     setSlots(data.slots)
+                    for (let i = 0; i < data.slots.length; i++) {
+                        let resSlot = data.slots[i].split(",")
+                        if (resSlot[2] === "1") {
+                            setHasLabs("Yes")
+                            break
+                        }
+                    }
                 }
             });
         } else {
@@ -86,6 +94,7 @@ const LessonDetail = ({ history, match }) => {
                 week: resAbs[0],
                 day: resAbs[1],
                 slot: resAbs[2],
+                lab: resAbs[3],
                 date: finalDate
             })
         }
@@ -93,7 +102,7 @@ const LessonDetail = ({ history, match }) => {
         const absenceRows = []
         for (let k = 0; k < absenceStructs.length; k++) {
             absenceRows.push(
-                <tr key={k} className={`${!slots.includes(`${absenceStructs[k].day},${absenceStructs[k].slot}`) && "bg-gray-300"}`}>
+                <tr key={k} className={`${!slots.includes(`${absenceStructs[k].day},${absenceStructs[k].slot},${absenceStructs[k].lab}`) && "bg-gray-300"}`}>
                     <td className="px-1 sm:px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">{absenceStructs[k].name}</td>
                     <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm xl:text-left leading-5">{days[absenceStructs[k].day]}</td>
                     <td className="px-0 sm:px-2 border-b border-gray-500 text-blue-900 text-sm leading-5">{absenceStructs[k].slot}</td>
@@ -168,8 +177,8 @@ const LessonDetail = ({ history, match }) => {
                     <table className="min-w-full">
                         <thead>
                             <tr className="">
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">#</th>
-                                <th className="px-6 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"></th>
+                                <th className="px-6 py-5 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">#</th>
+                                <th className="px-6 py-5 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider"></th>
                             </tr>
                         </thead>
                         <tbody className="bg-white  ">
@@ -188,6 +197,10 @@ const LessonDetail = ({ history, match }) => {
                             <tr>
                                 <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left font-bold leading-5">Current Absent Number</td>
                                 <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{absences.length}</td>
+                            </tr>
+                            <tr>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left font-bold leading-5">Has Labs</td>
+                                <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left leading-5">{hasLabs}</td>
                             </tr>
                             <tr>
                                 <td className="px-4 sm:px-8 md:px-20 py-4 border-b text-blue-900 border-gray-500 text-sm text-left font-bold leading-5">Weekly Schedule</td>
@@ -215,7 +228,8 @@ const LessonDetail = ({ history, match }) => {
                 </div>
 
                 <div className="m-0 md:m-2 xl:m-10  overflow-x-auto">
-                    <h1 className="flex justify-start text-2xl ml-8 md:ml-4 my-2">Absence</h1>
+                    <h1 className="flex justify-start text-2xl ml-8 md:ml-4 my-2">Absence*</h1>
+                    <p className="text-xs text-left ml-8 md:ml-4">*Darker row(s) either do(es) not exist as a slot or lab hour position changed.</p>
                     <table className="min-w-full">
                         <thead>
                             <tr className="">

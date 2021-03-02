@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
+import { Link } from 'react-router-dom'
 import { UserContext } from '../Context';
 
 var Kucukdevapi = require('kucukdevapi');
@@ -265,7 +266,7 @@ const SemesterDetail = ({ history, match }) => {
                                 lessons.map((lesson, index) => {
                                     return (
                                         <tr key={lesson._id}>
-                                            <td className="px-1 sm:px-4 py-2 whitespace-no-wrap border-b text-blue-900 font-bold text-left border-gray-500 text-sm leading-5">{lesson.name}</td>
+                                            <td className="px-1 sm:px-4 py-2 whitespace-no-wrap border-b text-blue-900 font-bold text-left border-gray-500 text-sm leading-5"><Link className="hover:underline" to={`/lessons/${lesson._id}`}>{lesson.name}</Link></td>
                                             <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{lesson.instructor}</td>
                                             <td className="px-0 sm:px-2 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">{(lesson.absences).length}</td>
                                             <td className="px-2 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{lesson.absenceLimit}</td>

@@ -56,7 +56,6 @@ const Lessons = ({ history }) => {
             setRefresh((x) => x + 1);
         });
 
-        console.log(parseInt(lessons.length / 5))
         if ((lessons.length % 5) === 1 && start !== 0 && parseInt(lessons.length / 5) * 5 === start) {
             setStart(start - 5)
             setEnd(end - 5)
