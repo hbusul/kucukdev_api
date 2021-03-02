@@ -265,13 +265,13 @@ const AddLesson = ({ history, match }) => {
                             className="w-full h-auto lg:block lg:w-7/12 bg-cover rounded-l-lg">
                             <div className="flex justify-between my-2 mx-4 md:mx-0 md:ml-4">
                                 <h1 className="flex justify-start text-2xl">{lessonID ? "Select Updated Hours*" : "Select Hours*"}</h1>
-                                <div>
-                                    <button onClick={() => setSlots([])} className="mx-2 px-3 py-1 text-sm bg-gray-300 rounded-full hover:bg-gray-400">Clear Slot Table</button>
+                                <div className="flex flex-col sm:flex-row">
+                                    <button onClick={() => setSlots([])} className="mx-2 px-3 py-1 my-1 text-xs sm:text-sm bg-gray-300 rounded-full hover:bg-gray-400">Clear Slot Table</button>
                                     <button
                                         type="button"
                                         style={{ transition: "all .15s ease" }}
                                         onClick={() => setLabModal(true)}
-                                        className="mx-2 px-3 py-1 text-sm bg-gray-300 rounded-full hover:bg-gray-400"
+                                        className="mx-2 px-3 py-1 my-1 text-xs sm:text-sm bg-gray-300 rounded-full hover:bg-gray-400"
                                     >
                                         Specify Lab Hours
             </button>
