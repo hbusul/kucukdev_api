@@ -23,18 +23,22 @@ const Lessons = ({ history }) => {
 
     useEffect(() => {
         if (login) {
-            let apiInstance = new Kucukdevapi.LessonsApi();
-            apiInstance.listLessonsOfSemester(uid, sid, (error, data, response) => {
-                if (error) {
-                    console.error(error);
-                    if (error.response.status === 401) {
-                        setLogin(false)
+            if (login.semesterID === "null") {
+                history.push("/semesters/add-semester")
+            } else {
+                let apiInstance = new Kucukdevapi.LessonsApi();
+                apiInstance.listLessonsOfSemester(uid, sid, (error, data, response) => {
+                    if (error) {
+                        console.error(error);
+                        if (error.response.status === 401) {
+                            setLogin(false)
+                        }
+                    } else {
+                        console.log('API called successfully. Returned data: ' + data);
+                        setLessons(data)
                     }
-                } else {
-                    console.log('API called successfully. Returned data: ' + data);
-                    setLessons(data)
-                }
-            });
+                });
+            }           
         } else {
             history.push("/signin")
         }

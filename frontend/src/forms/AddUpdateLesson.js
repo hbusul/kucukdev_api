@@ -35,6 +35,10 @@ const AddLesson = ({ history, match }) => {
 
     useEffect(() => {
         if (login) {
+            if (login.semesterID === "null") {
+                history.push("/semesters/add-semester")
+            }
+            
             if (lessonID) {
                 let apiInstance = new Kucukdevapi.LessonsApi();
                 let lid = lessonID;

@@ -31,37 +31,11 @@ const Attendance = ({ history }) => {
 
     useEffect(() => {
         if (login) {
-            let smestersApiInstance = new Kucukdevapi.SemestersApi();
-            smestersApiInstance.getSingleSemester(uid, sid, (error, data, response) => {
-                if (error) {
-                    console.error(error);
-                    if (error.response.status === 401) {
-                        setLogin(false)
-                    }
-                } else {
-                    console.log("API called successfully. Returned data: " + data);
-                    setSemester(data);
-                    setSemStartDate(data.startDate)
-                    const abvDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-                    let startDay = abvDays.indexOf((String(data.startDate).split(" "))[0])
-
-                    let curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000) + (startDay * 0.15))
-                    if (curWeek < 0) {
-                        curWeek = String(1)
-                    } else if (curWeek > weeksBetween) {
-                        curWeek = String(weeksBetween)
-                    } else {
-                        curWeek = String(curWeek)
-                    }
-                    setWeek(curWeek)
-                }
-            });
-
-            let lessonsApiInstance = new Kucukdevapi.LessonsApi();
-            lessonsApiInstance.listLessonsOfSemester(
-                uid,
-                sid,
-                (error, data, response) => {
+            if (login.semesterID === "null") {
+                history.push("/semesters/add-semester")
+            } else {
+                let smestersApiInstance = new Kucukdevapi.SemestersApi();
+                smestersApiInstance.getSingleSemester(uid, sid, (error, data, response) => {
                     if (error) {
                         console.error(error);
                         if (error.response.status === 401) {
@@ -69,24 +43,54 @@ const Attendance = ({ history }) => {
                         }
                     } else {
                         console.log("API called successfully. Returned data: " + data);
-                        setLessons(data);
+                        setSemester(data);
+                        setSemStartDate(data.startDate)
+                        const abvDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                        let startDay = abvDays.indexOf((String(data.startDate).split(" "))[0])
 
-                        const absenceArray = []
-                        const absenceIDArray = []
-                        for (let i = 0; i < data.length; i++) {
-                            for (let j = 0; j < data[i].absences.length; j++) {
-                                absenceArray.push(data[i].absences[j])
-                                absenceIDArray.push(data[i]._id)
-                            }
+                        let curWeek = Math.ceil((Date.now() - data.startDate) / (7 * 24 * 60 * 60 * 1000) + (startDay * 0.15))
+                        if (curWeek < 0) {
+                            curWeek = String(1)
+                        } else if (curWeek > weeksBetween) {
+                            curWeek = String(weeksBetween)
+                        } else {
+                            curWeek = String(curWeek)
                         }
-
-                        setOldAbsences(absenceArray)
-                        setOldAbsenceIDs(absenceIDArray)
-                        setAbsences(absenceArray)
-                        setAbsenceIDs(absenceIDArray)
+                        setWeek(curWeek)
                     }
-                }
-            );
+                });
+
+                let lessonsApiInstance = new Kucukdevapi.LessonsApi();
+                lessonsApiInstance.listLessonsOfSemester(
+                    uid,
+                    sid,
+                    (error, data, response) => {
+                        if (error) {
+                            console.error(error);
+                            if (error.response.status === 401) {
+                                setLogin(false)
+                            }
+                        } else {
+                            console.log("API called successfully. Returned data: " + data);
+                            setLessons(data);
+
+                            const absenceArray = []
+                            const absenceIDArray = []
+                            for (let i = 0; i < data.length; i++) {
+                                for (let j = 0; j < data[i].absences.length; j++) {
+                                    absenceArray.push(data[i].absences[j])
+                                    absenceIDArray.push(data[i]._id)
+                                }
+                            }
+
+                            setOldAbsences(absenceArray)
+                            setOldAbsenceIDs(absenceIDArray)
+                            setAbsences(absenceArray)
+                            setAbsenceIDs(absenceIDArray)
+                        }
+                    }
+                );
+            }
         } else {
             history.push("/signin")
         }

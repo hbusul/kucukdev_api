@@ -81,7 +81,7 @@ const AddSemester = ({ history, match }) => {
                 } else {
                     console.log('API called successfully. Returned data: ' + data);
                     if (data.length === 1) {
-                        setLogin({ userToken: login.userToken, userID: login.userID, semesterID: data[0]._id })
+                        setLogin({ userToken: login.userToken, userID: login.userID, semesterID: data[0]._id, universityID: login.universityID })
 
                         let updateSemesterModel = new Kucukdevapi.UpdateSemesterModel(data[0]._id);
                         let apiInstance = new Kucukdevapi.UsersApi();

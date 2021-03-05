@@ -20,18 +20,22 @@ const Semesters = ({ history }) => {
 
     useEffect(() => {
         if (login) {
-            let apiInstance = new Kucukdevapi.SemestersApi();
-            apiInstance.listSemestersOfUser(uid, (error, data, response) => {
-                if (error) {
-                    console.error(error);
-                    if (error.response.status === 401) {
-                        setLogin(false)
+            if (login.semesterID === "null") {
+                history.push("/semesters/add-semester")
+            } else {
+                let apiInstance = new Kucukdevapi.SemestersApi();
+                apiInstance.listSemestersOfUser(uid, (error, data, response) => {
+                    if (error) {
+                        console.error(error);
+                        if (error.response.status === 401) {
+                            setLogin(false)
+                        }
+                    } else {
+                        console.log('API called successfully. Returned data: ' + data);
+                        setSemesters(data)
                     }
-                } else {
-                    console.log('API called successfully. Returned data: ' + data);
-                    setSemesters(data)
-                }
-            });
+                });
+            }
         } else {
             history.push("/signin")
         }
@@ -68,7 +72,7 @@ const Semesters = ({ history }) => {
                 console.error(error);
             } else {
                 console.log('API called successfully. Returned data: ' + data);
-                setLogin({ userToken: login.userToken, userID: login.userID, semesterID: data.currentSemester })
+                setLogin({ userToken: login.userToken, userID: login.userID, semesterID: data.currentSemester, universityID: data.currentUniversity })
             }
         });
     }

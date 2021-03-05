@@ -20,7 +20,11 @@ const Overview = ({ history }) => {
 
     useEffect(() => {
         if (login) {
-            let smestersApiInstance = new Kucukdevapi.SemestersApi();
+            console.log(login)
+            if (login.semesterID === "null") {
+                history.push("/semesters/add-semester")
+            } else {
+                let smestersApiInstance = new Kucukdevapi.SemestersApi();
             smestersApiInstance.getSingleSemester(uid, sid, (error, data, response) => {
                 if (error) {
                     console.error(error);
@@ -74,6 +78,7 @@ const Overview = ({ history }) => {
                     }
                 }
             );
+            }
         } else {
             history.push("/signin")
         }

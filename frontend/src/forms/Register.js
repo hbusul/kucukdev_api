@@ -16,7 +16,7 @@ const Register = ({ history }) => {
 
         if (formPassword === formValidatePassword) {
             let apiInstance = new Kucukdevapi.UsersApi();
-            let userModel = new Kucukdevapi.UserModel(formEmail, formPassword, "null");
+            let userModel = new Kucukdevapi.UserModel(formEmail, formPassword);
             apiInstance.createUser(userModel, (error, data, response) => {
                 if (error) {
                     console.error(error);
