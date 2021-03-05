@@ -32,6 +32,24 @@ async def create_lesson(
 
     lesson = jsonable_encoder(lesson)
 
+    for slot in lesson["slots"]:
+        cur_slot = slot.split(",")
+        if cur_slot[0] < 0 or cur_slot[0] > 4:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Slot day cannot be < 0 or > 4"},
+            )
+        if cur_slot[1] < 0 or cur_slot[1] > 15:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Slot hour cannot be < 0 or > 15"},
+            )
+        if cur_slot[2] != 0 or cur_slot[2] != 1:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Slot lab hour must be 0 or 1"},
+            )
+
     if lesson["name"] == "" or lesson["instructor"] == "":
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -193,6 +211,24 @@ async def update_lesson(
     """Update a lesson with given userID, semesterID and lessonID"""
 
     lesson = {k: v for k, v in lesson.dict().items() if v is not None}
+
+    for slot in lesson["slots"]:
+        cur_slot = slot.split(",")
+        if cur_slot[0] < 0 or cur_slot[0] > 4:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Slot day cannot be < 0 or > 4"},
+            )
+        if cur_slot[1] < 0 or cur_slot[1] > 15:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Slot hour cannot be < 0 or > 15"},
+            )
+        if cur_slot[2] != 0 or cur_slot[2] != 1:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Slot lab hour must be 0 or 1"},
+            )
 
     if (
         auth_user := await user_models.get_current_user(request, token)

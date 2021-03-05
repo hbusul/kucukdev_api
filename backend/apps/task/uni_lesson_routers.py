@@ -64,7 +64,7 @@ async def create_university_lesson(
                         for section in lesson["sections"]:
                             if section["section"] == jsonable_section["section"]:
                                 return JSONResponse(
-                                    status_code=status.HTTP_200_OK,
+                                    status_code=status.HTTP_400_BAD_REQUEST,
                                     content={"message": "Section already exists"},
                                 )
 

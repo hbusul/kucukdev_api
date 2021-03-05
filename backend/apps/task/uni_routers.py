@@ -164,7 +164,7 @@ async def update_university(
         404: {"model": Message},
     },
 )
-async def delete_user(unid: str, request: Request):
+async def delete_university(unid: str, request: Request):
     """Delete a university with given universityID"""
 
     delete_result = await request.app.mongodb["universities"].delete_one({"_id": unid})

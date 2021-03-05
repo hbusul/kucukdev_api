@@ -131,7 +131,6 @@ class UserModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     email: EmailStr = Field(...)
     password: str = Field(...)
-    currentSemester: str = Field(...)
     semesters: List[UserSemesterModel] = []
 
     class Config:
@@ -140,7 +139,6 @@ class UserModel(BaseModel):
             "example": {
                 "email": "hello@agu.edu.tr",
                 "password": "hello1234",
-                "currentSemester": "null",
             }
         }
 
@@ -166,7 +164,20 @@ class UpdateSemesterModel(BaseModel):
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "currentSemester": "jkklj-jkll3-jaias-asad4",
+                "currentSemester": "c765c307-560c-47ab-b29e-0a1265eab860",
+            }
+        }
+
+
+class UpdateUniversityModel(BaseModel):
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    currentUniversity: str = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "currentUniversity": "c765c307-560c-47ab-b29e-0a1265eab860",
             }
         }
 
@@ -175,6 +186,7 @@ class UserAPIModel(BaseModel):
     id: Optional[str]
     email: Optional[EmailStr]
     currentSemester: Optional[str]
+    currentUniversity: Optional[str]
     semesters_url: Optional[str]
 
 
