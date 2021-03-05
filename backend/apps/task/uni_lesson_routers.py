@@ -26,7 +26,7 @@ router = APIRouter()
 
 
 @router.post(
-    "{unid}/semesters/{unisid}/lessons",
+    "/{unid}/semesters/{unisid}/lessons",
     response_description="Add new university lesson",
     operation_id="createUniversityLesson",
     response_model=Message,
@@ -147,7 +147,7 @@ async def create_university_lesson(
 
 
 @router.get(
-    "{unid}/semesters/{unisid}/lessons",
+    "/{unid}/semesters/{unisid}/lessons",
     response_description="List all lessons of a university semester",
     operation_id="listUniversitySemesterLessons",
     response_model=List[UniversityAPILessonModel],
@@ -177,7 +177,7 @@ async def list_university_lessons(unid: str, unisid: str, request: Request):
 
 
 @router.get(
-    "{unid}/semesters{unisid}/lessons/{unilid}",
+    "/{unid}/semesters/{unisid}/lessons/{unilid}",
     response_description="Get a single lessons of a university semester",
     operation_id="getSingleUniversitySemesterLesson",
     response_model=UniversityAPILessonModel,
@@ -209,7 +209,7 @@ async def show_university_lesson(unid: str, unisid: str, unilid: str, request: R
 
 
 @router.put(
-    "/{unid}/semesters{unisid}/lessons/{unilid}",
+    "/{unid}/semesters/{unisid}/lessons/{unilid}",
     response_description="Update a university lesson",
     operation_id="updateUniversityLesson",
     response_model=Message,

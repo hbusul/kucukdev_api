@@ -22,7 +22,7 @@ router = APIRouter()
 
 
 @router.post(
-    "{unid}/semesters",
+    "/{unid}/semesters",
     response_description="Add new university semester",
     operation_id="createUniversitySemester",
     response_model=UniversitySemesterModel,
@@ -74,7 +74,7 @@ async def create_university_semester(
 
 
 @router.get(
-    "{unid}/semesters",
+    "/{unid}/semesters",
     response_description="List all university semeseters",
     operation_id="listUniversitySemesters",
     response_model=List[UniversitySemesterModel],
@@ -100,7 +100,7 @@ async def list_university_semesters(unid: str, request: Request):
 
 
 @router.get(
-    "{unid}/semesters{unisid}",
+    "/{unid}/semesters/{unisid}",
     response_description="List a university semeseters",
     operation_id="getSingleUniversitySemesters",
     response_model=List[UniversitySemesterModel],
@@ -135,7 +135,7 @@ async def show_university_semester(unid: str, unisid: str, request: Request):
 
 
 @router.put(
-    "/{unid}/semesters{unisid}",
+    "/{unid}/semesters/{unisid}",
     response_description="Update a university semester",
     operation_id="updateUniversitySemester",
     response_model=Message,
@@ -197,7 +197,7 @@ async def update_university_semester(
 
 
 @router.delete(
-    "/{unid}/semesters{unisid}",
+    "/{unid}/semesters/{unisid}",
     response_description="Delete university semester",
     operation_id="deleteUniversitySemester",
     response_model=Message,
