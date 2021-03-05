@@ -16,8 +16,8 @@ from typing import List
 from jose import JWTError, jwt
 
 
-from apps.task import models
-from .models import (
+from apps.task import user_models
+from .user_models import (
     UserModel,
     UserAPIModel,
     UpdatePasswordModel,
@@ -75,18 +75,22 @@ async def create_user(request: Request, user: UserModel = Body(...)):
     response_model=UserAPIModel,
     responses={401: {"model": Message}},
 )
-async def get_current(request: Request, token: str = Depends(models.oauth2_scheme)):
+async def get_current(
+    request: Request, token: str = Depends(user_models.oauth2_scheme)
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, models.SECRET_KEY, algorithms=[models.ALGORITHM])
+        payload = jwt.decode(
+            token, user_models.SECRET_KEY, algorithms=[user_models.ALGORITHM]
+        )
         email: str = payload.get("sub")
         if email is None:
             raise credentials_exception
-        token_data = models.TokenData(email=email)
+        token_data = user_models.TokenData(email=email)
     except JWTError:
         raise credentials_exception
     user = await request.app.mongodb["users"].find_one({"email": token_data.email})
@@ -113,12 +117,12 @@ async def get_current(request: Request, token: str = Depends(models.oauth2_schem
     responses={403: {"model": Message}, 401: {"model": Message}},
 )
 async def show_user(
-    uid: str, request: Request, token: str = Depends(models.oauth2_scheme)
+    uid: str, request: Request, token: str = Depends(user_models.oauth2_scheme)
 ):
     """Get a single user with given userID"""
 
     if (
-        auth_user := await models.get_current_user(request, token)
+        auth_user := await user_models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
         semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
         userAPI = UserAPIModel(
@@ -151,12 +155,12 @@ async def update_password(
     uid: str,
     request: Request,
     password: UpdatePasswordModel = Body(...),
-    token: str = Depends(models.oauth2_scheme),
+    token: str = Depends(user_models.oauth2_scheme),
 ):
     """Update password of a user with given userID"""
 
     if (
-        auth_user := await models.get_current_user(request, token)
+        auth_user := await user_models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
 
         password = {k: v for k, v in password.dict().items() if v is not None}
@@ -206,12 +210,12 @@ async def update_password(
     },
 )
 async def delete_user(
-    uid: str, request: Request, token: str = Depends(models.oauth2_scheme)
+    uid: str, request: Request, token: str = Depends(user_models.oauth2_scheme)
 ):
     """Delete a user with given userID"""
 
     if (
-        auth_user := await models.get_current_user(request, token)
+        auth_user := await user_models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
 
         delete_result = await request.app.mongodb["users"].delete_one({"_id": uid})
@@ -254,12 +258,12 @@ async def update_current_semester(
     uid: str,
     request: Request,
     semester: UpdateSemesterModel = Body(...),
-    token: str = Depends(models.oauth2_scheme),
+    token: str = Depends(user_models.oauth2_scheme),
 ):
     """Update current semester ID of a user with given userID"""
 
     if (
-        auth_user := await models.get_current_user(request, token)
+        auth_user := await user_models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
 
         semester = {k: v for k, v in semester.dict().items() if v is not None}

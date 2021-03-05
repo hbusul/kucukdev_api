@@ -4,14 +4,15 @@ from fastapi.encoders import jsonable_encoder
 from typing import List
 import json
 
-from .models import (
+
+from apps.task import user_models
+from .user_models import (
     UserSemesterModel,
     UpdateSemesterModel,
     SemesterAPIModel,
     UpdateUserSemesterModel,
     Message,
 )
-from apps.task import models
 
 router = APIRouter()
 
@@ -32,7 +33,7 @@ async def create_semester(
     uid: str,
     request: Request,
     semester: UserSemesterModel = Body(...),
-    token: str = Depends(models.oauth2_scheme),
+    token: str = Depends(user_models.oauth2_scheme),
 ):
     """Create a semester for a user with given userID"""
 
@@ -52,7 +53,7 @@ async def create_semester(
         )
 
     if (
-        auth_user := await models.get_current_user(request, token)
+        auth_user := await user_models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
         update_result = await request.app.mongodb["users"].update_one(
             {"_id": uid}, {"$push": {"semesters": semester}}
@@ -91,14 +92,14 @@ async def create_semester(
     },
 )
 async def list_semesters(
-    uid: str, request: Request, token: str = Depends(models.oauth2_scheme)
+    uid: str, request: Request, token: str = Depends(user_models.oauth2_scheme)
 ):
     """list all semesters of a user with given userID"""
 
     semesters = []
 
     if (
-        auth_user := await models.get_current_user(request, token)
+        auth_user := await user_models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
         if auth_user["semesters"] is not None:
             for semester in auth_user["semesters"]:
@@ -144,12 +145,15 @@ async def list_semesters(
     },
 )
 async def show_semester(
-    uid: str, sid: str, request: Request, token: str = Depends(models.oauth2_scheme)
+    uid: str,
+    sid: str,
+    request: Request,
+    token: str = Depends(user_models.oauth2_scheme),
 ):
     """Get a single semester with given userID and semesterID"""
 
     if (
-        auth_user := await models.get_current_user(request, token)
+        auth_user := await user_models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
         for semester in auth_user["semesters"]:
             if semester["_id"] == sid:
@@ -199,14 +203,14 @@ async def update_semester(
     sid: str,
     request: Request,
     semester: UpdateUserSemesterModel = Body(...),
-    token: str = Depends(models.oauth2_scheme),
+    token: str = Depends(user_models.oauth2_scheme),
 ):
     """Update a semester with given userID and semesterID"""
 
     semester = {k: v for k, v in semester.dict().items() if v is not None}
     semester = jsonable_encoder(semester)
     if (
-        auth_user := await models.get_current_user(request, token)
+        auth_user := await user_models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
         if len(semester) >= 1:
             update_result = await request.app.mongodb["users"].update_many(
@@ -276,12 +280,15 @@ async def update_semester(
     },
 )
 async def delete_semester(
-    uid: str, sid: str, request: Request, token: str = Depends(models.oauth2_scheme)
+    uid: str,
+    sid: str,
+    request: Request,
+    token: str = Depends(user_models.oauth2_scheme),
 ):
     """Delete a semester with given userID and semesterID"""
 
     if (
-        auth_user := await models.get_current_user(request, token)
+        auth_user := await user_models.get_current_user(request, token)
     ) is not None and auth_user["_id"] == uid:
         find_user = await request.app.mongodb["users"].find_one(
             {"_id": uid, "semesters._id": sid}
