@@ -30,7 +30,7 @@ class LessonModel(BaseModel):
                 "name": "EE203",
                 "instructor": "Ali Veli",
                 "absenceLimit": 0,
-                "slots": ["2,7", "2,8"],
+                "slots": ["2,7,0", "2,8,0"],
             }
         }
 
@@ -48,7 +48,7 @@ class UpdateLessonModel(BaseModel):
                 "name": "EE203",
                 "instructor": "Ali Veli",
                 "absenceLimit": 0,
-                "slots": ["2,7", "2,8"],
+                "slots": ["2,7,0", "2,8,0"],
             }
         }
 
@@ -87,24 +87,6 @@ class UserSemesterModel(BaseModel):
                 "dLesson": 50,
                 "dBreak": 10,
                 "slotCount": 12,
-                # "lessons": [
-                #     {
-                #         "name": "EE203",
-                #         "instructor": "Ali Veli",
-                #         "slots": [["W", "7"], ["W", "8"]],
-                #     },
-                #     {
-                #         "name": "EE213",
-                #         "instructor": "Ali Ahmet",
-                #         "slots": [
-                #             ["M", "4"],
-                #             ["M", "5"],
-                #             ["T", "2"],
-                #             ["T", "3"],
-                #             ["T", "4"],
-                #         ],
-                #     },
-                # ],
             }
         }
 
@@ -129,13 +111,6 @@ class UpdateUserSemesterModel(BaseModel):
                 "dLesson": 50,
                 "dBreak": 10,
                 "slotCount": 12,
-                # "lessons": [
-                #     {
-                #         "name": "EE203",
-                #         "instructor": "Ali Veli",
-                #         "slots": [["W", "7"], ["W", "8"]],
-                #     },
-                # ],
             }
         }
 

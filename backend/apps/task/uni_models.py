@@ -24,7 +24,7 @@ class UniversityLessonModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
     code: str = Field(...)
-    ects: int = Field(...)
+    ects: float = Field(...)
     absenceLimit: int = Field(...)
     section: str = Field(...)
     instructor: str = Field(...)
@@ -49,7 +49,7 @@ class UniversityAPILessonModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
     code: str = Field(...)
-    ects: int = Field(...)
+    ects: float = Field(...)
     absenceLimit: int = Field(...)
     sections: List[UniversitySectionModel] = []
 
