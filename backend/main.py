@@ -12,6 +12,11 @@ from apps.task.user_routers import router as user_router
 from apps.task.semester_routers import router as semester_router
 from apps.task.lesson_routers import router as lesson_router
 
+from apps.task.uni_routers import router as uni_router
+from apps.task.uni_semester_routers import router as uni_semester_router
+from apps.task.uni_lesson_routers import router as uni_lesson_router
+
+
 app = FastAPI()
 
 origins = ["*"]
@@ -64,6 +69,15 @@ async def login_for_access_token(
 app.include_router(user_router, tags=["users"], prefix="/users")
 app.include_router(semester_router, tags=["semesters"], prefix="/users")
 app.include_router(lesson_router, tags=["lessons"], prefix="/users")
+
+app.include_router(uni_router, tags=["universities"], prefix="/universities")
+app.include_router(
+    uni_semester_router, tags=["university semesters"], prefix="/universities"
+)
+app.include_router(
+    uni_lesson_router, tags=["university lessons"], prefix="/universities"
+)
+
 
 if __name__ == "__main__":
     uvicorn.run(

@@ -304,15 +304,6 @@ async def delete_semester(
             {"_id": uid}, {"$pull": {"semesters": {"_id": sid}}}
         )
 
-        if (
-            created_semester := await request.app.mongodb["users"].find_one(
-                {"_id": uid}, {"semesters": {"$slice": -1}}
-            )
-        ) is None:
-            print(create_semester["semesters"])
-
-        print("not")
-
         if update_result.modified_count == 1:
             for semester in find_user["semesters"]:
                 if semester["_id"] == sid:
