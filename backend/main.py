@@ -15,7 +15,7 @@ from apps.task.lesson_routers import router as lesson_router
 from apps.task.uni_routers import router as uni_router
 from apps.task.uni_semester_routers import router as uni_semester_router
 from apps.task.uni_lesson_routers import router as uni_lesson_router
-
+from apps.task.uni_section_routers import router as uni_section_router
 
 app = FastAPI()
 
@@ -76,6 +76,9 @@ app.include_router(
 )
 app.include_router(
     uni_lesson_router, tags=["university lessons"], prefix="/universities"
+)
+app.include_router(
+    uni_section_router, tags=["university sections"], prefix="/universities"
 )
 
 

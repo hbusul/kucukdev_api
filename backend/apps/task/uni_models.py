@@ -29,7 +29,6 @@ class UniversityLessonModel(BaseModel):
     section: str = Field(...)
     instructor: str = Field(...)
     slots: List[str] = Field(...)
-    sections: List[UniversitySectionModel] = []
 
     class Config:
         allow_population_by_field_name = True
