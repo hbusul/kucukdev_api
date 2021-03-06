@@ -83,13 +83,14 @@ const AddSemester = ({ history, match }) => {
                     if (data.length === 1) {
                         setLogin({ userToken: login.userToken, userID: login.userID, semesterID: data[0]._id, universityID: login.universityID })
 
-                        let appsTaskUserModelsUpdateSemesterModel = new Kucukdevapi.AppsTaskUserModelsUpdateSemesterModel(data[0]._id);
-                        apiInstance.updateCurrentSemester(uid, appsTaskUserModelsUpdateSemesterModel, (error, data, response) => {
-                        if (error) {
-                            console.error(error);
-                        } else {
-                            console.log('API called successfully. Returned data: ' + data);
-                        }
+                        let updateSemesterModel = new Kucukdevapi.UpdateSemesterModel(data[0]._id);
+                        let apiInstance = new Kucukdevapi.UsersApi();
+                        apiInstance.updateCurrentSemester(uid, updateSemesterModel, (error, data, response) => {
+                            if (error) {
+                                console.error(error);
+                            } else {
+                                console.log('API called successfully. Returned data: ' + data);
+                            }
                         });
                     }
                     history.push("/semesters")
