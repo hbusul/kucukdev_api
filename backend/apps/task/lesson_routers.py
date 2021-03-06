@@ -34,20 +34,26 @@ async def create_lesson(
 
     for slot in lesson["slots"]:
         cur_slot = slot.split(",")
-        if cur_slot[0] < 0 or cur_slot[0] > 4:
+        if len(cur_slot) == 3:
+            if int(cur_slot[0]) < 0 or int(cur_slot[0]) > 4:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot day cannot be < 0 or > 4"},
+                )
+            if int(cur_slot[1]) < 0 or int(cur_slot[1]) > 15:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot hour cannot be < 0 or > 15"},
+                )
+            if int(cur_slot[2]) < 0 or int(cur_slot[2]) > 1:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot lab hour must be 0 or 1"},
+                )
+        else:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Slot day cannot be < 0 or > 4"},
-            )
-        if cur_slot[1] < 0 or cur_slot[1] > 15:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Slot hour cannot be < 0 or > 15"},
-            )
-        if cur_slot[2] != 0 or cur_slot[2] != 1:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Slot lab hour must be 0 or 1"},
+                content={"message": "Invalid lesson"},
             )
 
     if lesson["name"] == "" or lesson["instructor"] == "":
@@ -214,20 +220,26 @@ async def update_lesson(
 
     for slot in lesson["slots"]:
         cur_slot = slot.split(",")
-        if cur_slot[0] < 0 or cur_slot[0] > 4:
+        if len(cur_slot) == 3:
+            if int(cur_slot[0]) < 0 or int(cur_slot[0]) > 4:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot day cannot be < 0 or > 4"},
+                )
+            if int(cur_slot[1]) < 0 or int(cur_slot[1]) > 15:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot hour cannot be < 0 or > 15"},
+                )
+            if int(cur_slot[2]) < 0 or int(cur_slot[2]) > 1:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot lab hour must be 0 or 1"},
+                )
+        else:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Slot day cannot be < 0 or > 4"},
-            )
-        if cur_slot[1] < 0 or cur_slot[1] > 15:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Slot hour cannot be < 0 or > 15"},
-            )
-        if cur_slot[2] != 0 or cur_slot[2] != 1:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Slot lab hour must be 0 or 1"},
+                content={"message": "Invalid lesson"},
             )
 
     if (

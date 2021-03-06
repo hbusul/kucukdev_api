@@ -63,7 +63,6 @@ const AddLesson = ({ history, match }) => {
                         const labArray = []
                         for (let i = 0; i < data.slots.length; i++) {
                             let resSlot = data.slots[i].split(",")
-                            console.log(resSlot)
                             if (resSlot[2] === "1") {
                                 labArray.push(data.slots[i])
                             }
