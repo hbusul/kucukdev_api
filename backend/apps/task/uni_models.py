@@ -93,6 +93,33 @@ class UniversityModel(BaseModel):
         }
 
 
+class UpdateSemesterModel(BaseModel):
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    currentSemester: str = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "currentSemester": "c765c307-560c-47ab-b29e-0a1265eab860",
+            }
+        }
+
+
+class UpdateUniversityNameModel(BaseModel):
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    name: str = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "name": "AGU",
+            }
+        }
+
+
 class UniversityAPIModel(BaseModel):
     id: Optional[str]
     name: Optional[str]
+    currentSemester: Optional[str]

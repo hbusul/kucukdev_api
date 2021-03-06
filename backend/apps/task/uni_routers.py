@@ -16,7 +16,12 @@ from typing import List
 from jose import JWTError, jwt
 
 from apps.task import user_models
-from .uni_models import UniversityModel, UniversityAPIModel
+from .uni_models import (
+    UniversityModel,
+    UniversityAPIModel,
+    UpdateSemesterModel,
+    UpdateUniversityNameModel,
+)
 from .user_models import Message
 
 router = APIRouter()
@@ -43,6 +48,7 @@ async def create_university(
         auth_user := await user_models.get_current_user(request, token)
     ) is not None and auth_user["userGroup"] == "professor":
         university = jsonable_encoder(university)
+        university["currentSemester"] = "null"
 
         for doc in await request.app.mongodb["universities"].find().to_list(length=100):
             if doc["name"] == university["name"]:
@@ -80,8 +86,7 @@ async def list_universities(request: Request):
     universities = []
     for doc in await request.app.mongodb["universities"].find().to_list(length=100):
         universityAPI = UniversityAPIModel(
-            id=doc["_id"],
-            name=doc["name"],
+            id=doc["_id"], name=doc["name"], currentSemester=doc["currentSemester"]
         )
         jsonable_universityAPI = jsonable_encoder(universityAPI)
         universities.append(jsonable_universityAPI)
@@ -121,8 +126,8 @@ async def show_university(unid: str, request: Request):
 
 @router.put(
     "/{unid}",
-    response_description="Update a university",
-    operation_id="updateUniversity",
+    response_description="Update name of a university",
+    operation_id="updateUniversityName",
     response_model=Message,
     responses={
         404: {"model": Message},
@@ -130,10 +135,10 @@ async def show_university(unid: str, request: Request):
         400: {"model": Message},
     },
 )
-async def update_university(
+async def update_university_name(
     unid: str,
     request: Request,
-    university: UniversityModel = Body(...),
+    university: UpdateUniversityNameModel = Body(...),
     token: str = Depends(user_models.oauth2_scheme),
 ):
     """Update university of a user with given universityID"""
@@ -142,16 +147,6 @@ async def update_university(
         auth_user := await user_models.get_current_user(request, token)
     ) is not None and auth_user["userGroup"] == "professor":
         university = {k: v for k, v in university.dict().items() if v is not None}
-
-        if (
-            existing_user := await request.app.mongodb["universities"].find_one(
-                {"_id": unid}
-            )
-        ) is None:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "University not found"},
-            )
 
         if len(university) >= 1:
             for doc in (
@@ -178,8 +173,99 @@ async def update_university(
                         content={"message": "University name updated"},
                     )
 
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "University not found"},
+            )
+
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
+    )
+
+
+@router.put(
+    "/{unid}/update-current-semester",
+    response_description="Update current semester of a university",
+    operation_id="updateCurrentUniversitySemester",
+    response_model=Message,
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+        400: {"model": Message},
+    },
+)
+async def update_current_university_semester(
+    unid: str,
+    request: Request,
+    semester: UpdateSemesterModel = Body(...),
+    token: str = Depends(user_models.oauth2_scheme),
+):
+    """Update current semester of a university of a user with given universityID"""
+
+    if (
+        auth_user := await user_models.get_current_user(request, token)
+    ) is not None and auth_user["userGroup"] == "professor":
+        semester = {k: v for k, v in semester.dict().items() if v is not None}
+
+        if len(semester) >= 1:
+            update_result = await request.app.mongodb["universities"].update_one(
+                {"_id": unid},
+                {"$set": {"currentSemester": semester["currentSemester"]}},
+            )
+
+            if update_result.modified_count == 1:
+                if (
+                    updated_name := await request.app.mongodb["universities"].find_one(
+                        {"_id": unid}
+                    )
+                ) is not None:
+                    return JSONResponse(
+                        status_code=status.HTTP_200_OK,
+                        content={
+                            "message": "Current semester of the university updated"
+                        },
+                    )
+
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "University not found"},
+            )
+
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
+    )
+
+
+@router.get(
+    "/{unid}/current-semester",
+    response_description="Get current semester of a university",
+    operation_id="getCurrentUniversitySemester",
+    response_model=Message,
+    responses={
+        404: {"model": Message},
+    },
+)
+async def get_current_university_semester(unid: str, request: Request):
+    """Get a single semester of a university with given universityID and universitySemesterID"""
+
+    if (
+        university := await request.app.mongodb["universities"].find_one({"_id": unid})
+    ) is not None:
+        for semester in university["semesters"]:
+            if semester["_id"] == university["currentSemester"]:
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content=semester,
+                )
+
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Current semester not found"},
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content={"message": "University not found"},
     )
 
 
