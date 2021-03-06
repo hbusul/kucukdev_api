@@ -15,6 +15,7 @@ from pydantic import BaseModel
 from typing import List
 from jose import JWTError, jwt
 
+from apps.task import user_models
 from .uni_models import (
     UniversityLessonModel,
     UniversityAPILessonModel,
@@ -32,6 +33,7 @@ router = APIRouter()
     response_model=Message,
     responses={
         404: {"model": Message},
+        403: {"model": Message},
     },
 )
 async def create_university_lesson(
@@ -39,83 +41,39 @@ async def create_university_lesson(
     unisid: str,
     request: Request,
     university_lesson: UniversityLessonModel = Body(...),
+    token: str = Depends(user_models.oauth2_scheme),
 ):
     """Create a lesson for a semester of a university with given universityID and universitySemesterID"""
 
     university_lesson = jsonable_encoder(university_lesson)
 
-    section = UniversitySectionModel(
-        section=university_lesson["section"],
-        instructor=university_lesson["instructor"],
-        slots=university_lesson["slots"],
-    )
-
-    jsonable_section = jsonable_encoder(section)
-
     if (
-        existing_university := await request.app.mongodb["universities"].find_one(
-            {"_id": unid, "semesters._id": unisid}
+        auth_user := await user_models.get_current_user(request, token)
+    ) is not None and auth_user["userGroup"] == "professor":
+        section = UniversitySectionModel(
+            section=university_lesson["section"],
+            instructor=university_lesson["instructor"],
+            slots=university_lesson["slots"],
         )
-    ) is not None:
-        for semester in existing_university["semesters"]:
-            if semester["_id"] == unisid:
-                for lesson in semester["lessons"]:
-                    if lesson["code"] == university_lesson["code"]:
-                        for section in lesson["sections"]:
-                            if section["section"] == jsonable_section["section"]:
-                                return JSONResponse(
-                                    status_code=status.HTTP_400_BAD_REQUEST,
-                                    content={"message": "Section already exists"},
-                                )
 
-                        update_result = await request.app.mongodb[
-                            "universities"
-                        ].update_one(
-                            {
-                                "_id": unid,
-                                "semesters._id": unisid,
-                                "semesters.lessons._id": lesson["_id"],
-                            },
-                            {
-                                "$push": {
-                                    "semesters.$[i].lessons.$[j].sections": jsonable_section
-                                }
-                            },
-                            array_filters=[{"i._id": unisid}, {"j._id": lesson["_id"]}],
-                        )
+        jsonable_section = jsonable_encoder(section)
 
-                        return JSONResponse(
-                            status_code=status.HTTP_200_OK,
-                            content={"message": "New section added"},
-                        )
-
-    lessonAPI = UniversityAPILessonModel(
-        name=university_lesson["name"],
-        code=university_lesson["code"],
-        ects=university_lesson["ects"],
-        absenceLimit=university_lesson["absenceLimit"],
-        sections=[],
-    )
-    jsonable_lessonAPI = jsonable_encoder(lessonAPI)
-
-    update_result = await request.app.mongodb["universities"].update_one(
-        {"_id": unid, "semesters._id": unisid},
-        {"$push": {"semesters.$.lessons": jsonable_lessonAPI}},
-    )
-
-    if update_result.modified_count == 1:
         if (
-            created_university := await request.app.mongodb["universities"].find_one(
-                {
-                    "_id": unid,
-                    "semesters._id": unisid,
-                }
+            existing_university := await request.app.mongodb["universities"].find_one(
+                {"_id": unid, "semesters._id": unisid}
             )
         ) is not None:
-            for semester in created_university["semesters"]:
+            for semester in existing_university["semesters"]:
                 if semester["_id"] == unisid:
                     for lesson in semester["lessons"]:
                         if lesson["code"] == university_lesson["code"]:
+                            for section in lesson["sections"]:
+                                if section["section"] == jsonable_section["section"]:
+                                    return JSONResponse(
+                                        status_code=status.HTTP_400_BAD_REQUEST,
+                                        content={"message": "Section already exists"},
+                                    )
+
                             update_result = await request.app.mongodb[
                                 "universities"
                             ].update_one(
@@ -137,12 +95,69 @@ async def create_university_lesson(
 
                             return JSONResponse(
                                 status_code=status.HTTP_200_OK,
-                                content={"message": "New lesson added"},
+                                content={"message": "New section added"},
                             )
 
+        lessonAPI = UniversityAPILessonModel(
+            name=university_lesson["name"],
+            code=university_lesson["code"],
+            ects=university_lesson["ects"],
+            absenceLimit=university_lesson["absenceLimit"],
+            sections=[],
+        )
+        jsonable_lessonAPI = jsonable_encoder(lessonAPI)
+
+        update_result = await request.app.mongodb["universities"].update_one(
+            {"_id": unid, "semesters._id": unisid},
+            {"$push": {"semesters.$.lessons": jsonable_lessonAPI}},
+        )
+
+        if update_result.modified_count == 1:
+            if (
+                created_university := await request.app.mongodb[
+                    "universities"
+                ].find_one(
+                    {
+                        "_id": unid,
+                        "semesters._id": unisid,
+                    }
+                )
+            ) is not None:
+                for semester in created_university["semesters"]:
+                    if semester["_id"] == unisid:
+                        for lesson in semester["lessons"]:
+                            if lesson["code"] == university_lesson["code"]:
+                                update_result = await request.app.mongodb[
+                                    "universities"
+                                ].update_one(
+                                    {
+                                        "_id": unid,
+                                        "semesters._id": unisid,
+                                        "semesters.lessons._id": lesson["_id"],
+                                    },
+                                    {
+                                        "$push": {
+                                            "semesters.$[i].lessons.$[j].sections": jsonable_section
+                                        }
+                                    },
+                                    array_filters=[
+                                        {"i._id": unisid},
+                                        {"j._id": lesson["_id"]},
+                                    ],
+                                )
+
+                                return JSONResponse(
+                                    status_code=status.HTTP_200_OK,
+                                    content={"message": "New lesson added"},
+                                )
+
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "University semester not found"},
+        )
+
     return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": "University semester not found"},
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )
 
 
@@ -215,6 +230,7 @@ async def show_university_lesson(unid: str, unisid: str, unilid: str, request: R
     response_model=Message,
     responses={
         404: {"model": Message},
+        403: {"model": Message},
         400: {"model": Message},
     },
 )
@@ -224,63 +240,75 @@ async def update_university_lesson(
     unilid: str,
     request: Request,
     university_lesson: UniversityAPILessonModel = Body(...),
+    token: str = Depends(user_models.oauth2_scheme),
 ):
     """Update lesson of a university semester with given universityID, universitySemesterID and universityLessonID"""
 
-    university_lesson = {
-        k: v for k, v in university_lesson.dict().items() if v is not None
-    }
-
     if (
-        existing_university := await request.app.mongodb["universities"].find_one(
-            {"_id": unid, "semesters._id": unisid, "semesters.lessons._id": unilid}
-        )
-    ) is not None:
-        for semester in existing_university["semesters"]:
-            if semester["_id"] == unisid:
-                for lesson in semester["lessons"]:
-                    if lesson["code"] == university_lesson["code"]:
-                        return JSONResponse(
-                            status_code=status.HTTP_400_BAD_REQUEST,
-                            content={"message": "University lesson already exists"},
-                        )
-
-    if len(university_lesson) >= 1:
-        update_result = await request.app.mongodb["universities"].update_many(
-            {
-                "_id": unid,
-                "semesters._id": unisid,
-                "semesters.lessons._id": unilid,
-            },
-            {
-                "$set": {
-                    "semesters.$[i].lessons.$[j].name": university_lesson["name"],
-                    "semesters.$[i].lessons.$[j].code": university_lesson["code"],
-                    "semesters.$[i].lessons.$[j].ects": university_lesson["ects"],
-                    "semesters.$[i].lessons.$[j].absenceLimit": university_lesson[
-                        "absenceLimit"
-                    ],
-                }
-            },
-            array_filters=[{"i._id": unisid}, {"j._id": unilid}],
-        )
+        auth_user := await user_models.get_current_user(request, token)
+    ) is not None and auth_user["userGroup"] == "professor":
+        university_lesson = {
+            k: v for k, v in university_lesson.dict().items() if v is not None
+        }
 
         if (
-            updated_semester := await request.app.mongodb["universities"].find_one(
+            existing_university := await request.app.mongodb["universities"].find_one(
                 {"_id": unid, "semesters._id": unisid, "semesters.lessons._id": unilid}
             )
         ) is not None:
-            for semester in updated_semester["semesters"]:
+            for semester in existing_university["semesters"]:
                 if semester["_id"] == unisid:
                     for lesson in semester["lessons"]:
-                        if lesson["_id"] == unilid:
+                        if lesson["code"] == university_lesson["code"]:
                             return JSONResponse(
-                                status_code=status.HTTP_200_OK, content=lesson
+                                status_code=status.HTTP_400_BAD_REQUEST,
+                                content={"message": "University lesson already exists"},
                             )
 
+        if len(university_lesson) >= 1:
+            update_result = await request.app.mongodb["universities"].update_many(
+                {
+                    "_id": unid,
+                    "semesters._id": unisid,
+                    "semesters.lessons._id": unilid,
+                },
+                {
+                    "$set": {
+                        "semesters.$[i].lessons.$[j].name": university_lesson["name"],
+                        "semesters.$[i].lessons.$[j].code": university_lesson["code"],
+                        "semesters.$[i].lessons.$[j].ects": university_lesson["ects"],
+                        "semesters.$[i].lessons.$[j].absenceLimit": university_lesson[
+                            "absenceLimit"
+                        ],
+                    }
+                },
+                array_filters=[{"i._id": unisid}, {"j._id": unilid}],
+            )
+
+            if (
+                updated_semester := await request.app.mongodb["universities"].find_one(
+                    {
+                        "_id": unid,
+                        "semesters._id": unisid,
+                        "semesters.lessons._id": unilid,
+                    }
+                )
+            ) is not None:
+                for semester in updated_semester["semesters"]:
+                    if semester["_id"] == unisid:
+                        for lesson in semester["lessons"]:
+                            if lesson["_id"] == unilid:
+                                return JSONResponse(
+                                    status_code=status.HTTP_200_OK, content=lesson
+                                )
+
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "University semester not found"},
+        )
+
     return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": "University semester not found"},
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )
 
 
@@ -300,21 +328,29 @@ async def delete_university_lesson(
     unisid: str,
     unilid: str,
     request: Request,
+    token: str = Depends(user_models.oauth2_scheme),
 ):
     """Delete a university lesson with given universityID, universitySemesterID and universityLessonID"""
 
-    update_result = await request.app.mongodb["universities"].update_one(
-        {"_id": unid, "semesters._id": unisid},
-        {"$pull": {"semesters.$.lessons": {"_id": unilid}}},
-    )
+    if (
+        auth_user := await user_models.get_current_user(request, token)
+    ) is not None and auth_user["userGroup"] == "professor":
+        update_result = await request.app.mongodb["universities"].update_one(
+            {"_id": unid, "semesters._id": unisid},
+            {"$pull": {"semesters.$.lessons": {"_id": unilid}}},
+        )
 
-    if update_result.modified_count == 1:
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "University lesson deleted"},
+            )
+
         return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"message": "University lesson deleted"},
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "University lesson not found"},
         )
 
     return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": "University lesson not found"},
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )
