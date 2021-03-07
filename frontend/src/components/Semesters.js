@@ -64,17 +64,18 @@ const Semesters = ({ history }) => {
     }
 
     const setCurrentSemester = (id) => {
-
-        let apiInstance = new Kucukdevapi.UsersApi();
-        let updateSemesterModel = new Kucukdevapi.UpdateSemesterModel(id);
-        apiInstance.updateCurrentSemester(uid, updateSemesterModel, (error, data, response) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('API called successfully. Returned data: ' + data);
-                setLogin({ userToken: login.userToken, userID: login.userID, semesterID: data.currentSemester, universityID: data.currentUniversity })
-            }
-        });
+        if (login.semesterID !== id) {
+            let apiInstance = new Kucukdevapi.UsersApi();
+            let updateSemesterModel = new Kucukdevapi.UpdateSemesterModel(id);
+            apiInstance.updateCurrentSemester(uid, updateSemesterModel, (error, data, response) => {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                    setLogin({ userToken: login.userToken, userID: login.userID, semesterID: id, universityID: data.currentUniversity })
+                }
+            });
+        }       
     }
 
 
