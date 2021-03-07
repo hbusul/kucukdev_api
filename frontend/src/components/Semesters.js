@@ -72,7 +72,7 @@ const Semesters = ({ history }) => {
                     console.error(error);
                 } else {
                     console.log('API called successfully. Returned data: ' + data);
-                    setLogin({ userToken: login.userToken, userID: login.userID, semesterID: id, universityID: data.currentUniversity })
+                    setLogin({ userToken: login.userToken, userID: login.userID, semesterID: id, universityID: login.universityID })
                 }
             });
         }       
