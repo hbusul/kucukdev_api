@@ -68,7 +68,7 @@ class UniversityAPILessonModel(BaseModel):
 class UniversitySemesterModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
-    lessons: List[UniversityLessonModel] = []
+    lessons: List[UniversityAPILessonModel] = []
 
     class Config:
         allow_population_by_field_name = True

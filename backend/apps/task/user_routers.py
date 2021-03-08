@@ -273,20 +273,15 @@ async def update_current_semester(
                 {"_id": uid}, {"$set": {"currentSemester": semester["currentSemester"]}}
             )
 
-            if update_result.modified_count == 1:
+            if update_result.matched_count == 1:
                 return JSONResponse(
                     status_code=status.HTTP_200_OK,
                     content={"message": "Current semester updated"},
                 )
 
-        if (
-            existing_user := await request.app.mongodb["users"].find_one({"_id": uid})
-        ) is not None:
-            return existing_user
-
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "User not found"},
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Invalid input"},
         )
 
     return JSONResponse(
