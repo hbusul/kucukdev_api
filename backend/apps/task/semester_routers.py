@@ -7,6 +7,7 @@ import json
 
 from apps.task import user_models
 from .user_models import (
+    UserModel,
     UserSemesterModel,
     UpdateSemesterModel,
     SemesterAPIModel,
@@ -92,15 +93,14 @@ async def create_semester(
     },
 )
 async def list_semesters(
-    uid: str, request: Request, token: str = Depends(user_models.oauth2_scheme)
+    uid: str,
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """list all semesters of a user with given userID"""
 
     semesters = []
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
         if auth_user["semesters"] is not None:
             for semester in auth_user["semesters"]:
                 sid = semester["_id"]
