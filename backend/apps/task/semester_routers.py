@@ -34,28 +34,26 @@ async def create_semester(
     uid: str,
     request: Request,
     semester: UserSemesterModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Create a semester for a user with given userID"""
 
     semester = jsonable_encoder(semester)
 
+    resStartHour = semester["startHour"].split(".")
     if (
-        semester["dLesson"] < 0
-        or semester["dBreak"] < 0
-        or semester["slotCount"] < 3
-        or semester["slotCount"] > 15
+        len(resStartHour) != 2
+        or int(resStartHour[0]) < 0
+        or int(resStartHour[0]) > 23
+        or int(resStartHour[1]) < 0
+        or int(resStartHour[1]) > 59
     ):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={
-                "message": "Lesson, break duration must be > 0 and slot count must be < 15 and > 3"
-            },
+            content={"message": "Invalid start hour"},
         )
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
         update_result = await request.app.mongodb["users"].update_one(
             {"_id": uid}, {"$push": {"semesters": semester}}
         )
@@ -66,9 +64,14 @@ async def create_semester(
                     {"_id": uid}
                 )
             ) is not None:
+                semesters = []
+                for semester in created_semester["semesters"]:
+                    semester.pop("lessons")
+                    semesters.append(semester)
+
                 return JSONResponse(
                     status_code=status.HTTP_200_OK,
-                    content=created_semester["semesters"],
+                    content=semesters,
                 )
 
         return JSONResponse(
@@ -84,7 +87,7 @@ async def create_semester(
 @router.get(
     "/{uid}/semesters",
     response_description="List all semesters",
-    operation_id="	listSemestersOfUser",
+    operation_id="listSemestersOfUser",
     response_model=List[SemesterAPIModel],
     responses={
         404: {"model": Message},
@@ -105,21 +108,11 @@ async def list_semesters(
             for semester in auth_user["semesters"]:
                 sid = semester["_id"]
                 lessons_url = f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
-                semesterAPI = SemesterAPIModel(
-                    id=sid,
-                    name=semester["name"],
-                    startDate=semester["startDate"],
-                    endDate=semester["endDate"],
-                    startHour=semester["startHour"],
-                    dLesson=semester["dLesson"],
-                    dBreak=semester["dBreak"],
-                    slotCount=semester["slotCount"],
-                    lessons_url=lessons_url,
-                )
+                semester.pop("lessons")
+                semester["lessons_url"] = lessons_url
+                semester["id"] = semester.pop("_id")
 
-                jsonable_semesterAPI = jsonable_encoder(semesterAPI)
-
-                semesters.append(jsonable_semesterAPI)
+                semesters.append(semester)
 
             return JSONResponse(status_code=status.HTTP_200_OK, content=semesters)
 
@@ -148,34 +141,20 @@ async def show_semester(
     uid: str,
     sid: str,
     request: Request,
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Get a single semester with given userID and semesterID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
         for semester in auth_user["semesters"]:
             if semester["_id"] == sid:
                 sid = semester["_id"]
                 lessons_url = f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
-                semesterAPI = SemesterAPIModel(
-                    id=sid,
-                    name=semester["name"],
-                    startDate=semester["startDate"],
-                    endDate=semester["endDate"],
-                    startHour=semester["startHour"],
-                    dLesson=semester["dLesson"],
-                    dBreak=semester["dBreak"],
-                    slotCount=semester["slotCount"],
-                    lessons_url=lessons_url,
-                )
+                semester.pop("lessons")
+                semester["lessons_url"] = lessons_url
+                semester["id"] = semester.pop("_id")
 
-                jsonable_semesterAPI = jsonable_encoder(semesterAPI)
-
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK, content=jsonable_semesterAPI
-                )
+                return JSONResponse(status_code=status.HTTP_200_OK, content=semester)
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -203,15 +182,27 @@ async def update_semester(
     sid: str,
     request: Request,
     semester: UpdateUserSemesterModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Update a semester with given userID and semesterID"""
 
     semester = {k: v for k, v in semester.dict().items() if v is not None}
     semester = jsonable_encoder(semester)
+
+    resStartHour = semester["startHour"].split(".")
     if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+        len(resStartHour) != 2
+        or int(resStartHour[0]) < 0
+        or int(resStartHour[0]) > 23
+        or int(resStartHour[1]) < 0
+        or int(resStartHour[1]) > 59
+    ):
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Invalid start hour"},
+        )
+
+    if auth_user["_id"] == uid:
         if len(semester) >= 1:
             update_result = await request.app.mongodb["users"].update_many(
                 {"_id": uid, "semesters._id": sid},
@@ -239,22 +230,12 @@ async def update_semester(
                         lessons_url = (
                             f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
                         )
-                        semesterAPI = SemesterAPIModel(
-                            id=sid,
-                            name=semester["name"],
-                            startDate=semester["startDate"],
-                            endDate=semester["endDate"],
-                            startHour=semester["startHour"],
-                            dLesson=semester["dLesson"],
-                            dBreak=semester["dBreak"],
-                            slotCount=semester["slotCount"],
-                            lessons_url=lessons_url,
-                        )
-
-                        jsonable_semesterAPI = jsonable_encoder(semesterAPI)
+                        semester.pop("lessons")
+                        semester["lessons_url"] = lessons_url
+                        semester["id"] = semester.pop("_id")
 
                         return JSONResponse(
-                            status_code=status.HTTP_200_OK, content=jsonable_semesterAPI
+                            status_code=status.HTTP_200_OK, content=semester
                         )
 
         return JSONResponse(
@@ -283,13 +264,11 @@ async def delete_semester(
     uid: str,
     sid: str,
     request: Request,
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Delete a semester with given userID and semesterID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
         find_user = await request.app.mongodb["users"].find_one(
             {"_id": uid, "semesters._id": sid}
         )
@@ -311,21 +290,12 @@ async def delete_semester(
                     lessons_url = (
                         f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
                     )
-                    semesterAPI = SemesterAPIModel(
-                        id=sid,
-                        name=semester["name"],
-                        startDate=semester["startDate"],
-                        endDate=semester["endDate"],
-                        startHour=semester["startHour"],
-                        dLesson=semester["dLesson"],
-                        dBreak=semester["dBreak"],
-                        slotCount=semester["slotCount"],
-                        lessons_url=lessons_url,
-                    )
-                    jsonable_semesterAPI = jsonable_encoder(semesterAPI)
+                    semester.pop("lessons")
+                    semester["lessons_url"] = lessons_url
+                    semester["id"] = semester.pop("_id")
 
                     return JSONResponse(
-                        status_code=status.HTTP_200_OK, content=jsonable_semesterAPI
+                        status_code=status.HTTP_200_OK, content=semester
                     )
 
         return JSONResponse(

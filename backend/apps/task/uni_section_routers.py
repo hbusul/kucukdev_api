@@ -17,7 +17,7 @@ from jose import JWTError, jwt
 
 from apps.task import user_models
 from .uni_models import UniversitySectionModel
-from .user_models import Message
+from .user_models import UserModel, Message
 
 router = APIRouter()
 
@@ -33,21 +33,49 @@ router = APIRouter()
         400: {"model": Message},
     },
 )
-async def update_university_lesson(
+async def update_lesson_section(
     unid: str,
     unisid: str,
     unilid: str,
     secid: str,
     request: Request,
     new_section: UniversitySectionModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Update section of a lesson with given universityID, universitySemesterID, universityLessonID and sectionID"""
+    new_section = {k: v for k, v in new_section.dict().items() if v is not None}
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
-        new_section = {k: v for k, v in new_section.dict().items() if v is not None}
+    for slot in new_section["slots"]:
+        cur_slot = slot.split(",")
+        if len(cur_slot) == 3:
+            if int(cur_slot[0]) < 0 or int(cur_slot[0]) > 4:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot day cannot be < 0 or > 4"},
+                )
+            if int(cur_slot[1]) < 0 or int(cur_slot[1]) > 15:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot hour cannot be < 0 or > 15"},
+                )
+            if int(cur_slot[2]) < 0 or int(cur_slot[2]) > 1:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot lab hour must be 0 or 1"},
+                )
+        else:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Invalid lesson slot"},
+            )
+
+    if new_section["instructor"] == "" or new_section["section"] == "":
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Instructor name or section must be filled"},
+        )
+
+    if auth_user["userGroup"] == "professor":
 
         if (
             existing_university := await request.app.mongodb["universities"].find_one(
@@ -124,7 +152,7 @@ async def update_university_lesson(
 
 @router.delete(
     "/{unid}/semesters/{unisid}/lessons/{unilid}/sections/{secid}",
-    response_description="Delete lesson section",
+    response_description="Delete a lesson section",
     operation_id="deleteLessonSection",
     response_model=Message,
     responses={
@@ -138,13 +166,11 @@ async def delete_lesson_section(
     unilid: str,
     secid: str,
     request: Request,
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Delete a lesson section with given universityID, universitySemesterID, universityLessonID and sectionID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
+    if auth_user["userGroup"] == "professor":
         update_result = await request.app.mongodb["universities"].update_one(
             {
                 "_id": unid,

@@ -17,7 +17,7 @@ from jose import JWTError, jwt
 
 from apps.task import user_models
 from .uni_models import UniversitySemesterModel
-from .user_models import Message
+from .user_models import UserModel, Message
 
 router = APIRouter()
 
@@ -37,13 +37,11 @@ async def create_university_semester(
     unid: str,
     request: Request,
     university_semester: UniversitySemesterModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Create semester for a university with given universityID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
+    if auth_user["userGroup"] == "professor":
         university_semester = jsonable_encoder(university_semester)
 
         if (
@@ -160,13 +158,11 @@ async def update_university_semester(
     unisid: str,
     request: Request,
     university_semester: UniversitySemesterModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Update university of a semester with given universityID and universitySemesterID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
+    if auth_user["userGroup"] == "professor":
         university_semester = {
             k: v for k, v in university_semester.dict().items() if v is not None
         }
@@ -229,13 +225,11 @@ async def delete_university_semester(
     unid: str,
     unisid: str,
     request: Request,
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Delete a university semester with given universityID and universitySemesterID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
+    if auth_user["userGroup"] == "professor":
         delete_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid}, {"$pull": {"semesters": {"_id": unisid}}}
         )

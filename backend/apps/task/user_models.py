@@ -19,7 +19,7 @@ class LessonModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
     instructor: str = Field(...)
-    absenceLimit: int = Field(...)
+    absenceLimit: int = Field(..., ge=0)
     slots: List[str] = Field(...)
     absences: List[str] = []
 
@@ -39,7 +39,7 @@ class UpdateLessonModel(BaseModel):
     id: Optional[str]
     name: str = Field(...)
     instructor: str = Field(...)
-    absenceLimit: int = Field(...)
+    absenceLimit: int = Field(..., ge=0)
     slots: List[str] = Field(...)
 
     class Config:
@@ -71,9 +71,9 @@ class UserSemesterModel(BaseModel):
     startDate: datetime = Field(...)
     endDate: datetime = Field(...)
     startHour: str = Field(...)
-    dLesson: int = Field(...)
-    dBreak: int = Field(...)
-    slotCount: int = Field(...)
+    dLesson: int = Field(..., gt=0)
+    dBreak: int = Field(..., gt=0)
+    slotCount: int = Field(..., gt=3, lt=16)
     lessons: List[LessonModel] = []
 
     class Config:
@@ -96,9 +96,9 @@ class UpdateUserSemesterModel(BaseModel):
     startDate: datetime = Field(...)
     endDate: datetime = Field(...)
     startHour: str = Field(...)
-    dLesson: int = Field(...)
-    dBreak: int = Field(...)
-    slotCount: int = Field(...)
+    dLesson: int = Field(..., gt=0)
+    dBreak: int = Field(..., gt=0)
+    slotCount: int = Field(..., gt=3, lt=16)
 
     class Config:
         allow_population_by_field_name = True
@@ -225,7 +225,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt

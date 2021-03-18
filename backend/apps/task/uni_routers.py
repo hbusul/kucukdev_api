@@ -23,7 +23,7 @@ from .uni_models import (
     UpdateUniversityNameModel,
     UniversitySemesterModel,
 )
-from .user_models import Message
+from .user_models import UserModel, Message
 
 router = APIRouter()
 
@@ -41,13 +41,11 @@ router = APIRouter()
 async def create_university(
     request: Request,
     university: UniversityModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Create a university"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
+    if auth_user["userGroup"] == "professor":
         university = jsonable_encoder(university)
         university["currentSemester"] = "null"
 
@@ -140,13 +138,11 @@ async def update_university_name(
     unid: str,
     request: Request,
     university_name: UpdateUniversityNameModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Update name of a university with given universityID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
+    if auth_user["userGroup"] == "professor":
         university_name = {
             k: v for k, v in university_name.dict().items() if v is not None
         }
@@ -206,13 +202,11 @@ async def update_university_current_semester(
     unid: str,
     request: Request,
     current_semester: UpdateSemesterModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Update current semester of a university with given universityID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
+    if auth_user["userGroup"] == "professor":
         current_semester = {
             k: v for k, v in current_semester.dict().items() if v is not None
         }
@@ -284,13 +278,13 @@ async def show_university_current_semester(unid: str, request: Request):
     },
 )
 async def delete_university(
-    unid: str, request: Request, token: str = Depends(user_models.oauth2_scheme)
+    unid: str,
+    request: Request,
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Delete a university with given universityID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
+    if auth_user["userGroup"] == "professor":
         delete_result = await request.app.mongodb["universities"].delete_one(
             {"_id": unid}
         )

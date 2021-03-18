@@ -80,22 +80,20 @@ async def create_user(request: Request, user: UserModel = Body(...)):
     response_model=UserAPIModel,
     responses={401: {"model": Message}},
 )
-async def get_current(
-    request: Request, token: str = Depends(user_models.oauth2_scheme)
-):
-    if (auth_user := await user_models.get_current_user(request, token)) is not None:
-        uid = auth_user["_id"]
-        semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
-        userAPI = UserAPIModel(
-            id=auth_user["_id"],
-            email=auth_user["email"],
-            currentSemester=auth_user["currentSemester"],
-            currentUniversity=auth_user["currentUniversity"],
-            semesters_url=semesters_url,
-        )
-        jsonable_userAPI = jsonable_encoder(userAPI)
+async def get_current(auth_user: UserModel = Depends(user_models.get_current_user)):
 
-        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_userAPI)
+    uid = auth_user["_id"]
+    semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
+    userAPI = UserAPIModel(
+        id=auth_user["_id"],
+        email=auth_user["email"],
+        currentSemester=auth_user["currentSemester"],
+        currentUniversity=auth_user["currentUniversity"],
+        semesters_url=semesters_url,
+    )
+    jsonable_userAPI = jsonable_encoder(userAPI)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_userAPI)
 
 
 @router.get(
@@ -106,13 +104,13 @@ async def get_current(
     responses={403: {"model": Message}, 401: {"model": Message}},
 )
 async def show_user(
-    uid: str, request: Request, token: str = Depends(user_models.oauth2_scheme)
+    uid: str,
+    request: Request,
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Get a single user with given userID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
         if (
             user := await request.app.mongodb["users"].find_one(
                 {
@@ -154,13 +152,11 @@ async def update_password(
     uid: str,
     request: Request,
     password: UpdatePasswordModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Update password of a user with given userID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if uth_user["_id"] == uid:
 
         password = {k: v for k, v in password.dict().items() if v is not None}
 
@@ -209,13 +205,13 @@ async def update_password(
     },
 )
 async def delete_user(
-    uid: str, request: Request, token: str = Depends(user_models.oauth2_scheme)
+    uid: str,
+    request: Request,
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Delete a user with given userID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
 
         delete_result = await request.app.mongodb["users"].delete_one({"_id": uid})
 
@@ -257,13 +253,11 @@ async def update_current_semester(
     uid: str,
     request: Request,
     semester: UpdateSemesterModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Update current semester ID of a user with given userID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
 
         semester = {k: v for k, v in semester.dict().items() if v is not None}
 
@@ -304,13 +298,11 @@ async def update_current_university(
     uid: str,
     request: Request,
     university: UpdateUniversityModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Update current university ID of a user with given userID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
 
         university = {k: v for k, v in university.dict().items() if v is not None}
 

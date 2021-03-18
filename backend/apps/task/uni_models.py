@@ -24,8 +24,8 @@ class UniversityLessonModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
     code: str = Field(...)
-    ects: float = Field(...)
-    absenceLimit: int = Field(...)
+    ects: float = Field(..., ge=0)
+    absenceLimit: int = Field(..., ge=0)
     section: str = Field(...)
     instructor: str = Field(...)
     slots: List[str] = Field(...)
@@ -49,8 +49,8 @@ class UniversityAPILessonModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
     code: str = Field(...)
-    ects: float = Field(...)
-    absenceLimit: int = Field(...)
+    ects: float = Field(..., ge=0)
+    absenceLimit: int = Field(..., ge=0)
     sections: List[UniversitySectionModel] = []
 
     class Config:

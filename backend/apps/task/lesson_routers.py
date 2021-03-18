@@ -4,7 +4,13 @@ from fastapi.encoders import jsonable_encoder
 from typing import List
 
 from apps.task import user_models
-from .user_models import LessonModel, UpdateLessonModel, AbsenceModel, Message
+from .user_models import (
+    UserModel,
+    LessonModel,
+    UpdateLessonModel,
+    AbsenceModel,
+    Message,
+)
 
 router = APIRouter()
 
@@ -26,7 +32,7 @@ async def create_lesson(
     sid: str,
     request: Request,
     lesson: LessonModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Create a lessons for a semester with given userID, semesterID"""
 
@@ -53,7 +59,7 @@ async def create_lesson(
         else:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Invalid lesson"},
+                content={"message": "Invalid lesson slot"},
             )
 
     if lesson["name"] == "" or lesson["instructor"] == "":
@@ -62,9 +68,7 @@ async def create_lesson(
             content={"message": "Lesson and instructor name must be filled"},
         )
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
         update_result = await request.app.mongodb["users"].update_one(
             {"_id": uid, "semesters._id": sid},
             {"$push": {"semesters.$.lessons": lesson}},
@@ -79,18 +83,10 @@ async def create_lesson(
             for semester in existing_user["semesters"]:
                 if semester["_id"] == sid:
                     for lesson in semester["lessons"]:
-                        lessonAPI = UpdateLessonModel(
-                            id=lesson["_id"],
-                            name=lesson["name"],
-                            instructor=lesson["instructor"],
-                            absenceLimit=lesson["absenceLimit"],
-                            slots=lesson["slots"],
-                        )
-                    jsonable_lessonAPI = jsonable_encoder(lessonAPI)
 
-                    return JSONResponse(
-                        status_code=status.HTTP_200_OK, content=jsonable_lessonAPI
-                    )
+                        return JSONResponse(
+                            status_code=status.HTTP_200_OK, content=lesson
+                        )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -117,13 +113,11 @@ async def list_lessons(
     uid: str,
     sid: str,
     request: Request,
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """List all lessons of a semester with given userID, semesterID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
         if (
             user := await request.app.mongodb["users"].find_one(
                 {"_id": uid, "semesters._id": sid}
@@ -161,13 +155,11 @@ async def show_lesson(
     sid: str,
     lid: str,
     request: Request,
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Get a single lesson with given userID, semesterID and lessonID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
         if (
             user := await request.app.mongodb["users"].find_one(
                 {
@@ -212,7 +204,7 @@ async def update_lesson(
     lid: str,
     request: Request,
     lesson: UpdateLessonModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Update a lesson with given userID, semesterID and lessonID"""
 
@@ -242,9 +234,7 @@ async def update_lesson(
                 content={"message": "Invalid lesson"},
             )
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
         if len(lesson) >= 1:
             update_result = await request.app.mongodb["users"].update_many(
                 {
@@ -304,13 +294,11 @@ async def delete_lesson(
     sid: str,
     lid: str,
     request: Request,
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Delete a lesson with given userID, semesterID and lessonID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
         update_result = await request.app.mongodb["users"].update_one(
             {"_id": uid, "semesters._id": sid},
             {"$pull": {"semesters.$.lessons": {"_id": lid}}},
@@ -326,9 +314,9 @@ async def delete_lesson(
                     if semester["_id"] == sid:
                         for lesson in semester["lessons"]:
                             if lesson["_id"] == lid:
-                                lessonAPI = lesson
-
-            return JSONResponse(status_code=status.HTTP_200_OK, content=lessonAPI)
+                                return JSONResponse(
+                                    status_code=status.HTTP_200_OK, content=lesson
+                                )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -358,15 +346,13 @@ async def create_absence(
     lid: str,
     request: Request,
     absence: AbsenceModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Create an absence for a lesson with given userID, semesterID and lessonID"""
 
     absence = jsonable_encoder(absence)
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
         if (
             absence_user := await request.app.mongodb["users"].find_one(
                 {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid}
@@ -432,16 +418,13 @@ async def delete_absence(
     lid: str,
     request: Request,
     absence: AbsenceModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Delete an absence from a lesson with given userID, semesterID and lessonID"""
 
     absence = jsonable_encoder(absence)
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["_id"] == uid:
-
+    if auth_user["_id"] == uid:
         if (
             existing_user := await request.app.mongodb["users"].find_one(
                 {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid}

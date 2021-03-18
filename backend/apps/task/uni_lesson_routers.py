@@ -21,7 +21,7 @@ from .uni_models import (
     UniversityAPILessonModel,
     UniversitySectionModel,
 )
-from .user_models import Message
+from .user_models import UserModel, Message
 
 router = APIRouter()
 
@@ -41,15 +41,43 @@ async def create_university_lesson(
     unisid: str,
     request: Request,
     university_lesson: UniversityLessonModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Create a lesson for a semester of a university with given universityID and universitySemesterID"""
 
     university_lesson = jsonable_encoder(university_lesson)
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
+    for slot in university_lesson["slots"]:
+        cur_slot = slot.split(",")
+        if len(cur_slot) == 3:
+            if int(cur_slot[0]) < 0 or int(cur_slot[0]) > 4:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot day cannot be < 0 or > 4"},
+                )
+            if int(cur_slot[1]) < 0 or int(cur_slot[1]) > 15:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot hour cannot be < 0 or > 15"},
+                )
+            if int(cur_slot[2]) < 0 or int(cur_slot[2]) > 1:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Slot lab hour must be 0 or 1"},
+                )
+        else:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Invalid lesson slot"},
+            )
+
+    if university_lesson["instructor"] == "" or university_lesson["section"] == "":
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Instructor name or section must be filled"},
+        )
+
+    if auth_user["userGroup"] == "professor":
         section = UniversitySectionModel(
             section=university_lesson["section"],
             instructor=university_lesson["instructor"],
@@ -240,13 +268,11 @@ async def update_university_lesson(
     unilid: str,
     request: Request,
     university_lesson: UniversityAPILessonModel = Body(...),
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Update lesson of a university semester with given universityID, universitySemesterID and universityLessonID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
+    if auth_user["userGroup"] == "professor":
         university_lesson = {
             k: v for k, v in university_lesson.dict().items() if v is not None
         }
@@ -328,13 +354,11 @@ async def delete_university_lesson(
     unisid: str,
     unilid: str,
     request: Request,
-    token: str = Depends(user_models.oauth2_scheme),
+    auth_user: UserModel = Depends(user_models.get_current_user),
 ):
     """Delete a university lesson with given universityID, universitySemesterID and universityLessonID"""
 
-    if (
-        auth_user := await user_models.get_current_user(request, token)
-    ) is not None and auth_user["userGroup"] == "professor":
+    if auth_user["userGroup"] == "professor":
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid, "semesters._id": unisid},
             {"$pull": {"semesters.$.lessons": {"_id": unilid}}},
