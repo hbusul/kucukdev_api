@@ -115,7 +115,7 @@ const AddUISLesson = ({ history }) => {
                         setLogin({
                             userToken: login.userToken,
                             userID: login.userID,
-                            semesterID: login.id,
+                            semesterID: login.semesterID,
                             universityID: selectedUniversity,
                         })
                         setRefresh((x) => x + 1)
