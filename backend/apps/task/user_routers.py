@@ -23,6 +23,7 @@ from .user_models import (
     UpdatePasswordModel,
     UpdateSemesterModel,
     UpdateUniversityModel,
+    UpdateEntranceYearModel,
     Message,
 )
 
@@ -43,6 +44,7 @@ async def create_user(request: Request, user: UserModel = Body(...)):
     user["userGroup"] = "default"
     user["currentSemester"] = "null"
     user["currentUniversity"] = "null"
+    user["entranceYear"] = 0
 
     if (
         find_user := await request.app.mongodb["users"].find_one(
@@ -56,16 +58,13 @@ async def create_user(request: Request, user: UserModel = Body(...)):
         )
         uid = created_user["_id"]
         semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
-        userAPI = UserAPIModel(
-            id=created_user["_id"],
-            email=created_user["email"],
-            currentSemester=created_user["currentSemester"],
-            currentUniversity=created_user["currentUniversity"],
-            semesters_url=semesters_url,
-        )
-        jsonable_userAPI = jsonable_encoder(userAPI)
+        created_user.pop("semesters")
+        created_user.pop("password")
+        created_user.pop("userGroup")
+        created_user["id"] = created_user.pop("_id")
+        created_user["semesters_url"] = semesters_url
 
-        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_userAPI)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=created_user)
 
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,
@@ -84,16 +83,13 @@ async def get_current(auth_user: UserModel = Depends(user_models.get_current_use
 
     uid = auth_user["_id"]
     semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
-    userAPI = UserAPIModel(
-        id=auth_user["_id"],
-        email=auth_user["email"],
-        currentSemester=auth_user["currentSemester"],
-        currentUniversity=auth_user["currentUniversity"],
-        semesters_url=semesters_url,
-    )
-    jsonable_userAPI = jsonable_encoder(userAPI)
+    auth_user.pop("semesters")
+    auth_user.pop("password")
+    auth_user.pop("userGroup")
+    auth_user["id"] = auth_user.pop("_id")
+    auth_user["semesters_url"] = semesters_url
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_userAPI)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=auth_user)
 
 
 @router.get(
@@ -119,18 +115,13 @@ async def show_user(
             )
         ) is not None:
             semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
-            userAPI = UserAPIModel(
-                id=user["_id"],
-                email=user["email"],
-                currentSemester=user["currentSemester"],
-                currentUniversity=user["currentUniversity"],
-                semesters_url=semesters_url,
-            )
-            jsonable_userAPI = jsonable_encoder(userAPI)
+            auth_user.pop("semesters")
+            auth_user.pop("password")
+            auth_user.pop("userGroup")
+            auth_user["id"] = auth_user.pop("_id")
+            auth_user["semesters_url"] = semesters_url
 
-            return JSONResponse(
-                status_code=status.HTTP_200_OK, content=jsonable_userAPI
-            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=auth_user)
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -216,16 +207,9 @@ async def delete_user(
         delete_result = await request.app.mongodb["users"].delete_one({"_id": uid})
 
         if delete_result.deleted_count == 1:
-            semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
-            userAPI = UserAPIModel(
-                id=uid,
-                email=auth_user["email"],
-                semesters_url=semesters_url,
-            )
-            jsonable_userAPI = jsonable_encoder(userAPI)
-
             return JSONResponse(
-                status_code=status.HTTP_200_OK, content=jsonable_userAPI
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "User deleted"},
             )
 
         return JSONResponse(
@@ -275,7 +259,7 @@ async def update_current_semester(
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid input"},
+            content={"message": "Invalid semester ID"},
         )
 
     return JSONResponse(
@@ -319,14 +303,55 @@ async def update_current_university(
                     content={"message": "Current university ID updated"},
                 )
 
-        if (
-            existing_user := await request.app.mongodb["users"].find_one({"_id": uid})
-        ) is not None:
-            return existing_user
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Invalid university ID"},
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
+    )
+
+
+@router.put(
+    "/{uid}/entrance-year",
+    response_description="Update entrance year of a user",
+    operation_id="updateEntranceyear",
+    response_model=Message,
+    responses={
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
+    },
+)
+async def update_entrance_year(
+    uid: str,
+    request: Request,
+    entranceYear: UpdateEntranceYearModel = Body(...),
+    auth_user: UserModel = Depends(user_models.get_current_user),
+):
+    """Update entrance year of a user with given userID"""
+
+    if auth_user["_id"] == uid:
+
+        entranceYear = {k: v for k, v in entranceYear.dict().items() if v is not None}
+
+        if len(entranceYear) >= 1:
+
+            update_result = await request.app.mongodb["users"].update_one(
+                {"_id": uid},
+                {"$set": {"entranceYear": entranceYear["entranceYear"]}},
+            )
+
+            if update_result.modified_count == 1:
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content={"message": "User entrance year updated"},
+                )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "User not found"},
+            content={"message": "Invalid entrance year"},
         )
 
     return JSONResponse(

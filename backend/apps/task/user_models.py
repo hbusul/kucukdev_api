@@ -143,6 +143,27 @@ class UserModel(BaseModel):
         }
 
 
+class UserAPIModel(BaseModel):
+    id: Optional[str]
+    email: Optional[EmailStr]
+    currentSemester: Optional[str]
+    currentUniversity: Optional[str]
+    entranceYear: Optional[int]
+    semesters_url: Optional[str]
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "email": "hello@agu.edu.tr",
+                "currenSemester": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "currentUniversity": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "entranceYear": 2018,
+                "semesters_url": "api.kucukdev.org/users/uid/semesters",
+            }
+        }
+
+
 class UpdatePasswordModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     password: str = Field(...)
@@ -169,6 +190,19 @@ class UpdateSemesterModel(BaseModel):
         }
 
 
+class UpdateEntranceYearModel(BaseModel):
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    entranceYear: int = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "entranceYear": 2018,
+            }
+        }
+
+
 class UpdateUniversityModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     currentUniversity: str = Field(...)
@@ -180,14 +214,6 @@ class UpdateUniversityModel(BaseModel):
                 "currentUniversity": "c765c307-560c-47ab-b29e-0a1265eab860",
             }
         }
-
-
-class UserAPIModel(BaseModel):
-    id: Optional[str]
-    email: Optional[EmailStr]
-    currentSemester: Optional[str]
-    currentUniversity: Optional[str]
-    semesters_url: Optional[str]
 
 
 class Message(BaseModel):
