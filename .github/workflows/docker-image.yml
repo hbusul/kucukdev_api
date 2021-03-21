@@ -1,0 +1,20 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Kucukdev backend image
+      run: docker build ./backend --tag kucukdev_backend:latest
+    - name: Build Kucukdev frontend image
+      run: docker build ./frontend --tag kucukdev_frontend:latest
