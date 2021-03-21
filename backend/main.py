@@ -17,6 +17,12 @@ from apps.task.uni_semester_routers import router as uni_semester_router
 from apps.task.uni_lesson_routers import router as uni_lesson_router
 from apps.task.uni_section_routers import router as uni_section_router
 
+from apps.task.uni_department_routers import router as uni_department_router
+from apps.task.uni_curriculum_routers import router as uni_curriculum_router
+from apps.task.uni_cur_semester_routers import router as uni_cur_semester_router
+from apps.task.uni_cur_lesson_routers import router as uni_cur_lesson_router
+
+
 app = FastAPI()
 
 origins = ["*"]
@@ -79,6 +85,15 @@ app.include_router(
 )
 app.include_router(
     uni_section_router, tags=["university sections"], prefix="/universities"
+)
+
+app.include_router(uni_department_router, tags=["departments"], prefix="/universities")
+app.include_router(uni_curriculum_router, tags=["curriculums"], prefix="/universities")
+app.include_router(
+    uni_cur_semester_router, tags=["curriculum semesters"], prefix="/universities"
+)
+app.include_router(
+    uni_cur_lesson_router, tags=["curriculum lessons"], prefix="/universities"
 )
 
 
