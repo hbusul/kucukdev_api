@@ -18,3 +18,10 @@ jobs:
       run: docker build ./backend --tag kucukdev_backend:latest
     - name: Build Kucukdev frontend image
       run: docker build ./frontend --tag kucukdev_frontend:latest
+    - name: Start backend
+      run: export container_id=`docker run --env DB_NAME=stg --env DB_URL=stg --network host -d kucukdev_api_backend`
+    - name: Download openapi.json
+      run: wget localhost:8000/openapi.json && mkdir python_client && mv openapi.json python_client
+    - name: Stop backend
+      run: docker kill $container_id && docker rm $container_id
+    
