@@ -15,9 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build Kucukdev backend image
-      run: docker build ./backend --tag kucukdev_backend:latest
+      run: docker build ./backend --tag kucukdev_api_backend:latest
     - name: Build Kucukdev frontend image
-      run: docker build ./frontend --tag kucukdev_frontend:latest
+      run: docker build ./frontend --tag kucukdev_api_frontend:latest
     - name: Start backend
       run: export container_id=`docker run --env DB_NAME=stg --env DB_URL=stg --network host -d kucukdev_api_backend`
     - name: Download openapi.json
