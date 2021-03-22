@@ -270,9 +270,7 @@ async def update_curriculum_semester(
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={
-                "message": "Curriculum semester cannot be same with others or empty"
-            },
+            content={"message": "Curriculum semester cannot be empty"},
         )
 
     return JSONResponse(

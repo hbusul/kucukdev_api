@@ -190,6 +190,17 @@ async def update_department_curriculum(
                 status_code=status.HTTP_404_NOT_FOUND,
                 content={"message": "University department curriculum not found"},
             )
+        else:
+            for department in university["departments"]:
+                if department["_id"] == depid:
+                    for curriculum in department["curriculums"]:
+                        if curriculum["name"] == department_curriculum["name"]:
+                            return JSONResponse(
+                                status_code=status.HTTP_400_BAD_REQUEST,
+                                content={
+                                    "message": "University department curriculum already exists"
+                                },
+                            )
 
         if len(department_curriculum) >= 1:
             update_result = await request.app.mongodb["universities"].update_many(
@@ -202,6 +213,12 @@ async def update_department_curriculum(
                     "$set": {
                         "departments.$[i].curriculums.$[j].name": department_curriculum[
                             "name"
+                        ],
+                        "departments.$[i].curriculums.$[j].startYear": department_curriculum[
+                            "startYear"
+                        ],
+                        "departments.$[i].curriculums.$[j].endYear": department_curriculum[
+                            "endYear"
                         ],
                     }
                 },
@@ -216,7 +233,7 @@ async def update_department_curriculum(
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Curriculum name cannot be same with others or empty"},
+            content={"message": "Curriculum name cannot be empty"},
         )
 
     return JSONResponse(

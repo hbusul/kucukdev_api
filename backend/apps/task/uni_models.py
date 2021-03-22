@@ -105,15 +105,15 @@ class CurriculumSemesterModel(BaseModel):
 
 class UniversityCurriculumModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
-    name: Tuple[int, int] = Field(...)
+    name: str = Field(...)
+    startYear: int = Field(...)
+    endYear: int = Field(...)
     semesters: List[CurriculumSemesterModel] = []
 
     class Config:
         allow_population_by_field_name = True
         schema_extra = {
-            "example": {
-                "name": [2016, 2100],
-            }
+            "example": {"name": "2016 Later", "startYear": 2016, "endYear": 2100}
         }
 
 

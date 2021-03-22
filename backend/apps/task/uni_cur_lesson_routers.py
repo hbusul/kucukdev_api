@@ -291,9 +291,7 @@ async def update_curriculum_lesson(
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={
-                "message": "Curriculum lesson input cannot be same with others or empty"
-            },
+            content={"message": "Curriculum lesson input cannot be empty"},
         )
 
     return JSONResponse(
