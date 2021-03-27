@@ -213,13 +213,13 @@ class UpdatePasswordModel(BaseModel):
 
 class UpdateSemesterModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
-    currentSemester: str = Field(...)
+    currSemesterID: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "currentSemester": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "currSemesterID": "c765c307-560c-47ab-b29e-0a1265eab860",
             }
         }
 
@@ -239,13 +239,13 @@ class UpdateEntranceYearModel(BaseModel):
 
 class UpdateUniversityModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
-    currentUniversity: str = Field(...)
+    curUniversityID: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "currentUniversity": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "curUniversityID": "c765c307-560c-47ab-b29e-0a1265eab860",
             }
         }
 

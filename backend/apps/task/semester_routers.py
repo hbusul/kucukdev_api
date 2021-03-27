@@ -67,6 +67,12 @@ async def create_semester(
                     semester.pop("lessons")
                     semesters.append(semester)
 
+                if len(semesters) == 1:
+                    update_result = await request.app.mongodb["users"].update_one(
+                        {"_id": uid},
+                        {"$set": {"curSemesterID": semesters[0]["_id"]}},
+                    )
+
                 return semesters
 
         return JSONResponse(
