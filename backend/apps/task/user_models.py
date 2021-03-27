@@ -213,13 +213,13 @@ class UpdatePasswordModel(BaseModel):
 
 class UpdateSemesterModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
-    currSemesterID: str = Field(...)
+    curSemesterID: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "currSemesterID": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "curSemesterID": "c765c307-560c-47ab-b29e-0a1265eab860",
             }
         }
 
