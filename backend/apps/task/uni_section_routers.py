@@ -2,18 +2,11 @@ from fastapi import (
     APIRouter,
     Body,
     Request,
-    HTTPException,
     status,
     Response,
     Depends,
-    Request,
 )
 from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
-from passlib.hash import bcrypt
-from pydantic import BaseModel
-from typing import List
-from jose import JWTError, jwt
 
 from apps.task import user_models
 from .uni_models import UniversitySectionModel

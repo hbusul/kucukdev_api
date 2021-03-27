@@ -1,15 +1,13 @@
-from fastapi import APIRouter, Body, Request, HTTPException, status, Depends, Response
+from fastapi import APIRouter, Body, Request, status, Depends, Response
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import List
-import json
 
 
 from apps.task import user_models
 from .user_models import (
     UserModel,
     UserSemesterModel,
-    UpdateSemesterModel,
     SemesterAPIModel,
     UpdateUserSemesterModel,
     Message,
@@ -22,7 +20,7 @@ router = APIRouter()
     "/{uid}/semesters",
     response_description="Add new semester",
     operation_id="createSemester",
-    response_model=List[UserSemesterModel],
+    response_model=List[SemesterAPIModel],
     responses={
         404: {"model": Message},
         403: {"model": Message},
@@ -69,10 +67,7 @@ async def create_semester(
                     semester.pop("lessons")
                     semesters.append(semester)
 
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content=semesters,
-                )
+                return semesters
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -101,25 +96,13 @@ async def list_semesters(
 ):
     """list all semesters of a user with given userID"""
 
-    semesters = []
-
     if auth_user["_id"] == uid:
-        if auth_user["semesters"] is not None:
-            for semester in auth_user["semesters"]:
-                sid = semester["_id"]
-                lessons_url = f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
-                semester.pop("lessons")
-                semester["lessons_url"] = lessons_url
-                semester["id"] = semester.pop("_id")
+        semesters = []
+        for semester in auth_user["semesters"]:
+            semester.pop("lessons")
+            semesters.append(semester)
 
-                semesters.append(semester)
-
-            return JSONResponse(status_code=status.HTTP_200_OK, content=semesters)
-
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Semesters of user not found"},
-        )
+        return semesters
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -148,13 +131,7 @@ async def show_semester(
     if auth_user["_id"] == uid:
         for semester in auth_user["semesters"]:
             if semester["_id"] == sid:
-                sid = semester["_id"]
-                lessons_url = f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
-                semester.pop("lessons")
-                semester["lessons_url"] = lessons_url
-                semester["id"] = semester.pop("_id")
-
-                return JSONResponse(status_code=status.HTTP_200_OK, content=semester)
+                return semester
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -170,7 +147,7 @@ async def show_semester(
     "/{uid}/semesters/{sid}",
     response_description="Update a semester",
     operation_id="updateSemester",
-    response_model=SemesterAPIModel,
+    response_model=Message,
     responses={
         404: {"model": Message},
         403: {"model": Message},
@@ -219,28 +196,20 @@ async def update_semester(
                 },
             )
 
-            if (
-                updated_user := await request.app.mongodb["users"].find_one(
-                    {"_id": uid, "semesters._id": sid}
+            if update_result.modified_count == 1:
+                return JSONResponse(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content={"message": "Semester updated"},
                 )
-            ) is not None:
-                for semester in updated_user["semesters"]:
-                    if semester["_id"] == sid:
-                        sid = semester["_id"]
-                        lessons_url = (
-                            f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
-                        )
-                        semester.pop("lessons")
-                        semester["lessons_url"] = lessons_url
-                        semester["id"] = semester.pop("_id")
 
-                        return JSONResponse(
-                            status_code=status.HTTP_200_OK, content=semester
-                        )
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "Semester couldn't be updated"},
+            )
 
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Semester not found"},
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Invalid input"},
         )
 
     return JSONResponse(
@@ -252,7 +221,7 @@ async def update_semester(
     "/{uid}/semesters/{sid}",
     response_description="Delete semester",
     operation_id="deleteSemester",
-    response_model=SemesterAPIModel,
+    response_model=Message,
     responses={
         404: {"model": Message},
         403: {"model": Message},
@@ -273,7 +242,7 @@ async def delete_semester(
             {"_id": uid, "semesters._id": sid}
         )
 
-        if auth_user["currentSemester"] == sid:
+        if auth_user["curSemesterID"] == sid:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"message": "Current semester cannot be deleted"},
@@ -284,19 +253,10 @@ async def delete_semester(
         )
 
         if update_result.modified_count == 1:
-            for semester in find_user["semesters"]:
-                if semester["_id"] == sid:
-                    sid = semester["_id"]
-                    lessons_url = (
-                        f"api.kucukdev.org/users/{uid}/semesters/{sid}/lessons"
-                    )
-                    semester.pop("lessons")
-                    semester["lessons_url"] = lessons_url
-                    semester["id"] = semester.pop("_id")
-
-                    return JSONResponse(
-                        status_code=status.HTTP_200_OK, content=semester
-                    )
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "Semester deleted"},
+            )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

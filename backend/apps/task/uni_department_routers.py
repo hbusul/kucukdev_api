@@ -90,10 +90,7 @@ async def list_university_departments(unid: str, request: Request):
     if (
         university := await request.app.mongodb["universities"].find_one({"_id": unid})
     ) is not None:
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=university["departments"],
-        )
+        return university["departments"]
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -120,10 +117,7 @@ async def show_university_department(unid: str, depid: str, request: Request):
     ) is not None:
         for department in university["departments"]:
             if department["_id"] == depid:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content=department,
-                )
+                return department
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -158,12 +152,12 @@ async def update_university_department(
 
         if (
             existing_university := await request.app.mongodb["universities"].find_one(
-                {"_id": unid}
+                {"_id": unid, "departments._id": depid}
             )
         ) is None:
             return JSONResponse(
                 status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "University not found"},
+                content={"message": "University department not found"},
             )
         else:
             for department in existing_university["departments"]:
@@ -179,20 +173,15 @@ async def update_university_department(
                 {"$set": {"departments.$.name": university_department["name"]}},
             )
 
-            if (
-                updated_department := await request.app.mongodb[
-                    "universities"
-                ].find_one({"_id": unid, "departments._id": depid})
-            ) is not None:
-                for department in updated_department["departments"]:
-                    if department["_id"] == depid:
-                        return JSONResponse(
-                            status_code=status.HTTP_200_OK, content=department
-                        )
+            if update_result.modified_count == 1:
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content={"message": "University department updated"},
+                )
 
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "University department not found"},
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Invalid input"},
         )
 
     return JSONResponse(

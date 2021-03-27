@@ -1,4 +1,4 @@
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from fastapi import HTTPException, status, Request, Depends
 from typing import Optional, List, Dict
 import uuid
@@ -35,8 +35,29 @@ class LessonModel(BaseModel):
         }
 
 
+class LessonAPIModel(BaseModel):
+    id: Optional[str] = Field(alias="_id")
+    name: Optional[str]
+    instructor: Optional[str]
+    absenceLimit: Optional[int]
+    slots: Optional[List[str]]
+    absences: Optional[List[str]]
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "name": "EE203",
+                "instructor": "Ali Veli",
+                "absenceLimit": 0,
+                "slots": ["2,7,0", "2,8,0"],
+                "absences": ["1,3,5", "1,3,6"],
+            }
+        }
+
+
 class UpdateLessonModel(BaseModel):
-    id: Optional[str]
     name: str = Field(...)
     instructor: str = Field(...)
     absenceLimit: int = Field(..., ge=0)
@@ -116,7 +137,7 @@ class UpdateUserSemesterModel(BaseModel):
 
 
 class SemesterAPIModel(BaseModel):
-    id: Optional[str]
+    id: Optional[str] = Field(alias="_id")
     name: Optional[str]
     startDate: Optional[datetime]
     endDate: Optional[datetime]
@@ -124,7 +145,21 @@ class SemesterAPIModel(BaseModel):
     dLesson: Optional[int]
     dBreak: Optional[int]
     slotCount: Optional[int]
-    lessons_url: Optional[str]
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "name": "2020-21 Spring",
+                "startDate": "2016-02-18T00:00:00Z",
+                "endDate": "2016-06-18T00:00:00Z",
+                "startHour": "8.10",
+                "dLesson": 50,
+                "dBreak": 10,
+                "slotCount": 12,
+            }
+        }
 
 
 class UserModel(BaseModel):
@@ -144,22 +179,21 @@ class UserModel(BaseModel):
 
 
 class UserAPIModel(BaseModel):
-    id: Optional[str]
+    id: Optional[str] = Field(alias="_id")
     email: Optional[EmailStr]
-    currentSemester: Optional[str]
-    currentUniversity: Optional[str]
+    curSemesterID: Optional[str]
+    curUniversityID: Optional[str]
     entranceYear: Optional[int]
-    semesters_url: Optional[str]
 
     class Config:
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
+                "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
                 "email": "hello@agu.edu.tr",
-                "currenSemester": "c765c307-560c-47ab-b29e-0a1265eab860",
-                "currentUniversity": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "curSemesterID": "stringID",
+                "curUniversityID": "stringID",
                 "entranceYear": 2018,
-                "semesters_url": "api.kucukdev.org/users/uid/semesters",
             }
         }
 

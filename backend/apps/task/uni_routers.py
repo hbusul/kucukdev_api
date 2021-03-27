@@ -2,18 +2,13 @@ from fastapi import (
     APIRouter,
     Body,
     Request,
-    HTTPException,
     status,
     Response,
     Depends,
-    Request,
 )
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from passlib.hash import bcrypt
-from pydantic import BaseModel
 from typing import List
-from jose import JWTError, jwt
 
 from apps.task import user_models
 from .user_models import UpdateSemesterModel
@@ -32,7 +27,7 @@ router = APIRouter()
     "",
     response_description="Add new university",
     operation_id="createUniversity",
-    response_model=UniversityModel,
+    response_model=UniversityAPIModel,
     responses={
         400: {"model": Message},
         403: {"model": Message},
@@ -47,7 +42,7 @@ async def create_university(
 
     if auth_user["userGroup"] == "professor":
         university = jsonable_encoder(university)
-        university["currentSemester"] = "null"
+        university["curSemesterID"] = "null"
 
         for doc in await request.app.mongodb["universities"].find().to_list(length=100):
             if doc["name"] == university["name"]:
@@ -63,7 +58,7 @@ async def create_university(
             {"_id": new_university.inserted_id}
         )
 
-        return JSONResponse(status_code=status.HTTP_200_OK, content=created_university)
+        return created_university
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -84,14 +79,10 @@ async def list_universities(request: Request):
 
     universities = []
     for doc in await request.app.mongodb["universities"].find().to_list(length=100):
-        universityAPI = UniversityAPIModel(
-            id=doc["_id"], name=doc["name"], currentSemester=doc["currentSemester"]
-        )
-        jsonable_universityAPI = jsonable_encoder(universityAPI)
-        universities.append(jsonable_universityAPI)
+        universities.append(doc)
 
     if len(universities) > 0:
-        return JSONResponse(status_code=status.HTTP_200_OK, content=universities)
+        return universities
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -115,7 +106,7 @@ async def show_university(unid: str, request: Request):
             }
         )
     ) is not None:
-        return JSONResponse(status_code=status.HTTP_200_OK, content=university)
+        return university
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -147,16 +138,6 @@ async def update_university_name(
             k: v for k, v in university_name.dict().items() if v is not None
         }
 
-        if (
-            existing_user := await request.app.mongodb["universities"].find_one(
-                {"_id": unid}
-            )
-        ) is None:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "University not found"},
-            )
-
         if len(university_name) >= 1:
             for doc in (
                 await request.app.mongodb["universities"].find().to_list(length=100)
@@ -172,15 +153,20 @@ async def update_university_name(
             )
 
             if update_result.modified_count == 1:
-                if (
-                    updated_name := await request.app.mongodb["universities"].find_one(
-                        {"_id": unid}
-                    )
-                ) is not None:
-                    return JSONResponse(
-                        status_code=status.HTTP_200_OK,
-                        content={"message": "University name updated"},
-                    )
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content={"message": "University name updated"},
+                )
+
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "University not found"},
+            )
+
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Invalid university name"},
+        )
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -214,24 +200,24 @@ async def update_university_current_semester(
         if len(current_semester) >= 1:
             update_result = await request.app.mongodb["universities"].update_one(
                 {"_id": unid},
-                {"$set": {"currentSemester": current_semester["currentSemester"]}},
+                {"$set": {"curSemesterID": current_semester["curSemesterID"]}},
             )
 
             if update_result.modified_count == 1:
-                if (
-                    updated_name := await request.app.mongodb["universities"].find_one(
-                        {"_id": unid}
-                    )
-                ) is not None:
-                    return JSONResponse(
-                        status_code=status.HTTP_200_OK,
-                        content={"message": "University current semester updated"},
-                    )
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content={"message": "University current semester updated"},
+                )
 
             return JSONResponse(
                 status_code=status.HTTP_404_NOT_FOUND,
                 content={"message": "University not found"},
             )
+
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Invalid semester ID"},
+        )
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -255,11 +241,8 @@ async def show_university_current_semester(unid: str, request: Request):
         )
     ) is not None:
         for semester in university["semesters"]:
-            if semester["_id"] == university["currentSemester"]:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content=semester,
-                )
+            if semester["_id"] == university["curSemesterID"]:
+                return semester
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,

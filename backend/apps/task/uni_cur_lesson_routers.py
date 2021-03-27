@@ -142,10 +142,7 @@ async def list_curriculum_lessons(
                     if curriculum["_id"] == curid:
                         for semester in curriculum["semesters"]:
                             if semester["_id"] == cursid:
-                                return JSONResponse(
-                                    status_code=status.HTTP_200_OK,
-                                    content=semester["lessons"],
-                                )
+                                return semester["lessons"]
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -186,10 +183,7 @@ async def show_curriculum_lesson(
                             if semester["_id"] == cursid:
                                 for lesson in semester["lessons"]:
                                     if lesson["_id"] == curlid:
-                                        return JSONResponse(
-                                            status_code=status.HTTP_200_OK,
-                                            content=lesson,
-                                        )
+                                        return lesson
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,

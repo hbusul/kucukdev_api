@@ -102,10 +102,7 @@ async def list_department_curriculums(unid: str, depid: str, request: Request):
     ) is not None:
         for department in university["departments"]:
             if department["_id"] == depid:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content=department["curriculums"],
-                )
+                return department["curriculums"]
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -140,10 +137,7 @@ async def show_department_curriculum(
             if department["_id"] == depid:
                 for curriculum in department["curriculums"]:
                     if curriculum["_id"] == curid:
-                        return JSONResponse(
-                            status_code=status.HTTP_200_OK,
-                            content=curriculum,
-                        )
+                        return curriculum
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,

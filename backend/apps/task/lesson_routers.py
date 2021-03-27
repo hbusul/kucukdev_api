@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Request, HTTPException, status, Depends, Response
+from fastapi import APIRouter, Body, Request, status, Depends, Response
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import List
@@ -8,6 +8,7 @@ from .user_models import (
     UserModel,
     LessonModel,
     UpdateLessonModel,
+    LessonAPIModel,
     AbsenceModel,
     Message,
 )
@@ -19,7 +20,7 @@ router = APIRouter()
     "/{uid}/semesters/{sid}/lessons",
     response_description="Add new lesson into a semester",
     operation_id="createLesson",
-    response_model=LessonModel,
+    response_model=LessonAPIModel,
     responses={
         404: {"model": Message},
         403: {"model": Message},
@@ -83,10 +84,7 @@ async def create_lesson(
             for semester in existing_user["semesters"]:
                 if semester["_id"] == sid:
                     for lesson in semester["lessons"]:
-
-                        return JSONResponse(
-                            status_code=status.HTTP_200_OK, content=lesson
-                        )
+                        return lesson
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -102,7 +100,7 @@ async def create_lesson(
     "/{uid}/semesters/{sid}/lessons",
     response_description="List all lessons of a semester",
     operation_id="listLessonsOfSemester",
-    response_model=List[LessonModel],
+    response_model=List[LessonAPIModel],
     responses={
         404: {"model": Message},
         403: {"model": Message},
@@ -125,9 +123,7 @@ async def list_lessons(
         ) is not None:
             for semester in user["semesters"]:
                 if semester["_id"] == sid:
-                    return JSONResponse(
-                        status_code=status.HTTP_200_OK, content=semester["lessons"]
-                    )
+                    return semester["lessons"]
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -143,7 +139,7 @@ async def list_lessons(
     "/{uid}/semesters/{sid}/lessons/{lid}",
     response_description="Get a single lesson of a semester",
     operation_id="getSingleLesson",
-    response_model=LessonModel,
+    response_model=LessonAPIModel,
     responses={
         404: {"model": Message},
         403: {"model": Message},
@@ -173,9 +169,7 @@ async def show_lesson(
                 if semester["_id"] == sid:
                     for lesson in semester["lessons"]:
                         if lesson["_id"] == lid:
-                            return JSONResponse(
-                                status_code=status.HTTP_200_OK, content=lesson
-                            )
+                            return lesson
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -191,7 +185,7 @@ async def show_lesson(
     "/{uid}/semesters/{sid}/lessons/{lid}",
     response_description="Update a lesson",
     operation_id="updateLesson",
-    response_model=LessonModel,
+    response_model=Message,
     responses={
         404: {"model": Message},
         403: {"model": Message},
@@ -255,23 +249,21 @@ async def update_lesson(
                 array_filters=[{"i._id": sid}, {"j._id": lid}],
             )
 
-            if (
-                existing_user := await request.app.mongodb["users"].find_one(
-                    {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid}
+            if update_result.modified_count == 1:
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content={"message": "Lesson updated"},
                 )
-            ) is not None:
-                for semester in existing_user["semesters"]:
-                    if semester["_id"] == sid:
-                        for lesson in semester["lessons"]:
-                            if lesson["_id"] == lid:
-                                return JSONResponse(
-                                    status_code=status.HTTP_200_OK, content=lesson
-                                )
 
             return JSONResponse(
                 status_code=status.HTTP_404_NOT_FOUND,
                 content={"message": "Lesson not found"},
             )
+
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Invalid input"},
+        )
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -305,18 +297,10 @@ async def delete_lesson(
         )
 
         if update_result.modified_count == 1:
-            if (
-                updated_user := await request.app.mongodb["users"].find_one(
-                    {"_id": uid, "semesters._id": sid}
-                )
-            ) is not None:
-                for semester in auth_user["semesters"]:
-                    if semester["_id"] == sid:
-                        for lesson in semester["lessons"]:
-                            if lesson["_id"] == lid:
-                                return JSONResponse(
-                                    status_code=status.HTTP_200_OK, content=lesson
-                                )
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "Lesson deleted"},
+            )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

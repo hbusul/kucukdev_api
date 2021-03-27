@@ -1,6 +1,6 @@
-from typing import Optional, List, Dict, Tuple
-import uuid
+from typing import Optional, List
 from pydantic import BaseModel, Field
+import uuid
 
 
 class UniversitySectionModel(BaseModel):
@@ -146,6 +146,22 @@ class UniversityModel(BaseModel):
         }
 
 
+class UniversityAPIModel(BaseModel):
+    id: Optional[str] = Field(alias="_id")
+    name: Optional[str]
+    curSemesterID: Optional[str]
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "name": "AGU",
+                "curSemesterID": "stringID",
+            }
+        }
+
+
 class UpdateUniversityNameModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
@@ -157,9 +173,3 @@ class UpdateUniversityNameModel(BaseModel):
                 "name": "AGU",
             }
         }
-
-
-class UniversityAPIModel(BaseModel):
-    id: Optional[str]
-    name: Optional[str]
-    currentSemester: Optional[str]

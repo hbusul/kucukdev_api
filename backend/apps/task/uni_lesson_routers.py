@@ -2,18 +2,13 @@ from fastapi import (
     APIRouter,
     Body,
     Request,
-    HTTPException,
     status,
     Response,
     Depends,
-    Request,
 )
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from passlib.hash import bcrypt
-from pydantic import BaseModel
 from typing import List
-from jose import JWTError, jwt
 
 from apps.task import user_models
 from .uni_models import (
@@ -208,10 +203,7 @@ async def list_university_lessons(unid: str, unisid: str, request: Request):
     ) is not None:
         for semester in university["semesters"]:
             if semester["_id"] == unisid:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content=semester["lessons"],
-                )
+                return semester["lessons"]
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -240,10 +232,7 @@ async def show_university_lesson(unid: str, unisid: str, unilid: str, request: R
             if semester["_id"] == unisid:
                 for lesson in semester["lessons"]:
                     if lesson["_id"] == unilid:
-                        return JSONResponse(
-                            status_code=status.HTTP_200_OK,
-                            content=lesson,
-                        )
+                        return lesson
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -290,6 +279,11 @@ async def update_university_lesson(
                                 status_code=status.HTTP_400_BAD_REQUEST,
                                 content={"message": "University lesson already exists"},
                             )
+        else:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "University lesson not found"},
+            )
 
         if len(university_lesson) >= 1:
             update_result = await request.app.mongodb["universities"].update_many(
@@ -311,26 +305,20 @@ async def update_university_lesson(
                 array_filters=[{"i._id": unisid}, {"j._id": unilid}],
             )
 
-            if (
-                updated_semester := await request.app.mongodb["universities"].find_one(
-                    {
-                        "_id": unid,
-                        "semesters._id": unisid,
-                        "semesters.lessons._id": unilid,
-                    }
+            if update_result.modified_count == 1:
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content={"message": "University lesson updated"},
                 )
-            ) is not None:
-                for semester in updated_semester["semesters"]:
-                    if semester["_id"] == unisid:
-                        for lesson in semester["lessons"]:
-                            if lesson["_id"] == unilid:
-                                return JSONResponse(
-                                    status_code=status.HTTP_200_OK, content=lesson
-                                )
+
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "University lesson not found"},
+            )
 
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "University semester not found"},
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Invalid input"},
         )
 
     return JSONResponse(

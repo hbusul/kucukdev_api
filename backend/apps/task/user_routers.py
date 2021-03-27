@@ -2,18 +2,13 @@ from fastapi import (
     APIRouter,
     Body,
     Request,
-    HTTPException,
     status,
     Response,
     Depends,
-    Request,
 )
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from passlib.hash import bcrypt
-from pydantic import BaseModel
-from typing import List
-from jose import JWTError, jwt
 
 
 from apps.task import user_models
@@ -42,8 +37,8 @@ async def create_user(request: Request, user: UserModel = Body(...)):
 
     user = jsonable_encoder(user)
     user["userGroup"] = "default"
-    user["currentSemester"] = "null"
-    user["currentUniversity"] = "null"
+    user["curSemesterID"] = "null"
+    user["curUniversityID"] = "null"
     user["entranceYear"] = 0
 
     if (
@@ -56,15 +51,7 @@ async def create_user(request: Request, user: UserModel = Body(...)):
         created_user = await request.app.mongodb["users"].find_one(
             {"_id": new_user.inserted_id}
         )
-        uid = created_user["_id"]
-        semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
-        created_user.pop("semesters")
-        created_user.pop("password")
-        created_user.pop("userGroup")
-        created_user["id"] = created_user.pop("_id")
-        created_user["semesters_url"] = semesters_url
-
-        return JSONResponse(status_code=status.HTTP_200_OK, content=created_user)
+        return created_user
 
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,
@@ -80,16 +67,7 @@ async def create_user(request: Request, user: UserModel = Body(...)):
     responses={401: {"model": Message}},
 )
 async def get_current(auth_user: UserModel = Depends(user_models.get_current_user)):
-
-    uid = auth_user["_id"]
-    semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
-    auth_user.pop("semesters")
-    auth_user.pop("password")
-    auth_user.pop("userGroup")
-    auth_user["id"] = auth_user.pop("_id")
-    auth_user["semesters_url"] = semesters_url
-
-    return JSONResponse(status_code=status.HTTP_200_OK, content=auth_user)
+    return auth_user
 
 
 @router.get(
@@ -114,14 +92,7 @@ async def show_user(
                 }
             )
         ) is not None:
-            semesters_url = f"api.kucukdev.org/users/{uid}/semesters"
-            auth_user.pop("semesters")
-            auth_user.pop("password")
-            auth_user.pop("userGroup")
-            auth_user["id"] = auth_user.pop("_id")
-            auth_user["semesters_url"] = semesters_url
-
-            return JSONResponse(status_code=status.HTTP_200_OK, content=auth_user)
+            return auth_user
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -132,7 +103,7 @@ async def show_user(
     "/{uid}/change-password",
     response_description="Update password of a user",
     operation_id="updatePassword",
-    response_model=UpdatePasswordModel,
+    response_model=Message,
     responses={
         401: {"model": Message},
         403: {"model": Message},
@@ -147,7 +118,7 @@ async def update_password(
 ):
     """Update password of a user with given userID"""
 
-    if uth_user["_id"] == uid:
+    if auth_user["_id"] == uid:
 
         password = {k: v for k, v in password.dict().items() if v is not None}
 
@@ -159,24 +130,19 @@ async def update_password(
             )
 
             if update_result.modified_count == 1:
-                if (
-                    updated_user := await request.app.mongodb["users"].find_one(
-                        {"_id": uid}
-                    )
-                ) is not None:
-                    return JSONResponse(
-                        status_code=status.HTTP_200_OK,
-                        content={"message": "Password updated"},
-                    )
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content={"message": "Password updated"},
+                )
 
-        if (
-            existing_user := await request.app.mongodb["users"].find_one({"_id": uid})
-        ) is not None:
-            return existing_user
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "Password couldn't be updated"},
+            )
 
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "User not found"},
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "Invalid input"},
         )
 
     return JSONResponse(
@@ -208,7 +174,7 @@ async def delete_user(
 
         if delete_result.deleted_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=status.HTTP_200_OK,
                 content={"message": "User deleted"},
             )
 
@@ -224,7 +190,7 @@ async def delete_user(
 
 @router.put(
     "/{uid}/current-semester",
-    response_description="Update current semester of a user",
+    response_description="Update current semester ID of a user",
     operation_id="updateCurrentSemester",
     response_model=Message,
     responses={
@@ -248,7 +214,7 @@ async def update_current_semester(
         if len(semester) >= 1:
 
             update_result = await request.app.mongodb["users"].update_one(
-                {"_id": uid}, {"$set": {"currentSemester": semester["currentSemester"]}}
+                {"_id": uid}, {"$set": {"curSemesterID": semester["curSemesterID"]}}
             )
 
             if update_result.matched_count == 1:
@@ -256,6 +222,11 @@ async def update_current_semester(
                     status_code=status.HTTP_200_OK,
                     content={"message": "Current semester updated"},
                 )
+
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "Current semester couldn't be updated"},
+            )
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -269,7 +240,7 @@ async def update_current_semester(
 
 @router.put(
     "/{uid}/current-university",
-    response_description="Update current university of a user",
+    response_description="Update current university ID of a user",
     operation_id="updateCurrentUniversity",
     response_model=Message,
     responses={
@@ -294,7 +265,7 @@ async def update_current_university(
 
             update_result = await request.app.mongodb["users"].update_one(
                 {"_id": uid},
-                {"$set": {"currentUniversity": university["currentUniversity"]}},
+                {"$set": {"curUniversityID": university["curUniversityID"]}},
             )
 
             if update_result.modified_count == 1:
@@ -303,8 +274,13 @@ async def update_current_university(
                     content={"message": "Current university ID updated"},
                 )
 
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "Current university ID couldn't be updated"},
+            )
+
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content={"message": "Invalid university ID"},
         )
 
@@ -349,8 +325,13 @@ async def update_entrance_year(
                     content={"message": "User entrance year updated"},
                 )
 
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "User entrance year couldn't be updated"},
+            )
+
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content={"message": "Invalid entrance year"},
         )
 
