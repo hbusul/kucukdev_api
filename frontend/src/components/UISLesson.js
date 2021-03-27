@@ -49,7 +49,7 @@ const UISLesson = ({ lesson, selectedLessons, onSelectLesson }) => {
                     {fixedSlots.map((slot, index) => {
                         let day_hour = slot.split(" ")
                         return (
-                            <p
+                            <div
                                 className="pr-2 font-bold flex flex-row"
                                 key={index}
                             >
@@ -57,7 +57,7 @@ const UISLesson = ({ lesson, selectedLessons, onSelectLesson }) => {
                                 <div className="font-normal pl-1">
                                     {day_hour[1]}
                                 </div>
-                            </p>
+                            </div>
                         )
                     })}
                 </div>

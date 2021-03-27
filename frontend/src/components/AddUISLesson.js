@@ -91,7 +91,7 @@ const AddUISLesson = ({ history }) => {
         } else {
             history.push("/signin")
         }
-    }, [refresh])
+    }, [refresh, login, setLogin, history])
 
     const onSelectUuniversity = (e) => {
         e.preventDefault()
@@ -267,7 +267,7 @@ const AddUISLesson = ({ history }) => {
                                                 (university, index) => (
                                                     <option
                                                         key={index}
-                                                        value={university.id}
+                                                        value={university._id}
                                                     >
                                                         {university.name}
                                                     </option>

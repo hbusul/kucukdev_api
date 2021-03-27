@@ -45,7 +45,7 @@ const Semester = ({
                         ></span>
                         <Link
                             to={{
-                                pathname: `/semesters/update-semester/${semester.id}`,
+                                pathname: `/semesters/update-semester/${semester._id}`,
                             }}
                             className="relative text-xs font-bold"
                         >
@@ -72,7 +72,7 @@ const Semester = ({
                             className="absolute inset-0 bg-green-500 opacity-90 rounded-full"
                         ></span>
                         <Link
-                            to={`/semesters/${semester.id}`}
+                            to={`/semesters/${semester._id}`}
                             className="relative text-xs font-bold"
                         >
                             View
@@ -152,10 +152,10 @@ const Semester = ({
                 <button
                     onClick={onCurrentSemester}
                     className={`px-5 py-2 border-blue-500 border text-blue-500 rounded transition duration-300 hover:bg-blue-700 hover:text-white focus:outline-none ${
-                        currentSemester === semester.id && "px-8"
+                        currentSemester === semester._id && "px-8"
                     }`}
                 >
-                    {currentSemester === semester.id
+                    {currentSemester === semester._id
                         ? "Current"
                         : "Set Current"}
                 </button>

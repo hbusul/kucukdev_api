@@ -280,7 +280,7 @@ const LessonDetail = ({ history, match }) => {
                                     {fixedSlots.map((slot, index) => {
                                         let day_hour = slot.split(" ")
                                         return (
-                                            <p
+                                            <div
                                                 className="pr-2 font-bold flex flex-row"
                                                 key={index}
                                             >
@@ -288,7 +288,7 @@ const LessonDetail = ({ history, match }) => {
                                                 <div className="font-normal pl-1">
                                                     {day_hour[1]}
                                                 </div>
-                                            </p>
+                                            </div>
                                         )
                                     })}
                                 </td>

@@ -20,7 +20,6 @@ const Overview = ({ history }) => {
 
     useEffect(() => {
         if (login) {
-            console.log(login)
             if (login.semesterID === "null") {
                 history.push("/semesters/add-semester")
             } else {

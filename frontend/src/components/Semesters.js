@@ -116,10 +116,10 @@ const Semesters = ({ history }) => {
                                     semesters.slice(start, end).map(semester => {
                                         return (
                                             <Semester
-                                                key={semester.id}
+                                                key={semester._id}
                                                 semester={semester}
-                                                onDeleteSemester={() => deleteSemester(semester.id)}
-                                                onCurrentSemester={() => setCurrentSemester(semester.id)}
+                                                onDeleteSemester={() => deleteSemester(semester._id)}
+                                                onCurrentSemester={() => setCurrentSemester(semester._id)}
                                                 currentSemester={login.semesterID}
                                             />
                                         )

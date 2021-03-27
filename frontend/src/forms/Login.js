@@ -47,7 +47,7 @@ const Login = (props) => {
                         console.error(error);
                     } else {
                         console.log('API called successfully. Returned data: ' + response.body);
-                        setLogin({ userToken: token, userID: data.id, semesterID: data.currentSemester, universityID: data.currentUniversity })
+                        setLogin({ userToken: token, userID: data._id, semesterID: data.curSemesterID, universityID: data.curUniversityID })
                         props.history.push("/")
                     }
                 });

@@ -41,12 +41,12 @@ const Lesson = ({ lesson, onDeleteLesson }) => {
                 {fixedSlots.map((slot, index) => {
                     let day_hour = slot.split(" ")
                     return (
-                        <p className="pr-2 font-bold flex flex-row" key={index}>
+                        <div className="justify-center font-bold flex flex-row" key={index}>
                             {day_hour[0]}{" "}
                             <div className="font-normal pl-1">
                                 {day_hour[1]}
                             </div>
-                        </p>
+                        </div>
                     )
                 })}
             </td>
