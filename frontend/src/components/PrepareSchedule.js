@@ -35,7 +35,7 @@ const PrepareSchedule = ({ history }) => {
                         }
                     } else {
                         console.log(
-                            "api called successfully. Returned data: " + data
+                            "api not called successfully. Returned data: " + data
                         )
                         setUniversities(data)
                     }
