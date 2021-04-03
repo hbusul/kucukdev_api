@@ -37,7 +37,9 @@ const Navbar = () => {
                                 </ul>
                             </div>
 
-                            <Link to="/attendance" className="text-gray-800 text-md font-semibold hover:text-blue-600">Attendance</Link>
+                            <Link to="/attendance" className="text-gray-800 text-md font-semibold hover:text-blue-600 mr-3 lg:mr-6">Attendance</Link>
+                            <Link to="/prepare-schedule" className="text-gray-800 text-md font-semibold hover:text-blue-600 mr-3 lg:mr-6">Prepare</Link>
+
                         </div>
 
                     }
@@ -49,7 +51,7 @@ const Navbar = () => {
                         </div>
                         :
                         <div className="hidden sm:flex sm:items-center">
-                            <Link to="/" className="text-gray-800 text-md font-semibold hover:text-blue-600 mr-4">Profile</Link>
+                            <Link to="/" className="text-gray-800 text-md font-semibold hover:text-blue-600 mr-4 hidden md:flex">Profile</Link>
                             <Link to="/" onClick={onLogoutUser.bind()} className="text-gray-800 text-md font-semibold border px-4 py-2 rounded-lg hover:text-blue-600 hover:border-blue-600">Logout</Link>
 
                         </div>
@@ -66,11 +68,12 @@ const Navbar = () => {
                 <div className="block sm:hidden bg-white border-t-2 py-2">
                     <div className="flex flex-col">
                         {
-                            isVisible ? <div className="flex flex-row justify-between">
+                            isVisible ? <div className="grid grid-cols-3 justify-items-center">
                                 <Link to="/overview" className="text-gray-800 text-sm font-semibold hover:text-blue-600 mb-1">Overview</Link>
                                 <Link to="/semesters" className="text-gray-800 text-sm font-semibold hover:text-blue-600 mb-1">Semesters</Link>
                                 <Link to="/lessons" className="text-gray-800 text-sm font-semibold hover:text-blue-600 mb-1">Lessons</Link>
                                 <Link to="/attendance" className="text-gray-800 text-sm font-semibold hover:text-blue-600 mb-1">Attendance</Link>
+                                <Link to="/prepare-schedule" className="text-gray-800 text-sm font-semibold hover:text-blue-600 mb-1">Prepare</Link>
                             </div> : null
                         }
                         {!login ?

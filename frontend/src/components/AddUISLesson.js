@@ -52,6 +52,9 @@ const AddUISLesson = ({ history }) => {
                         (error, data, response) => {
                             if (error) {
                                 console.error(error)
+                                if (error.response.status === 401) {
+                                    setLogin(false)
+                                }
                             } else {
                                 console.log(
                                     "API called successfully. Returned data: " +
@@ -93,7 +96,7 @@ const AddUISLesson = ({ history }) => {
         }
     }, [refresh, login, setLogin, history])
 
-    const onSelectUuniversity = (e) => {
+    const onSelectUniversity = (e) => {
         e.preventDefault()
 
         if (selectedUniversity !== "null") {
@@ -108,6 +111,9 @@ const AddUISLesson = ({ history }) => {
                 (error, data, response) => {
                     if (error) {
                         console.error(error)
+                        if (error.response.status === 401) {
+                            setLogin(false)
+                        }
                     } else {
                         console.log(
                             "API called successfully. Returned data: " + data
@@ -162,6 +168,9 @@ const AddUISLesson = ({ history }) => {
                     (error, data, response) => {
                         if (error) {
                             console.error(error)
+                            if (error.response.status === 401) {
+                                setLogin(false)
+                            }
                         } else {
                             console.log(
                                 "API called successfully. Returned data: " +
@@ -249,7 +258,7 @@ const AddUISLesson = ({ history }) => {
                                     </li>
                                 </ul>
                                 <form
-                                    onSubmit={onSelectUuniversity.bind(this)}
+                                    onSubmit={onSelectUniversity.bind(this)}
                                     className="px-8 pt-6 pb-8 mb-4 bg-white rounded"
                                 >
                                     <div className="mb-4">

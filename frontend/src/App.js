@@ -15,6 +15,7 @@ import ShowLessons from "./components/Lessons"
 import LessonDetail from "./components/LessonDetail"
 import Overview from "./components/Overview"
 import Attendance from "./components/Attendance.js"
+import PrepareSchedule from "./components/PrepareSchedule"
 
 function App() {
     return (
@@ -35,6 +36,11 @@ function App() {
                     <Route exact path="/semesters" component={Semesters} />
                     <Route exact path="/lessons" component={ShowLessons} />
                     <Route exact path="/attendance" component={Attendance} />
+                    <Route
+                        exact
+                        path="/prepare-schedule"
+                        component={PrepareSchedule}
+                    />
 
                     <Route
                         exact
