@@ -34,9 +34,7 @@ const PrepareSchedule = ({ history }) => {
                             setLogin(false)
                         }
                     } else {
-                        console.log(
-                            "NOTAPI called successfully. Returned data: " + data
-                        )
+                        console.log("da")
                         setUniversities(data)
                     }
                 })
