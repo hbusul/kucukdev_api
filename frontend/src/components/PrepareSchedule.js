@@ -138,7 +138,7 @@ const PrepareSchedule = ({ history }) => {
                         ) {
                             for (let j = 0; j < data[i].semesters.length; j++) {
                                 if (
-                                    Number(year) * Number(semester) ===
+                                    2 * Number(year) - 2 + Number(semester) ===
                                     data[i].semesters[j].semester
                                 ) {
                                     console.log(data[i].semesters[j])
@@ -448,7 +448,7 @@ const PrepareSchedule = ({ history }) => {
                         <div>
                             <h1 className="flex justify-start text-2xl ml-8 md:ml-4">
                                 {department.name} Curriculum of Semester
-                                {` ${Number(year) * Number(semester)}`}
+                                {` ${2 * Number(year) - 2 + Number(semester)}`}
                             </h1>
                             <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
                                 <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 rounded-bl-lg rounded-br-lg">
@@ -474,10 +474,12 @@ const PrepareSchedule = ({ history }) => {
                                                 </td>
                                                 <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                     {`${year}st Year, ${
-                                                        Number(year) *
+                                                        2 * Number(year) -
+                                                        2 +
                                                         Number(semester)
                                                     }${
-                                                        (Number(year) *
+                                                        (2 * Number(year) -
+                                                            2 +
                                                             Number(semester)) %
                                                             2 ===
                                                         0
@@ -508,10 +510,12 @@ const PrepareSchedule = ({ history }) => {
                                                     </td>
                                                     <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                         {`${year}st Year, ${
-                                                            Number(year) *
+                                                            2 * Number(year) -
+                                                            2 +
                                                             Number(semester)
                                                         }${
-                                                            (Number(year) *
+                                                            (2 * Number(year) -
+                                                                2 +
                                                                 Number(
                                                                     semester
                                                                 )) %
@@ -532,10 +536,12 @@ const PrepareSchedule = ({ history }) => {
                                                     </td>
                                                     <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                         {`${year}st Year, ${
-                                                            Number(year) *
+                                                            2 * Number(year) -
+                                                            2 +
                                                             Number(semester)
                                                         }${
-                                                            (Number(year) *
+                                                            (2 * Number(year) -
+                                                                2 +
                                                                 Number(
                                                                     semester
                                                                 )) %
