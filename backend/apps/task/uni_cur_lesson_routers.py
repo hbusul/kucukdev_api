@@ -58,7 +58,7 @@ async def create_curriculum_lesson(
                             for semester in curriculum["semesters"]:
                                 if semester["_id"] == cursid:
                                     for lesson in semester["lessons"]:
-                                        if lesson["name"] == curriculum_lesson["name"]:
+                                        if lesson["code"] == curriculum_lesson["code"]:
                                             return JSONResponse(
                                                 status_code=status.HTTP_400_BAD_REQUEST,
                                                 content={
@@ -263,6 +263,9 @@ async def update_curriculum_lesson(
                     "$set": {
                         "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].name": curriculum_lesson[
                             "name"
+                        ],
+                        "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].code": curriculum_lesson[
+                            "code"
                         ],
                         "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].lessonType": curriculum_lesson[
                             "lessonType"

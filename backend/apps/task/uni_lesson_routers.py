@@ -185,6 +185,35 @@ async def create_university_lesson(
 
 
 @router.get(
+    "/{unid}/semesters/{unisid}/lessons/find-code",
+    response_description="Get a single lessons with code",
+    operation_id="getSingleLessonWithCode",
+    response_model=UniversityAPILessonModel,
+    responses={
+        404: {"model": Message},
+    },
+)
+async def show_lesson_with_code(unid: str, code: str, request: Request):
+    """Get a single lesson of a university semester with given universityID and Lesson Code"""
+
+    if (
+        university := await request.app.mongodb["universities"].find_one(
+            {"_id": unid, "semesters.lessons.code": code}
+        )
+    ) is not None:
+        for semester in university["semesters"]:
+            if semester["_id"] == university["curSemesterID"]:
+                for lesson in semester["lessons"]:
+                    if lesson["code"] == code:
+                        return lesson
+
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content={"message": "University lesson not found"},
+    )
+
+
+@router.get(
     "/{unid}/semesters/{unisid}/lessons",
     response_description="List all lessons of a university semester",
     operation_id="listUniversitySemesterLessons",

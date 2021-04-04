@@ -82,11 +82,14 @@ class UniversitySemesterModel(BaseModel):
 class CurriculumLessonModel(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
+    code: str = Field(...)
     lessonType: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
-        schema_extra = {"example": {"name": "PHYS101", "lessonType": "science"}}
+        schema_extra = {
+            "example": {"name": "PHYSICS I", "code": "PHYS101", "lessonType": "science"}
+        }
 
 
 class CurriculumSemesterModel(BaseModel):
