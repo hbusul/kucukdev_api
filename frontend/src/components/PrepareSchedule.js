@@ -20,10 +20,7 @@ const PrepareSchedule = ({ history }) => {
     const [selectedUniversity, setSelectedUniversity] = useState("null")
     const [semesterLessons, setSemesterLessons] = useState([])
     const [selectedLessons, setSelectedLessons] = useState([])
-    const [defaultLessons, setDefaultLessons] = useState([])
-    const [scienceLessons, setScienceLessons] = useState([])
-    const [techLessons, setTechLessons] = useState([])
-    const [nonTechLessons, setNonTechLessons] = useState([])
+    const [lessonGroups, setLessonGroups] = useState({})
 
     const [start, setStart] = useState(0)
     const [end, setEnd] = useState(10)
@@ -144,6 +141,7 @@ const PrepareSchedule = ({ history }) => {
                             startYear >= data[i].startYear &&
                             startYear < data[i].endYear
                         ) {
+                            const localLessonGroups = {}
                             for (let j = 0; j < data[i].semesters.length; j++) {
                                 if (
                                     nthSemester ===
@@ -151,68 +149,32 @@ const PrepareSchedule = ({ history }) => {
                                 ) {
                                     console.log(data[i].semesters[j])
                                     const selectedLessons = []
-                                    const defaultLessons = []
-                                    const scienceLessons = []
-                                    const techLessons = []
-                                    const nonTechLessons = []
                                     for (
                                         let k = 0;
                                         k < data[i].semesters[j].lessons.length;
                                         k++
                                     ) {
+                                        if(!(data[i].semesters[j].lessons[k].lessonType in localLessonGroups))
+                                            localLessonGroups[data[i].semesters[j].lessons[k].lessonType] = []
+                                        localLessonGroups[data[i].semesters[j].lessons[k].lessonType].push(data[i].semesters[j].lessons[k])
+
                                         if (
                                             data[i].semesters[j].lessons[k]
                                                 .lessonType === "default"
                                         ) {
-                                            defaultLessons.push(
-                                                data[i].semesters[j].lessons[k]
-                                            )
                                             selectedLessons.push(
                                                 data[i].semesters[j].lessons[k]
                                             )
-                                        } else if (
-                                            data[i].semesters[j].lessons[k]
-                                                .lessonType === "science"
-                                        ) {
-                                            if (scienceLessons.length === 0) {
-                                                selectedLessons.push(
-                                                    data[i].semesters[j]
-                                                        .lessons[k]
-                                                )
-                                            }
-                                            scienceLessons.push(
-                                                data[i].semesters[j].lessons[k]
-                                            )
-                                        } else if (
-                                            data[i].semesters[j].lessons[k]
-                                                .lessonType === "tech-elective"
-                                        ) {
-                                            if (techLessons.length === 0) {
-                                                selectedLessons.push(
-                                                    data[i].semesters[j]
-                                                        .lessons[k]
-                                                )
-                                            }
-                                            techLessons.push(
-                                                data[i].semesters[j].lessons[k]
-                                            )
                                         } else {
-                                            if (nonTechLessons.length === 0) {
+                                            if (localLessonGroups[data[i].semesters[j].lessons[k].lessonType].length === 1) {
                                                 selectedLessons.push(
-                                                    data[i].semesters[j]
-                                                        .lessons[k]
+                                                    data[i].semesters[j].lessons[k]
                                                 )
                                             }
-                                            nonTechLessons.push(
-                                                data[i].semesters[j].lessons[k]
-                                            )
                                         }
                                     }
+                                    setLessonGroups(localLessonGroups)
                                     setSelectedLessons(selectedLessons)
-                                    setDefaultLessons(defaultLessons)
-                                    setScienceLessons(scienceLessons)
-                                    setTechLessons(techLessons)
-                                    setNonTechLessons(nonTechLessons)
                                     setShowCurriculum(true)
                                 }
                             }
@@ -532,22 +494,24 @@ const PrepareSchedule = ({ history }) => {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="bg-white">
-                                                    <tr className="bg-blue-400">
-                                                        <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
-                                                        <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                            DEFAULT LESSONS
-                                                        </td>
-                                                        <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                            {`${year}st Year, ${nthSemester}${
-                                                                nthSemester %
-                                                                    2 ===
-                                                                0
-                                                                    ? "nd"
-                                                                    : "st"
-                                                            } Semester`}
-                                                        </td>
-                                                    </tr>
-                                                    {defaultLessons.map(
+                                                {
+                                                    Object.keys(lessonGroups).map(
+                                                        (group) => (<><tr className="bg-blue-400">
+                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
+                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                {group}
+                                                            </td>
+                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                {`${year}st Year, ${nthSemester}${
+                                                                    nthSemester %
+                                                                        2 ===
+                                                                    0
+                                                                        ? "nd"
+                                                                        : "st"
+                                                                } Semester`}
+                                                             </td>
+                                                            </tr>
+                                                        {lessonGroups[group].map(
                                                         (lesson) => (
                                                             <tr
                                                                 key={
@@ -587,72 +551,11 @@ const PrepareSchedule = ({ history }) => {
                                                                 </td>
                                                             </tr>
                                                         )
-                                                    )}
-                                                    <tr>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td>. . .</td>
-                                                    </tr>
-                                                    {scienceLessons.length >
-                                                        0 && (
-                                                        <tr className="bg-purple-400">
-                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
-                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                SCIENCE
-                                                                ELECTIVES
-                                                            </td>
-                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                {`${year}st Year, ${nthSemester}${
-                                                                    nthSemester %
-                                                                        2 ===
-                                                                    0
-                                                                        ? "nd"
-                                                                        : "st"
-                                                                } Semester`}
-                                                            </td>
-                                                        </tr>
-                                                    )}
-                                                    {scienceLessons.map(
-                                                        (lesson) => (
-                                                            <tr
-                                                                key={
-                                                                    lesson.code
-                                                                }
-                                                                onClick={() =>
-                                                                    selectLessons(
-                                                                        lesson
-                                                                    )
-                                                                }
-                                                                className={`cursor-pointer ${
-                                                                    selectedLessons.includes(
-                                                                        lesson
-                                                                    )
-                                                                        ? `bg-purple-300`
-                                                                        : ``
-                                                                }`}
-                                                            >
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                    {
-                                                                        lesson.code
-                                                                    }
-                                                                </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                    {
-                                                                        lesson.name
-                                                                    }
-                                                                </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                    {`${year}st Year, ${nthSemester}${
-                                                                        nthSemester %
-                                                                            2 ===
-                                                                        0
-                                                                            ? "nd"
-                                                                            : "st"
-                                                                    } Semester`}
-                                                                </td>
-                                                            </tr>
-                                                        )
-                                                    )}
+                                                            )}
+                                                            </>
+                                                            )
+                                                    )
+                                                }
                                                 </tbody>
                                             </table>
                                         </div>
