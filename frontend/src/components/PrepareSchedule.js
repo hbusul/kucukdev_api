@@ -13,6 +13,7 @@ const PrepareSchedule = ({ history }) => {
     const [year, setYear] = useState(1)
     const [semester, setSemester] = useState(1)
     const [startYear, setStartYear] = useState(new Date().getFullYear())
+    const [nthSemester, setNthSemester] = useState(1)
     const [refresh, setRefresh] = useState(0)
 
     const [universities, setUniversities] = useState([])
@@ -69,9 +70,8 @@ const PrepareSchedule = ({ history }) => {
         }
     }, [history, refresh, login, setLogin])
 
-    let nthSemester = 1
     useEffect(() => {
-        nthSemester = 2 * Number(year) - 2 + Number(semester)
+        setNthSemester(2 * Number(year) - 2 + Number(semester))
     }, [year, semester])
 
     const selectLessons = (newLesson) => {
@@ -135,7 +135,6 @@ const PrepareSchedule = ({ history }) => {
                     console.log(
                         "API called successfully. Returned data: " + data
                     )
-                    console.log(data)
                     for (let i = 0; i < data.length; i++) {
                         if (
                             startYear >= data[i].startYear &&
@@ -147,7 +146,6 @@ const PrepareSchedule = ({ history }) => {
                                     nthSemester ===
                                     data[i].semesters[j].semester
                                 ) {
-                                    console.log(data[i].semesters[j])
                                     const selectedLessons = []
                                     for (
                                         let k = 0;
@@ -236,6 +234,8 @@ const PrepareSchedule = ({ history }) => {
         "bg-pink-300",
         "bg-green-300",
     ]
+
+    const suffixes = ["st", "nd", "rd", "th"]
 
     const currentYear = new Date().getFullYear()
     const years = []
@@ -554,12 +554,25 @@ const PrepareSchedule = ({ history }) => {
                                                                     {`${group.toUpperCase()} LESSONS`}
                                                                 </td>
                                                                 <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                    {`${year}st Year, ${nthSemester}${
+                                                                    {`${year}${
+                                                                        suffixes[
+                                                                            year -
+                                                                                1
+                                                                        ]
+                                                                    } Year, ${
                                                                         nthSemester %
-                                                                            2 ===
-                                                                        0
-                                                                            ? "nd"
-                                                                            : "st"
+                                                                            2 ==
+                                                                        1
+                                                                            ? "1"
+                                                                            : "2"
+                                                                    }${
+                                                                        suffixes[
+                                                                            nthSemester %
+                                                                                2 ==
+                                                                            1
+                                                                                ? 0
+                                                                                : 1
+                                                                        ]
                                                                     } Semester`}
                                                                 </td>
                                                             </tr>
@@ -596,12 +609,25 @@ const PrepareSchedule = ({ history }) => {
                                                                         }
                                                                     </td>
                                                                     <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                        {`${year}st Year, ${nthSemester}${
+                                                                        {`${year}${
+                                                                            suffixes[
+                                                                                year -
+                                                                                    1
+                                                                            ]
+                                                                        } Year, ${
                                                                             nthSemester %
-                                                                                2 ===
-                                                                            0
-                                                                                ? "nd"
-                                                                                : "st"
+                                                                                2 ==
+                                                                            1
+                                                                                ? "1"
+                                                                                : "2"
+                                                                        }${
+                                                                            suffixes[
+                                                                                nthSemester %
+                                                                                    2 ==
+                                                                                1
+                                                                                    ? 0
+                                                                                    : 1
+                                                                            ]
                                                                         } Semester`}
                                                                     </td>
                                                                 </tr>
