@@ -154,9 +154,22 @@ const PrepareSchedule = ({ history }) => {
                                         k < data[i].semesters[j].lessons.length;
                                         k++
                                     ) {
-                                        if(!(data[i].semesters[j].lessons[k].lessonType in localLessonGroups))
-                                            localLessonGroups[data[i].semesters[j].lessons[k].lessonType] = []
-                                        localLessonGroups[data[i].semesters[j].lessons[k].lessonType].push(data[i].semesters[j].lessons[k])
+                                        if (
+                                            !(
+                                                data[i].semesters[j].lessons[k]
+                                                    .lessonType in
+                                                localLessonGroups
+                                            )
+                                        )
+                                            localLessonGroups[
+                                                data[i].semesters[j].lessons[
+                                                    k
+                                                ].lessonType
+                                            ] = []
+                                        localLessonGroups[
+                                            data[i].semesters[j].lessons[k]
+                                                .lessonType
+                                        ].push(data[i].semesters[j].lessons[k])
 
                                         if (
                                             data[i].semesters[j].lessons[k]
@@ -166,9 +179,15 @@ const PrepareSchedule = ({ history }) => {
                                                 data[i].semesters[j].lessons[k]
                                             )
                                         } else {
-                                            if (localLessonGroups[data[i].semesters[j].lessons[k].lessonType].length === 1) {
+                                            if (
+                                                localLessonGroups[
+                                                    data[i].semesters[j]
+                                                        .lessons[k].lessonType
+                                                ].length === 1
+                                            ) {
                                                 selectedLessons.push(
-                                                    data[i].semesters[j].lessons[k]
+                                                    data[i].semesters[j]
+                                                        .lessons[k]
                                                 )
                                             }
                                         }
@@ -202,6 +221,21 @@ const PrepareSchedule = ({ history }) => {
             }
         )
     }
+
+    const priColors = [
+        "bg-blue-400",
+        "bg-purple-400",
+        "bg-yellow-400",
+        "bg-pink-400",
+        "bg-green-400",
+    ]
+    const secColors = [
+        "bg-blue-300",
+        "bg-purple-300",
+        "bg-yellow-300",
+        "bg-pink-300",
+        "bg-green-300",
+    ]
 
     const currentYear = new Date().getFullYear()
     const years = []
@@ -494,53 +528,32 @@ const PrepareSchedule = ({ history }) => {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="bg-white">
-                                                {
-                                                    Object.keys(lessonGroups).map(
-                                                        (group) => (<><tr className="bg-blue-400">
-                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
-                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                {group}
-                                                            </td>
-                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                {`${year}st Year, ${nthSemester}${
-                                                                    nthSemester %
-                                                                        2 ===
-                                                                    0
-                                                                        ? "nd"
-                                                                        : "st"
-                                                                } Semester`}
-                                                             </td>
-                                                            </tr>
-                                                        {lessonGroups[group].map(
-                                                        (lesson) => (
+                                                    {Object.keys(
+                                                        lessonGroups
+                                                    ).map((group, index) => (
+                                                        <>
+                                                            {index > 0 && (
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td>
+                                                                        . . .
+                                                                    </td>
+                                                                </tr>
+                                                            )}
                                                             <tr
-                                                                key={
-                                                                    lesson.code
+                                                                className={
+                                                                    priColors[
+                                                                        index %
+                                                                            priColors.length
+                                                                    ]
                                                                 }
-                                                                onClick={() =>
-                                                                    selectLessons(
-                                                                        lesson
-                                                                    )
-                                                                }
-                                                                className={`cursor-pointer ${
-                                                                    selectedLessons.includes(
-                                                                        lesson
-                                                                    )
-                                                                        ? `bg-blue-300`
-                                                                        : ``
-                                                                }`}
                                                             >
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                    {
-                                                                        lesson.code
-                                                                    }
+                                                                <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
+                                                                <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {`${group.toUpperCase()} LESSONS`}
                                                                 </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                    {
-                                                                        lesson.name
-                                                                    }
-                                                                </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     {`${year}st Year, ${nthSemester}${
                                                                         nthSemester %
                                                                             2 ===
@@ -550,12 +563,51 @@ const PrepareSchedule = ({ history }) => {
                                                                     } Semester`}
                                                                 </td>
                                                             </tr>
-                                                        )
-                                                            )}
-                                                            </>
-                                                            )
-                                                    )
-                                                }
+                                                            {lessonGroups[
+                                                                group
+                                                            ].map((lesson) => (
+                                                                <tr
+                                                                    key={
+                                                                        lesson.code
+                                                                    }
+                                                                    onClick={() =>
+                                                                        selectLessons(
+                                                                            lesson
+                                                                        )
+                                                                    }
+                                                                    className={`cursor-pointer ${
+                                                                        selectedLessons.includes(
+                                                                            lesson
+                                                                        ) &&
+                                                                        secColors[
+                                                                            index %
+                                                                                secColors.length
+                                                                        ]
+                                                                    }`}
+                                                                >
+                                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                        {
+                                                                            lesson.code
+                                                                        }
+                                                                    </td>
+                                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                        {
+                                                                            lesson.name
+                                                                        }
+                                                                    </td>
+                                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                        {`${year}st Year, ${nthSemester}${
+                                                                            nthSemester %
+                                                                                2 ===
+                                                                            0
+                                                                                ? "nd"
+                                                                                : "st"
+                                                                        } Semester`}
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </>
+                                                    ))}
                                                 </tbody>
                                             </table>
                                         </div>
