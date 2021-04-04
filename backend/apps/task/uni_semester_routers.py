@@ -36,44 +36,37 @@ async def create_university_semester(
 ):
     """Create semester for a university with given universityID"""
 
-    if auth_user["userGroup"] == "professor":
-        university_semester = jsonable_encoder(university_semester)
-
-        if (
-            created_university := await request.app.mongodb["universities"].find_one(
-                {"_id": unid}
-            )
-        ) is not None:
-            for semester in created_university["semesters"]:
-                if semester["name"] == university_semester["name"]:
-                    return JSONResponse(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        content={"message": "University semester already exists"},
-                    )
-
-        update_result = await request.app.mongodb["universities"].update_one(
-            {"_id": unid}, {"$push": {"semesters": university_semester}}
+    if auth_user["userGroup"] != "professor":
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content={"message": "No right to access"},
         )
 
-        if update_result.modified_count == 1:
-            if (
-                created_university := await request.app.mongodb[
-                    "universities"
-                ].find_one({"_id": unid})
-            ) is not None:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content=created_university["semesters"],
-                )
+    university_semester = jsonable_encoder(university_semester)
 
+    university = await request.app.mongodb["universities"].find_one({"_id": unid})
+
+    if not university:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"message": "University not found"},
         )
 
-    return JSONResponse(
-        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
+    if university_semester["name"] in [x["name"] for x in university["semesters"]]:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "University semester already exists"},
+        )
+
+    await request.app.mongodb["universities"].update_one(
+        {"_id": unid}, {"$push": {"semesters": university_semester}}
     )
+
+    university = await request.app.mongodb["universities"].find_one({"_id": unid})
+    university_semester = [
+        x for x in university["semesters"] if x["name"] == university_semester["name"]
+    ][0]
+    return university_semester
 
 
 @router.get(
