@@ -6,7 +6,9 @@ var Kucukdevapi = require("kucukdevapi")
 const PrepareSchedule = ({ history }) => {
     const [login, setLogin] = useContext(UserContext)
 
-    const [showCurriculumModal, setShowCurriculumModal] = useState(false)
+    const [showCurriculum, setShowCurriculum] = useState(false)
+    const [showAdditionalLesson, setShowAdditionalLesson] = useState(false)
+
     const [department, setDepartment] = useState()
     const [year, setYear] = useState(1)
     const [semester, setSemester] = useState(1)
@@ -16,12 +18,15 @@ const PrepareSchedule = ({ history }) => {
     const [universities, setUniversities] = useState([])
     const [departments, setDepartments] = useState([])
     const [selectedUniversity, setSelectedUniversity] = useState("null")
-    const [lessons, setLessons] = useState([])
+    const [semesterLessons, setSemesterLessons] = useState([])
     const [selectedLessons, setSelectedLessons] = useState([])
     const [defaultLessons, setDefaultLessons] = useState([])
     const [scienceLessons, setScienceLessons] = useState([])
     const [techLessons, setTechLessons] = useState([])
     const [nonTechLessons, setNonTechLessons] = useState([])
+
+    const [start, setStart] = useState(0)
+    const [end, setEnd] = useState(10)
 
     useEffect(() => {
         if (login) {
@@ -66,6 +71,11 @@ const PrepareSchedule = ({ history }) => {
             history.push("/signin")
         }
     }, [history, refresh, login, setLogin])
+
+    let nthSemester = 1
+    useEffect(() => {
+        nthSemester = 2 * Number(year) - 2 + Number(semester)
+    }, [year, semester])
 
     const selectLessons = (newLesson) => {
         if (selectedLessons.includes(newLesson)) {
@@ -136,11 +146,10 @@ const PrepareSchedule = ({ history }) => {
                         ) {
                             for (let j = 0; j < data[i].semesters.length; j++) {
                                 if (
-                                    2 * Number(year) - 2 + Number(semester) ===
+                                    nthSemester ===
                                     data[i].semesters[j].semester
                                 ) {
                                     console.log(data[i].semesters[j])
-                                    setLessons(data[i].semesters[j].lessons)
                                     const selectedLessons = []
                                     const defaultLessons = []
                                     const scienceLessons = []
@@ -204,11 +213,29 @@ const PrepareSchedule = ({ history }) => {
                                     setScienceLessons(scienceLessons)
                                     setTechLessons(techLessons)
                                     setNonTechLessons(nonTechLessons)
-                                    setShowCurriculumModal(true)
+                                    setShowCurriculum(true)
                                 }
                             }
                         }
                     }
+                }
+            }
+        )
+
+        let universityApiInstance = new Kucukdevapi.UniversitiesApi()
+        universityApiInstance.getCurrentUniversitySemester(
+            unid,
+            (error, data, response) => {
+                if (error) {
+                    console.error(error)
+                    if (error.response.status === 401) {
+                        setLogin(false)
+                    }
+                } else {
+                    console.log(
+                        "API called successfully. Returned data: " + data
+                    )
+                    setSemesterLessons(data.lessons)
                 }
             }
         )
@@ -220,9 +247,23 @@ const PrepareSchedule = ({ history }) => {
         years.push(currentYear - i)
     }
 
+    const setPrevious = () => {
+        if (start !== 0) {
+            setStart(start - 10)
+            setEnd(end - 10)
+        }
+    }
+
+    const setNext = () => {
+        if (start + 10 < semesterLessons.length) {
+            setStart(start + 10)
+            setEnd(end + 10)
+        }
+    }
+
     return (
-        <div className="flex flex-col mt-4">
-            {login.universityID === "null" ? (
+        <div className="flex flex-col mt-8">
+            {login.universityID === "null" && (
                 <div className="flex h-full">
                     <div className="flex bg-white shadow-xl rounded flex-col md:w-2/3 sm:w-full mx-auto mt-4">
                         <div className="w-full flex">
@@ -233,7 +274,7 @@ const PrepareSchedule = ({ history }) => {
                                 }}
                             ></div>
                             <div className="w-full lg:w-7/12 bg-white p-5 rounded-lg lg:rounded-l-none mx-auto">
-                                <h3 className="text-2xl">Add From System</h3>
+                                <h3 className="text-2xl">Prepare Schedule</h3>
                                 <ul className="list-disc ml-4 md:ml-12">
                                     <li>
                                         <p className="mt-4 md:mt-8 text-justify">
@@ -297,9 +338,11 @@ const PrepareSchedule = ({ history }) => {
                         </div>
                     </div>
                 </div>
-            ) : (
+            )}
+
+            {!showAdditionalLesson ? (
                 <div className="flex flex-col xl:mx-40">
-                    {!showCurriculumModal ? (
+                    {!showCurriculum ? (
                         <div className="flex h-full">
                             <div className="flex bg-white shadow-xl rounded flex-col md:w-2/3 sm:w-full mx-auto mt-4">
                                 <div className="w-full flex">
@@ -445,11 +488,13 @@ const PrepareSchedule = ({ history }) => {
                     ) : (
                         <div>
                             <h1 className="flex justify-start text-2xl ml-8 md:ml-4">
-                                {department.name} Curriculum of Semester
-                                {` ${2 * Number(year) - 2 + Number(semester)}`}
+                                {department.name} Curriculum
+                                <div className="font-extralight ml-2">
+                                    {` Semester ${nthSemester}`}
+                                </div>
                             </h1>
                             <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
-                                <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 rounded-bl-lg rounded-br-lg">
+                                <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
                                     <table className="min-w-full">
                                         <thead>
                                             <tr className="">
@@ -471,16 +516,8 @@ const PrepareSchedule = ({ history }) => {
                                                     DEFAULT LESSONS
                                                 </td>
                                                 <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                    {`${year}st Year, ${
-                                                        2 * Number(year) -
-                                                        2 +
-                                                        Number(semester)
-                                                    }${
-                                                        (2 * Number(year) -
-                                                            2 +
-                                                            Number(semester)) %
-                                                            2 ===
-                                                        0
+                                                    {`${year}st Year, ${nthSemester}${
+                                                        nthSemester % 2 === 0
                                                             ? "nd"
                                                             : "st"
                                                     } Semester`}
@@ -488,36 +525,27 @@ const PrepareSchedule = ({ history }) => {
                                             </tr>
                                             {defaultLessons.map((lesson) => (
                                                 <tr
-                                                    key={lesson.name}
+                                                    key={lesson.code}
                                                     onClick={() =>
                                                         selectLessons(lesson)
                                                     }
-                                                    className={
+                                                    className={`cursor-pointer ${
                                                         selectedLessons.includes(
                                                             lesson
                                                         )
                                                             ? `bg-blue-300`
                                                             : ``
-                                                    }
+                                                    }`}
                                                 >
+                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                        {lesson.code}
+                                                    </td>
                                                     <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                         {lesson.name}
                                                     </td>
                                                     <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        LESSON NAME
-                                                    </td>
-                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {`${year}st Year, ${
-                                                            2 * Number(year) -
-                                                            2 +
-                                                            Number(semester)
-                                                        }${
-                                                            (2 * Number(year) -
-                                                                2 +
-                                                                Number(
-                                                                    semester
-                                                                )) %
-                                                                2 ===
+                                                        {`${year}st Year, ${nthSemester}${
+                                                            nthSemester % 2 ===
                                                             0
                                                                 ? "nd"
                                                                 : "st"
@@ -525,7 +553,11 @@ const PrepareSchedule = ({ history }) => {
                                                     </td>
                                                 </tr>
                                             ))}
-                                            <div className="mt-2"></div>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td>. . .</td>
+                                            </tr>
                                             {scienceLessons.length > 0 && (
                                                 <tr className="bg-purple-400">
                                                     <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
@@ -533,17 +565,8 @@ const PrepareSchedule = ({ history }) => {
                                                         SCIENCE ELECTIVES
                                                     </td>
                                                     <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {`${year}st Year, ${
-                                                            2 * Number(year) -
-                                                            2 +
-                                                            Number(semester)
-                                                        }${
-                                                            (2 * Number(year) -
-                                                                2 +
-                                                                Number(
-                                                                    semester
-                                                                )) %
-                                                                2 ===
+                                                        {`${year}st Year, ${nthSemester}${
+                                                            nthSemester % 2 ===
                                                             0
                                                                 ? "nd"
                                                                 : "st"
@@ -553,34 +576,27 @@ const PrepareSchedule = ({ history }) => {
                                             )}
                                             {scienceLessons.map((lesson) => (
                                                 <tr
-                                                    key={lesson.name}
+                                                    key={lesson.code}
                                                     onClick={() =>
                                                         selectLessons(lesson)
                                                     }
-                                                    className={
+                                                    className={`cursor-pointer ${
                                                         selectedLessons.includes(
                                                             lesson
                                                         )
                                                             ? `bg-purple-300`
                                                             : ``
-                                                    }
+                                                    }`}
                                                 >
+                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                        {lesson.code}
+                                                    </td>
                                                     <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                         {lesson.name}
                                                     </td>
                                                     <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        LESSON NAME
-                                                    </td>
-                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {`${year}st Year, ${
-                                                            Number(year) *
-                                                            Number(semester)
-                                                        }${
-                                                            (Number(year) *
-                                                                Number(
-                                                                    semester
-                                                                )) %
-                                                                2 ===
+                                                        {`${year}st Year, ${nthSemester}${
+                                                            nthSemester % 2 ===
                                                             0
                                                                 ? "nd"
                                                                 : "st"
@@ -592,8 +608,205 @@ const PrepareSchedule = ({ history }) => {
                                     </table>
                                 </div>
                             </div>
+                            <div className="flex flex-row justify-center lg:justify-end lg:mr-4">
+                                <button
+                                    onClick={() => setShowCurriculum(false)}
+                                    className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+                                >
+                                    Go Back
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        setShowAdditionalLesson(true)
+                                    }
+                                    className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline"
+                                >
+                                    Continue
+                                </button>
+                            </div>
                         </div>
                     )}
+                </div>
+            ) : (
+                <div className="xl:mx-32">
+                    <div className="flex flex-col lg:flex-row lg:justify-around">
+                        <div className="w-full lg:w-4/12">
+                            <h1 className="flex justify-start text-2xl ml-8 md:ml-20">
+                                Selected Lessons
+                            </h1>
+                            <div className="py-2 sm:px-6 lg:px-8">
+                                <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
+                                    <table className="min-w-full">
+                                        <thead>
+                                            <tr className="">
+                                                <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                    Code
+                                                </th>
+                                                <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                    Name
+                                                </th>
+                                                <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                    Action
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white">
+                                            {selectedLessons.map((lesson) => (
+                                                <tr key={lesson.code}>
+                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                        {lesson.code}
+                                                    </td>
+                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                        {lesson.name}
+                                                    </td>
+                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                        <button
+                                                            onClick={(e) =>
+                                                                selectLessons(
+                                                                    lesson
+                                                                )
+                                                            }
+                                                        >
+                                                            <i className="fas fa-times"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="w-full lg:w-8/12">
+                            <h1 className="flex justify-start text-2xl ml-8 md:ml-20">
+                                Add More Lessons
+                            </h1>
+                            <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
+                                <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 rounded-bl-lg rounded-br-lg">
+                                    <table className="min-w-full">
+                                        <thead>
+                                            <tr className="">
+                                                <th className="px-4 py-2 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">
+                                                    Code
+                                                </th>
+                                                <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                    Lesson Name
+                                                </th>
+                                                <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                    Action
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white  ">
+                                            {semesterLessons
+                                                .slice(start, end)
+                                                .map((lesson) => (
+                                                    <tr key={lesson.code}>
+                                                        <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                            {lesson.code}
+                                                        </td>
+                                                        <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                            {lesson.name}
+                                                        </td>
+                                                        <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                            <button
+                                                                onClick={(e) =>
+                                                                    selectLessons(
+                                                                        lesson
+                                                                    )
+                                                                }
+                                                            >
+                                                                <i className="fas fa-check"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                        </tbody>
+                                    </table>
+                                    <div className="sm:flex-1 sm:flex sm:items-center sm:justify-between my-4 work-sans">
+                                        <div>
+                                            <p className="text-sm leading-5 text-blue-700">
+                                                Showing
+                                                <span className="font-medium mx-1">
+                                                    {start + 1}
+                                                </span>
+                                                to
+                                                <span className="font-medium mx-1">
+                                                    {end <
+                                                    semesterLessons.length
+                                                        ? end
+                                                        : semesterLessons.length}
+                                                </span>
+                                                of
+                                                <span className="font-medium mx-1">
+                                                    {semesterLessons.length}
+                                                </span>
+                                                results
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <nav className="relative z-0 inline-flex shadow-sm">
+                                                <div>
+                                                    <button
+                                                        onClick={() =>
+                                                            setPrevious()
+                                                        }
+                                                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
+                                                        aria-label="Previous"
+                                                    >
+                                                        <svg
+                                                            className="h-5 w-5"
+                                                            viewBox="0 0 20 20"
+                                                            fill="currentColor"
+                                                        >
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                                                                clipRule="evenodd"
+                                                            />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                <div v-if="pagination.current_page < pagination.last_page">
+                                                    <button
+                                                        onClick={() =>
+                                                            setNext()
+                                                        }
+                                                        className="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
+                                                        aria-label="Next"
+                                                    >
+                                                        <svg
+                                                            className="h-5 w-5"
+                                                            viewBox="0 0 20 20"
+                                                            fill="currentColor"
+                                                        >
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                                                clipRule="evenodd"
+                                                            />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex flex-row justify-center lg:justify-end lg:mr-6">
+                        <button
+                            onClick={() => setShowAdditionalLesson(false)}
+                            className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+                        >
+                            Go Back
+                        </button>
+                        <button className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline">
+                            Continue
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
