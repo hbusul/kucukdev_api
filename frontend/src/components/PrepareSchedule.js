@@ -263,7 +263,7 @@ const PrepareSchedule = ({ history }) => {
 
     return (
         <div className="flex flex-col mt-8">
-            {login.universityID === "null" && (
+            {login.universityID === "null" ? (
                 <div className="flex h-full">
                     <div className="flex bg-white shadow-xl rounded flex-col md:w-2/3 sm:w-full mx-auto mt-4">
                         <div className="w-full flex">
@@ -338,475 +338,554 @@ const PrepareSchedule = ({ history }) => {
                         </div>
                     </div>
                 </div>
-            )}
-
-            {!showAdditionalLesson ? (
-                <div className="flex flex-col xl:mx-40">
-                    {!showCurriculum ? (
-                        <div className="flex h-full">
-                            <div className="flex bg-white shadow-xl rounded flex-col md:w-2/3 sm:w-full mx-auto mt-4">
-                                <div className="w-full flex">
-                                    <div
-                                        className="w-full h-auto bg-gray-400 hidden lg:block lg:w-5/12 bg-cover rounded-l-lg"
-                                        style={{
-                                            backgroundImage: `url("https://images.unsplash.com/photo-1560785477-d43d2b34e0df?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1267&q=80")`,
-                                        }}
-                                    ></div>
-                                    <div className="w-full lg:w-7/12 bg-white p-5 rounded-lg lg:rounded-l-none mx-auto">
-                                        <h3 className="text-2xl">
-                                            Prepare Your Schedule
-                                        </h3>
-                                        <form
-                                            onSubmit={onSelectDepartmentInformation.bind(
-                                                this
-                                            )}
-                                            className="px-8 pt-6 pb-8 mb-4 bg-white rounded"
-                                        >
-                                            <div className="mb-4">
-                                                <label className="block mb-2 text-md font-bold text-gray-700 text-left">
-                                                    What is your department?
-                                                </label>
-                                                <select
-                                                    onChange={(e) =>
-                                                        setDepartment(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline bg-white"
-                                                    id="university"
-                                                >
-                                                    {departments.map(
-                                                        (department, index) => (
-                                                            <option
-                                                                key={index}
-                                                                value={
-                                                                    department
-                                                                }
-                                                            >
-                                                                {
-                                                                    department.name
-                                                                }
-                                                            </option>
-                                                        )
+            ) : (
+                <div>
+                    {!showAdditionalLesson ? (
+                        <div className="flex flex-col xl:mx-40">
+                            {!showCurriculum ? (
+                                <div className="flex h-full">
+                                    <div className="flex bg-white shadow-xl rounded flex-col md:w-2/3 sm:w-full mx-auto mt-4">
+                                        <div className="w-full flex">
+                                            <div
+                                                className="w-full h-auto bg-gray-400 hidden lg:block lg:w-5/12 bg-cover rounded-l-lg"
+                                                style={{
+                                                    backgroundImage: `url("https://images.unsplash.com/photo-1560785477-d43d2b34e0df?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1267&q=80")`,
+                                                }}
+                                            ></div>
+                                            <div className="w-full lg:w-7/12 bg-white p-5 rounded-lg lg:rounded-l-none mx-auto">
+                                                <h3 className="text-2xl">
+                                                    Prepare Your Schedule
+                                                </h3>
+                                                <form
+                                                    onSubmit={onSelectDepartmentInformation.bind(
+                                                        this
                                                     )}
-                                                </select>
-                                            </div>
-                                            <div className="mb-4 md:flex md:justify-between">
-                                                <div className="md:w-1/2 mb-4 md:mr-2 md:mb-0 sm:w-full">
-                                                    <label className="block mb-2 text-md font-bold text-gray-700 text-left">
-                                                        Which year will you
-                                                        study?
-                                                    </label>
-                                                    <select
-                                                        onChange={(e) =>
-                                                            setYear(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline bg-white"
-                                                        id="university"
-                                                    >
-                                                        <option value="1">
-                                                            1st Year, Freshman
-                                                        </option>
-                                                        <option value="2">
-                                                            2nd Year, Sophomore
-                                                        </option>
-                                                        <option value="3">
-                                                            3rd Year, Junior
-                                                        </option>
-                                                        <option value="4">
-                                                            4th Year, Senior
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                                <div className="md:w-1/2  md:ml-2 sm:w-full">
-                                                    <label className="block mb-2 text-md font-bold text-gray-700 text-left">
-                                                        Which semester will you
-                                                        study?
-                                                    </label>
-                                                    <select
-                                                        onChange={(e) =>
-                                                            setSemester(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline bg-white"
-                                                        id="university"
-                                                    >
-                                                        <option value="1">
-                                                            Fall
-                                                        </option>
-                                                        <option value="2">
-                                                            Spring
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div className="mb-4">
-                                                <label className="block mb-2 text-md font-bold text-gray-700 text-left">
-                                                    When did you start your 1st
-                                                    year?
-                                                </label>
-                                                <select
-                                                    onChange={(e) =>
-                                                        setStartYear(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline bg-white"
-                                                    id="university"
+                                                    className="px-8 pt-6 pb-8 mb-4 bg-white rounded"
                                                 >
-                                                    {years.map(
-                                                        (year, index) => (
-                                                            <option
-                                                                key={index}
-                                                                value={year}
+                                                    <div className="mb-4">
+                                                        <label className="block mb-2 text-md font-bold text-gray-700 text-left">
+                                                            What is your
+                                                            department?
+                                                        </label>
+                                                        <select
+                                                            onChange={(e) =>
+                                                                setDepartment(
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline bg-white"
+                                                            id="university"
+                                                        >
+                                                            {departments.map(
+                                                                (
+                                                                    department,
+                                                                    index
+                                                                ) => (
+                                                                    <option
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        value={
+                                                                            department
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            department.name
+                                                                        }
+                                                                    </option>
+                                                                )
+                                                            )}
+                                                        </select>
+                                                    </div>
+                                                    <div className="mb-4 md:flex md:justify-between">
+                                                        <div className="md:w-1/2 mb-4 md:mr-2 md:mb-0 sm:w-full">
+                                                            <label className="block mb-2 text-md font-bold text-gray-700 text-left">
+                                                                Which year will
+                                                                you study?
+                                                            </label>
+                                                            <select
+                                                                onChange={(e) =>
+                                                                    setYear(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                                className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline bg-white"
+                                                                id="university"
                                                             >
-                                                                {`${year}/${
-                                                                    year + 1
+                                                                <option value="1">
+                                                                    1st Year,
+                                                                    Freshman
+                                                                </option>
+                                                                <option value="2">
+                                                                    2nd Year,
+                                                                    Sophomore
+                                                                </option>
+                                                                <option value="3">
+                                                                    3rd Year,
+                                                                    Junior
+                                                                </option>
+                                                                <option value="4">
+                                                                    4th Year,
+                                                                    Senior
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="md:w-1/2  md:ml-2 sm:w-full">
+                                                            <label className="block mb-2 text-md font-bold text-gray-700 text-left">
+                                                                Which semester
+                                                                will you study?
+                                                            </label>
+                                                            <select
+                                                                onChange={(e) =>
+                                                                    setSemester(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                                className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline bg-white"
+                                                                id="university"
+                                                            >
+                                                                <option value="1">
+                                                                    Fall
+                                                                </option>
+                                                                <option value="2">
+                                                                    Spring
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mb-4">
+                                                        <label className="block mb-2 text-md font-bold text-gray-700 text-left">
+                                                            When did you start
+                                                            your 1st year?
+                                                        </label>
+                                                        <select
+                                                            onChange={(e) =>
+                                                                setStartYear(
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline bg-white"
+                                                            id="university"
+                                                        >
+                                                            {years.map(
+                                                                (
+                                                                    year,
+                                                                    index
+                                                                ) => (
+                                                                    <option
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        value={
+                                                                            year
+                                                                        }
+                                                                    >
+                                                                        {`${year}/${
+                                                                            year +
+                                                                            1
+                                                                        }`}
+                                                                    </option>
+                                                                )
+                                                            )}
+                                                        </select>
+                                                    </div>
+                                                    <div className="mb-6 text-center">
+                                                        <button
+                                                            className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+                                                            type="submit"
+                                                        >
+                                                            Next
+                                                        </button>
+                                                    </div>
+                                                    <hr className="mb-6 border-t" />
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div>
+                                    <h1 className="flex justify-start text-2xl ml-8 md:ml-4">
+                                        {department.name} Curriculum
+                                        <div className="font-extralight ml-2">
+                                            {` Semester ${nthSemester}`}
+                                        </div>
+                                    </h1>
+                                    <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
+                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
+                                            <table className="min-w-full">
+                                                <thead>
+                                                    <tr className="">
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                            Code
+                                                        </th>
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                            Name
+                                                        </th>
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                            Semester
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white">
+                                                    <tr className="bg-blue-400">
+                                                        <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
+                                                        <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                            DEFAULT LESSONS
+                                                        </td>
+                                                        <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                            {`${year}st Year, ${nthSemester}${
+                                                                nthSemester %
+                                                                    2 ===
+                                                                0
+                                                                    ? "nd"
+                                                                    : "st"
+                                                            } Semester`}
+                                                        </td>
+                                                    </tr>
+                                                    {defaultLessons.map(
+                                                        (lesson) => (
+                                                            <tr
+                                                                key={
+                                                                    lesson.code
+                                                                }
+                                                                onClick={() =>
+                                                                    selectLessons(
+                                                                        lesson
+                                                                    )
+                                                                }
+                                                                className={`cursor-pointer ${
+                                                                    selectedLessons.includes(
+                                                                        lesson
+                                                                    )
+                                                                        ? `bg-blue-300`
+                                                                        : ``
                                                                 }`}
-                                                            </option>
+                                                            >
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {
+                                                                        lesson.code
+                                                                    }
+                                                                </td>
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {
+                                                                        lesson.name
+                                                                    }
+                                                                </td>
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {`${year}st Year, ${nthSemester}${
+                                                                        nthSemester %
+                                                                            2 ===
+                                                                        0
+                                                                            ? "nd"
+                                                                            : "st"
+                                                                    } Semester`}
+                                                                </td>
+                                                            </tr>
                                                         )
                                                     )}
-                                                </select>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>. . .</td>
+                                                    </tr>
+                                                    {scienceLessons.length >
+                                                        0 && (
+                                                        <tr className="bg-purple-400">
+                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
+                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                SCIENCE
+                                                                ELECTIVES
+                                                            </td>
+                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                {`${year}st Year, ${nthSemester}${
+                                                                    nthSemester %
+                                                                        2 ===
+                                                                    0
+                                                                        ? "nd"
+                                                                        : "st"
+                                                                } Semester`}
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                    {scienceLessons.map(
+                                                        (lesson) => (
+                                                            <tr
+                                                                key={
+                                                                    lesson.code
+                                                                }
+                                                                onClick={() =>
+                                                                    selectLessons(
+                                                                        lesson
+                                                                    )
+                                                                }
+                                                                className={`cursor-pointer ${
+                                                                    selectedLessons.includes(
+                                                                        lesson
+                                                                    )
+                                                                        ? `bg-purple-300`
+                                                                        : ``
+                                                                }`}
+                                                            >
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {
+                                                                        lesson.code
+                                                                    }
+                                                                </td>
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {
+                                                                        lesson.name
+                                                                    }
+                                                                </td>
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {`${year}st Year, ${nthSemester}${
+                                                                        nthSemester %
+                                                                            2 ===
+                                                                        0
+                                                                            ? "nd"
+                                                                            : "st"
+                                                                    } Semester`}
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-row justify-center lg:justify-end lg:mr-4">
+                                        <button
+                                            onClick={() =>
+                                                setShowCurriculum(false)
+                                            }
+                                            className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+                                        >
+                                            Go Back
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                setShowAdditionalLesson(true)
+                                            }
+                                            className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline"
+                                        >
+                                            Continue
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="xl:mx-32">
+                            <div className="flex flex-col lg:flex-row lg:justify-around">
+                                <div className="w-full lg:w-4/12">
+                                    <h1 className="flex justify-start text-2xl ml-8 md:ml-20">
+                                        Selected Lessons
+                                    </h1>
+                                    <div className="py-2 sm:px-6 lg:px-8">
+                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
+                                            <table className="min-w-full">
+                                                <thead>
+                                                    <tr className="">
+                                                        <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                            Code
+                                                        </th>
+                                                        <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                            Name
+                                                        </th>
+                                                        <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                            Action
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white">
+                                                    {selectedLessons.map(
+                                                        (lesson) => (
+                                                            <tr
+                                                                key={
+                                                                    lesson.code
+                                                                }
+                                                            >
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {
+                                                                        lesson.code
+                                                                    }
+                                                                </td>
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {
+                                                                        lesson.name
+                                                                    }
+                                                                </td>
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    <button
+                                                                        onClick={(
+                                                                            e
+                                                                        ) =>
+                                                                            selectLessons(
+                                                                                lesson
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-times"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="w-full lg:w-8/12">
+                                    <h1 className="flex justify-start text-2xl ml-8 md:ml-20">
+                                        Add More Lessons
+                                    </h1>
+                                    <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
+                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 rounded-bl-lg rounded-br-lg">
+                                            <table className="min-w-full">
+                                                <thead>
+                                                    <tr className="">
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">
+                                                            Code
+                                                        </th>
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                            Lesson Name
+                                                        </th>
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                            Action
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white  ">
+                                                    {semesterLessons
+                                                        .slice(start, end)
+                                                        .map((lesson) => (
+                                                            <tr
+                                                                key={
+                                                                    lesson.code
+                                                                }
+                                                            >
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {
+                                                                        lesson.code
+                                                                    }
+                                                                </td>
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {
+                                                                        lesson.name
+                                                                    }
+                                                                </td>
+                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    <button
+                                                                        onClick={(
+                                                                            e
+                                                                        ) =>
+                                                                            selectLessons(
+                                                                                lesson
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-check"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                </tbody>
+                                            </table>
+                                            <div className="sm:flex-1 sm:flex sm:items-center sm:justify-between my-4 work-sans">
+                                                <div>
+                                                    <p className="text-sm leading-5 text-blue-700">
+                                                        Showing
+                                                        <span className="font-medium mx-1">
+                                                            {start + 1}
+                                                        </span>
+                                                        to
+                                                        <span className="font-medium mx-1">
+                                                            {end <
+                                                            semesterLessons.length
+                                                                ? end
+                                                                : semesterLessons.length}
+                                                        </span>
+                                                        of
+                                                        <span className="font-medium mx-1">
+                                                            {
+                                                                semesterLessons.length
+                                                            }
+                                                        </span>
+                                                        results
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <nav className="relative z-0 inline-flex shadow-sm">
+                                                        <div>
+                                                            <button
+                                                                onClick={() =>
+                                                                    setPrevious()
+                                                                }
+                                                                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
+                                                                aria-label="Previous"
+                                                            >
+                                                                <svg
+                                                                    className="h-5 w-5"
+                                                                    viewBox="0 0 20 20"
+                                                                    fill="currentColor"
+                                                                >
+                                                                    <path
+                                                                        fillRule="evenodd"
+                                                                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                                                                        clipRule="evenodd"
+                                                                    />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                        <div v-if="pagination.current_page < pagination.last_page">
+                                                            <button
+                                                                onClick={() =>
+                                                                    setNext()
+                                                                }
+                                                                className="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
+                                                                aria-label="Next"
+                                                            >
+                                                                <svg
+                                                                    className="h-5 w-5"
+                                                                    viewBox="0 0 20 20"
+                                                                    fill="currentColor"
+                                                                >
+                                                                    <path
+                                                                        fillRule="evenodd"
+                                                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                                                        clipRule="evenodd"
+                                                                    />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </nav>
+                                                </div>
                                             </div>
-                                            <div className="mb-6 text-center">
-                                                <button
-                                                    className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
-                                                    type="submit"
-                                                >
-                                                    Next
-                                                </button>
-                                            </div>
-                                            <hr className="mb-6 border-t" />
-                                        </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ) : (
-                        <div>
-                            <h1 className="flex justify-start text-2xl ml-8 md:ml-4">
-                                {department.name} Curriculum
-                                <div className="font-extralight ml-2">
-                                    {` Semester ${nthSemester}`}
-                                </div>
-                            </h1>
-                            <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
-                                <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
-                                    <table className="min-w-full">
-                                        <thead>
-                                            <tr className="">
-                                                <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                                    Code
-                                                </th>
-                                                <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                                    Name
-                                                </th>
-                                                <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                                    Semester
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white">
-                                            <tr className="bg-blue-400">
-                                                <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
-                                                <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                    DEFAULT LESSONS
-                                                </td>
-                                                <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                    {`${year}st Year, ${nthSemester}${
-                                                        nthSemester % 2 === 0
-                                                            ? "nd"
-                                                            : "st"
-                                                    } Semester`}
-                                                </td>
-                                            </tr>
-                                            {defaultLessons.map((lesson) => (
-                                                <tr
-                                                    key={lesson.code}
-                                                    onClick={() =>
-                                                        selectLessons(lesson)
-                                                    }
-                                                    className={`cursor-pointer ${
-                                                        selectedLessons.includes(
-                                                            lesson
-                                                        )
-                                                            ? `bg-blue-300`
-                                                            : ``
-                                                    }`}
-                                                >
-                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {lesson.code}
-                                                    </td>
-                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {lesson.name}
-                                                    </td>
-                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {`${year}st Year, ${nthSemester}${
-                                                            nthSemester % 2 ===
-                                                            0
-                                                                ? "nd"
-                                                                : "st"
-                                                        } Semester`}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td>. . .</td>
-                                            </tr>
-                                            {scienceLessons.length > 0 && (
-                                                <tr className="bg-purple-400">
-                                                    <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
-                                                    <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        SCIENCE ELECTIVES
-                                                    </td>
-                                                    <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {`${year}st Year, ${nthSemester}${
-                                                            nthSemester % 2 ===
-                                                            0
-                                                                ? "nd"
-                                                                : "st"
-                                                        } Semester`}
-                                                    </td>
-                                                </tr>
-                                            )}
-                                            {scienceLessons.map((lesson) => (
-                                                <tr
-                                                    key={lesson.code}
-                                                    onClick={() =>
-                                                        selectLessons(lesson)
-                                                    }
-                                                    className={`cursor-pointer ${
-                                                        selectedLessons.includes(
-                                                            lesson
-                                                        )
-                                                            ? `bg-purple-300`
-                                                            : ``
-                                                    }`}
-                                                >
-                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {lesson.code}
-                                                    </td>
-                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {lesson.name}
-                                                    </td>
-                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {`${year}st Year, ${nthSemester}${
-                                                            nthSemester % 2 ===
-                                                            0
-                                                                ? "nd"
-                                                                : "st"
-                                                        } Semester`}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div className="flex flex-row justify-center lg:justify-end lg:mr-4">
+                            <div className="flex flex-row justify-center lg:justify-end lg:mr-6">
                                 <button
-                                    onClick={() => setShowCurriculum(false)}
+                                    onClick={() =>
+                                        setShowAdditionalLesson(false)
+                                    }
                                     className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
                                 >
                                     Go Back
                                 </button>
-                                <button
-                                    onClick={() =>
-                                        setShowAdditionalLesson(true)
-                                    }
-                                    className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline"
-                                >
+                                <button className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline">
                                     Continue
                                 </button>
                             </div>
                         </div>
                     )}
-                </div>
-            ) : (
-                <div className="xl:mx-32">
-                    <div className="flex flex-col lg:flex-row lg:justify-around">
-                        <div className="w-full lg:w-4/12">
-                            <h1 className="flex justify-start text-2xl ml-8 md:ml-20">
-                                Selected Lessons
-                            </h1>
-                            <div className="py-2 sm:px-6 lg:px-8">
-                                <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
-                                    <table className="min-w-full">
-                                        <thead>
-                                            <tr className="">
-                                                <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                                    Code
-                                                </th>
-                                                <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                                    Name
-                                                </th>
-                                                <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                                    Action
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white">
-                                            {selectedLessons.map((lesson) => (
-                                                <tr key={lesson.code}>
-                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {lesson.code}
-                                                    </td>
-                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        {lesson.name}
-                                                    </td>
-                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                        <button
-                                                            onClick={(e) =>
-                                                                selectLessons(
-                                                                    lesson
-                                                                )
-                                                            }
-                                                        >
-                                                            <i className="fas fa-times"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full lg:w-8/12">
-                            <h1 className="flex justify-start text-2xl ml-8 md:ml-20">
-                                Add More Lessons
-                            </h1>
-                            <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
-                                <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 rounded-bl-lg rounded-br-lg">
-                                    <table className="min-w-full">
-                                        <thead>
-                                            <tr className="">
-                                                <th className="px-4 py-2 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">
-                                                    Code
-                                                </th>
-                                                <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                                    Lesson Name
-                                                </th>
-                                                <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                                    Action
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white  ">
-                                            {semesterLessons
-                                                .slice(start, end)
-                                                .map((lesson) => (
-                                                    <tr key={lesson.code}>
-                                                        <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                            {lesson.code}
-                                                        </td>
-                                                        <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                            {lesson.name}
-                                                        </td>
-                                                        <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                            <button
-                                                                onClick={(e) =>
-                                                                    selectLessons(
-                                                                        lesson
-                                                                    )
-                                                                }
-                                                            >
-                                                                <i className="fas fa-check"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                        </tbody>
-                                    </table>
-                                    <div className="sm:flex-1 sm:flex sm:items-center sm:justify-between my-4 work-sans">
-                                        <div>
-                                            <p className="text-sm leading-5 text-blue-700">
-                                                Showing
-                                                <span className="font-medium mx-1">
-                                                    {start + 1}
-                                                </span>
-                                                to
-                                                <span className="font-medium mx-1">
-                                                    {end <
-                                                    semesterLessons.length
-                                                        ? end
-                                                        : semesterLessons.length}
-                                                </span>
-                                                of
-                                                <span className="font-medium mx-1">
-                                                    {semesterLessons.length}
-                                                </span>
-                                                results
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <nav className="relative z-0 inline-flex shadow-sm">
-                                                <div>
-                                                    <button
-                                                        onClick={() =>
-                                                            setPrevious()
-                                                        }
-                                                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
-                                                        aria-label="Previous"
-                                                    >
-                                                        <svg
-                                                            className="h-5 w-5"
-                                                            viewBox="0 0 20 20"
-                                                            fill="currentColor"
-                                                        >
-                                                            <path
-                                                                fillRule="evenodd"
-                                                                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                                                                clipRule="evenodd"
-                                                            />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                                <div v-if="pagination.current_page < pagination.last_page">
-                                                    <button
-                                                        onClick={() =>
-                                                            setNext()
-                                                        }
-                                                        className="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
-                                                        aria-label="Next"
-                                                    >
-                                                        <svg
-                                                            className="h-5 w-5"
-                                                            viewBox="0 0 20 20"
-                                                            fill="currentColor"
-                                                        >
-                                                            <path
-                                                                fillRule="evenodd"
-                                                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                                                clipRule="evenodd"
-                                                            />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </nav>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex flex-row justify-center lg:justify-end lg:mr-6">
-                        <button
-                            onClick={() => setShowAdditionalLesson(false)}
-                            className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
-                        >
-                            Go Back
-                        </button>
-                        <button className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline">
-                            Continue
-                        </button>
-                    </div>
                 </div>
             )}
         </div>
