@@ -185,7 +185,7 @@ async def create_university_lesson(
 
 
 @router.get(
-    "/{unid}/semesters/{unisid}/lessons/find-code",
+    "/{unid}/semesters/current-semester/lessons/find-code",
     response_description="Get a single lessons with code",
     operation_id="getSingleLessonWithCode",
     response_model=UniversityAPILessonModel,
