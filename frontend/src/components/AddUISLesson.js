@@ -413,7 +413,7 @@ const AddUISLesson = ({ history }) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex justify-center md:justify-end text-xs md:text-base mt-4 mr-6">
+                    <div className="flex justify-center md:justify-end text-xs md:text-base my-4 md:mr-6">
                         <button
                             onClick={() => setAddLessonModal(true)}
                             className="w-1/2 md:w-1/3 lg:w-1/5 px-8 py-2 font-bold text-white whitespace-nowrap bg-green-500 rounded-full hover:bg-green-700 focus:outline-none focus:shadow-outline"

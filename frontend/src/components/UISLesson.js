@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 
 const UISLesson = ({ lesson, selectedLessons, onSelectLesson }) => {
     const [slots] = useState(lesson.slots)
+    const [instructor, setInstructor] = useState(lesson.instructor)
     const [fixedSlots, setFixedSlots] = useState([])
 
     useEffect(() => {
@@ -25,12 +26,15 @@ const UISLesson = ({ lesson, selectedLessons, onSelectLesson }) => {
             day !== "null" && fixedSlot.push(`${day} `)
         }
 
+        const resInstructor = lesson.instructor.split(" ")
+        setInstructor(resInstructor[resInstructor.length - 1])
+
         setFixedSlots(fixedSlot)
     }, [lesson, slots])
 
     return (
         <tr className="hover:bg-gray-100">
-            <td className="px-4 py-2 whitespace-nowrap border-b border-gray-500">
+            <td className="px-4 py-2 border-b border-gray-500">
                 <div className="text-sm text-left leading-5 text-blue-900">
                     {lesson.name}
                 </div>
@@ -41,11 +45,11 @@ const UISLesson = ({ lesson, selectedLessons, onSelectLesson }) => {
             <td className="px-4 py-2 whitespace-nowrap border-b text-blue-900 border-gray-500 text-sm leading-5">
                 {lesson.ects}
             </td>
-            <td className="px-4 py-2 whitespace-nowrap border-b text-blue-900 border-gray-500 text-sm leading-5">
-                {lesson.instructor}
+            <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                {instructor}
             </td>
             <td className="px-4 py-2 whitespace-nowrap border-b text-blue-900 border-gray-500 text-sm leading-5">
-                <div className="flex flex-row">
+                <div className="flex flex-row justify-center">
                     {fixedSlots.map((slot, index) => {
                         let day_hour = slot.split(" ")
                         return (
