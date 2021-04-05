@@ -337,7 +337,7 @@ const PrepareSchedule = ({ history }) => {
             ) : (
                 <div>
                     {!showAdditionalLesson ? (
-                        <div className="flex flex-col xl:mx-40">
+                        <div className="flex flex-col">
                             {!showCurriculum ? (
                                 <div className="flex h-full">
                                     <div className="flex bg-white shadow-xl rounded flex-col md:w-2/3 sm:w-full mx-auto mt-4">
@@ -504,15 +504,15 @@ const PrepareSchedule = ({ history }) => {
                                     </div>
                                 </div>
                             ) : (
-                                <div>
+                                <div className="xl:mx-40">
                                     <h1 className="flex justify-start text-2xl ml-8 md:ml-4">
                                         {department.name} Curriculum
                                         <div className="font-extralight ml-2">
                                             {` Semester ${nthSemester}`}
                                         </div>
                                     </h1>
-                                    <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
-                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
+                                    <div className="py-2 overflow-x-auto md:px-6 lg:px-8">
+                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard md:px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
                                             <table className="min-w-full">
                                                 <thead>
                                                     <tr className="">
@@ -549,11 +549,11 @@ const PrepareSchedule = ({ history }) => {
                                                                     ]
                                                                 }
                                                             >
-                                                                <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
-                                                                <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
+                                                                <td className="px-4 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     {`${group.toUpperCase()} LESSONS`}
                                                                 </td>
-                                                                <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     {`${year}${
                                                                         suffixes[
                                                                             year -
@@ -561,14 +561,14 @@ const PrepareSchedule = ({ history }) => {
                                                                         ]
                                                                     } Year, ${
                                                                         nthSemester %
-                                                                            2 ==
+                                                                            2 ===
                                                                         1
                                                                             ? "1"
                                                                             : "2"
                                                                     }${
                                                                         suffixes[
                                                                             nthSemester %
-                                                                                2 ==
+                                                                                2 ===
                                                                             1
                                                                                 ? 0
                                                                                 : 1
@@ -598,38 +598,17 @@ const PrepareSchedule = ({ history }) => {
                                                                         ]
                                                                     }`}
                                                                 >
-                                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                         {
                                                                             lesson.code
                                                                         }
                                                                     </td>
-                                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                         {
                                                                             lesson.name
                                                                         }
                                                                     </td>
-                                                                    <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                        {`${year}${
-                                                                            suffixes[
-                                                                                year -
-                                                                                    1
-                                                                            ]
-                                                                        } Year, ${
-                                                                            nthSemester %
-                                                                                2 ==
-                                                                            1
-                                                                                ? "1"
-                                                                                : "2"
-                                                                        }${
-                                                                            suffixes[
-                                                                                nthSemester %
-                                                                                    2 ==
-                                                                                1
-                                                                                    ? 0
-                                                                                    : 1
-                                                                            ]
-                                                                        } Semester`}
-                                                                    </td>
+                                                                    <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
                                                                 </tr>
                                                             ))}
                                                         </>
@@ -638,7 +617,7 @@ const PrepareSchedule = ({ history }) => {
                                             </table>
                                         </div>
                                     </div>
-                                    <div className="flex flex-row justify-center lg:justify-end lg:mr-4">
+                                    <div className="flex flex-row justify-center lg:justify-end lg:mr-4 mb-8">
                                         <button
                                             onClick={() =>
                                                 setShowCurriculum(false)
@@ -660,24 +639,24 @@ const PrepareSchedule = ({ history }) => {
                             )}
                         </div>
                     ) : (
-                        <div className="xl:mx-32">
+                        <div className="xl:mx-36">
                             <div className="flex flex-col lg:flex-row lg:justify-around">
-                                <div className="w-full lg:w-4/12">
+                                <div className="w-full lg:w-4/12 xl:w-1/2">
                                     <h1 className="flex justify-start text-2xl ml-8 md:ml-20">
                                         Selected Lessons
                                     </h1>
-                                    <div className="py-2 sm:px-6 lg:px-8">
-                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
+                                    <div className="py-2 md:px-6 lg:px-8">
+                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard md:px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
                                             <table className="min-w-full">
                                                 <thead>
                                                     <tr className="">
-                                                        <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
                                                             Code
                                                         </th>
-                                                        <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
                                                             Name
                                                         </th>
-                                                        <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
                                                             Action
                                                         </th>
                                                     </tr>
@@ -690,17 +669,17 @@ const PrepareSchedule = ({ history }) => {
                                                                     lesson.code
                                                                 }
                                                             >
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     {
                                                                         lesson.code
                                                                     }
                                                                 </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     {
                                                                         lesson.name
                                                                     }
                                                                 </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     <button
                                                                         onClick={(
                                                                             e
@@ -722,12 +701,12 @@ const PrepareSchedule = ({ history }) => {
                                     </div>
                                 </div>
 
-                                <div className="w-full lg:w-8/12">
+                                <div className="w-full lg:w-7/12 xl:w-9/12 mt-4 md:mt-0 ">
                                     <h1 className="flex justify-start text-2xl ml-8 md:ml-20">
                                         Add More Lessons
                                     </h1>
                                     <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
-                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 rounded-bl-lg rounded-br-lg">
+                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard md:px-8 pt-2 rounded-bl-lg rounded-br-lg">
                                             <table className="min-w-full">
                                                 <thead>
                                                     <tr className="">
@@ -735,7 +714,7 @@ const PrepareSchedule = ({ history }) => {
                                                             Code
                                                         </th>
                                                         <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                                            Lesson Name
+                                                            Name
                                                         </th>
                                                         <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
                                                             Action
@@ -751,17 +730,17 @@ const PrepareSchedule = ({ history }) => {
                                                                     lesson.code
                                                                 }
                                                             >
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     {
                                                                         lesson.code
                                                                     }
                                                                 </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     {
                                                                         lesson.name
                                                                     }
                                                                 </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     <button
                                                                         onClick={(
                                                                             e
@@ -850,20 +829,20 @@ const PrepareSchedule = ({ history }) => {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="flex flex-row justify-center lg:justify-end lg:mr-12 mb-8 mt-4">
+                                        <button
+                                            onClick={() =>
+                                                setShowAdditionalLesson(false)
+                                            }
+                                            className="w-4/12 md:w-5/12 lg:w-5/12 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+                                        >
+                                            Go Back
+                                        </button>
+                                        <button className="w-4/12 md:w-5/12 lg:w-5/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline">
+                                            Continue
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex flex-row justify-center lg:justify-end lg:mr-6">
-                                <button
-                                    onClick={() =>
-                                        setShowAdditionalLesson(false)
-                                    }
-                                    className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
-                                >
-                                    Go Back
-                                </button>
-                                <button className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline">
-                                    Continue
-                                </button>
                             </div>
                         </div>
                     )}
