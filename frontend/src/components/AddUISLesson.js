@@ -121,6 +121,7 @@ const AddUISLesson = ({ history }) => {
                         setLogin({
                             userToken: login.userToken,
                             userID: login.userID,
+                            userGroup: login.userGroup,
                             semesterID: login.semesterID,
                             universityID: selectedUniversity,
                         })
