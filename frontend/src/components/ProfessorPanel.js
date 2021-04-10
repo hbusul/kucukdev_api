@@ -766,6 +766,8 @@ const ProfessorPanel = ({ history }) => {
                                 "API called successfully. Returned data: " +
                                     data
                             )
+                            onSelectUniversity(selectedUniversity, true)
+                            selectedUniversity.curSemesterID = unisid
                         }
                     }
                 )
@@ -1154,6 +1156,18 @@ const ProfessorPanel = ({ history }) => {
                                                 }`}
                                             >
                                                 <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5 cursor-pointer">
+                                                    {selectedUniversity &&
+                                                    selectedUniversity.curSemesterID ===
+                                                        semester._id ? (
+                                                        <i
+                                                            className="cursor-pointer far fa-dot-circle mr-1"
+                                                            style={{
+                                                                color: "green",
+                                                                fontSize:
+                                                                    "1rem",
+                                                            }}
+                                                        ></i>
+                                                    ) : null}
                                                     {semester.name}
                                                 </td>
                                                 <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
