@@ -16,6 +16,7 @@ import LessonDetail from "./components/LessonDetail"
 import Overview from "./components/Overview"
 import Attendance from "./components/Attendance.js"
 import PrepareSchedule from "./components/PrepareSchedule"
+import ProfessorPanel from "./components/ProfessorPanel"
 
 function App() {
     return (
@@ -40,6 +41,11 @@ function App() {
                         exact
                         path="/prepare-schedule"
                         component={PrepareSchedule}
+                    />
+                    <Route
+                        exact
+                        path="/professor-panel"
+                        component={ProfessorPanel}
                     />
 
                     <Route
