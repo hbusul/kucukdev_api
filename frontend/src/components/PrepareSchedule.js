@@ -59,7 +59,7 @@ const PrepareSchedule = ({ history }) => {
                             )
                             setDepartments(data)
                             if (data.length > 0) {
-                                setDepartment(data[0])
+                                setDepartment(data[0]._id)
                             }
                         }
                     }
@@ -122,7 +122,7 @@ const PrepareSchedule = ({ history }) => {
 
         let apiInstance = new Kucukdevapi.CurriculumsApi()
         let unid = login.universityID
-        let depid = department._id
+        let depid = department
         apiInstance.listUniversityDepartmentCurriculums(
             unid,
             depid,
@@ -384,7 +384,7 @@ const PrepareSchedule = ({ history }) => {
                                                                             index
                                                                         }
                                                                         value={
-                                                                            department
+                                                                            department._id
                                                                         }
                                                                     >
                                                                         {
