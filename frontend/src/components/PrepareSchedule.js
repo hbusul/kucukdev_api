@@ -449,8 +449,7 @@ const PrepareSchedule = ({ history }) => {
                                                         </div>
                                                         <div className="md:w-1/2  md:ml-2 sm:w-full">
                                                             <label className="block mb-2 text-md font-bold text-gray-700 text-left">
-                                                                Which semester
-                                                                will you study?
+                                                                Fall or Spring?
                                                             </label>
                                                             <select
                                                                 onChange={(e) =>
