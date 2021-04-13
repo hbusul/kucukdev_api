@@ -383,6 +383,7 @@ const PrepareSchedule = ({ history }) => {
                                                             department?
                                                         </label>
                                                         <select
+                                                            value={department}
                                                             onChange={(e) =>
                                                                 setDepartment(
                                                                     e.target
@@ -420,6 +421,7 @@ const PrepareSchedule = ({ history }) => {
                                                                 you study?
                                                             </label>
                                                             <select
+                                                                value={year}
                                                                 onChange={(e) =>
                                                                     setYear(
                                                                         e.target
@@ -452,6 +454,7 @@ const PrepareSchedule = ({ history }) => {
                                                                 Fall or Spring?
                                                             </label>
                                                             <select
+                                                                value={semester}
                                                                 onChange={(e) =>
                                                                     setSemester(
                                                                         e.target
@@ -476,6 +479,7 @@ const PrepareSchedule = ({ history }) => {
                                                             your 1st year?
                                                         </label>
                                                         <select
+                                                            value={startYear}
                                                             onChange={(e) =>
                                                                 setStartYear(
                                                                     e.target
