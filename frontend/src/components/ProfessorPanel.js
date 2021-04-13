@@ -2178,7 +2178,15 @@ const ProfessorPanel = ({ history }) => {
                                 {/*header*/}
                                 <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
                                     <h3 className="pt-4 text-2xl text-center">
-                                        Update Lesson
+                                        {currentUpdate === "addLesson"
+                                            ? "Add Lesson"
+                                            : currentUpdate === "addSection"
+                                            ? "Add Section"
+                                            : currentUpdate === "updateSection"
+                                            ? "Update Section"
+                                            : currentUpdate === "updateLesson"
+                                            ? "Update Lesson"
+                                            : null}
                                     </h3>
 
                                     <button
@@ -2194,60 +2202,65 @@ const ProfessorPanel = ({ history }) => {
                                 </div>
                                 {/*body*/}
                                 <form className="px-8 pt-6 pb-8 bg-white rounded">
-                                    <div className="mb-4">
-                                        <label className="block mb-2 text-base font-bold text-gray-700">
-                                            Lesson Name
-                                        </label>
-                                        <input
-                                            className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                                            type="text"
-                                            value={name}
-                                            onChange={(e) =>
-                                                setName(e.target.value)
-                                            }
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block mb-2 text-base font-bold text-gray-700">
-                                            Lesson Code
-                                        </label>
-                                        <input
-                                            className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                                            type="text"
-                                            value={code}
-                                            onChange={(e) =>
-                                                setCode(e.target.value)
-                                            }
-                                        />
-                                        <p className="flex justify-center text-xs italic text-red-500 my-2">
-                                            Write same as seen in the university
-                                            information system and kucukdev.org
-                                            database.
-                                        </p>
-                                    </div>
-                                    <div className="mb-4">
+                                    <div className="mb-4 md:flex md:justify-between">
                                         <div className="w-full mb-4 md:mr-2 md:mb-0">
                                             <label className="block mb-2 text-base font-bold text-gray-700">
-                                                Lesson ECTS
+                                                Name
+                                            </label>
+                                            <input
+                                                className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                type="text"
+                                                placeholder="Art Of Computing"
+                                                value={name}
+                                                onChange={(e) =>
+                                                    setName(e.target.value)
+                                                }
+                                            />
+                                        </div>
+                                        <div className="w-full mb-4 md:mr-2 md:mb-0">
+                                            <label className="block mb-2 text-base font-bold text-gray-700">
+                                                Code
+                                            </label>
+                                            <input
+                                                className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                type="text"
+                                                placeholder="COMP101"
+                                                value={code}
+                                                onChange={(e) =>
+                                                    setCode(e.target.value)
+                                                }
+                                            />
+                                            <p className="flex justify-center text-xs italic text-red-500 my-2">
+                                                Write same as seen in the
+                                                university information system
+                                                and kucukdev.org database.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-4 md:flex md:justify-between">
+                                        <div className="w-full mb-4 md:mr-2 md:mb-0">
+                                            <label className="block mb-2 text-base font-bold text-gray-700">
+                                                ECTS
                                             </label>
                                             <input
                                                 className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                                 type="number"
+                                                placeholder="6"
                                                 value={ects}
                                                 onChange={(e) =>
                                                     setEcts(e.target.value)
                                                 }
                                             />
                                         </div>
-                                    </div>
-                                    <div className="mb-4">
                                         <div className="w-full mb-4 md:mr-2 md:mb-0">
                                             <label className="block mb-2 text-base font-bold text-gray-700">
-                                                Lesson Absence Limit
+                                                Absence Limit
                                             </label>
                                             <input
                                                 className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                                 type="number"
+                                                placeholder="21"
                                                 value={absenceLimit}
                                                 onChange={(e) =>
                                                     setAbsenceLimit(
@@ -2261,45 +2274,50 @@ const ProfessorPanel = ({ history }) => {
                                     currentUpdate === "addSection" ||
                                     currentUpdate === "updateSection" ? (
                                         <div>
-                                            <div className="mb-4">
-                                                <label className="block mb-2 text-base font-bold text-gray-700">
-                                                    Lesson Instructor
-                                                </label>
-                                                <input
-                                                    className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                                                    type="text"
-                                                    value={instructor}
-                                                    onChange={(e) =>
-                                                        setInstructor(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                />
+                                            <div className="mb-4 md:flex md:justify-between">
+                                                <div className="w-full mb-4 md:mr-2 md:mb-0">
+                                                    <label className="block mb-2 text-base font-bold text-gray-700">
+                                                        Instructor
+                                                    </label>
+                                                    <input
+                                                        className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                        type="text"
+                                                        placeholder="Jack Joe"
+                                                        value={instructor}
+                                                        onChange={(e) =>
+                                                            setInstructor(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                                <div className="w-full mb-4 md:mr-2 md:mb-0">
+                                                    <label className="block mb-2 text-base font-bold text-gray-700">
+                                                        Section
+                                                    </label>
+                                                    <input
+                                                        className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                        type="text"
+                                                        placeholder="03"
+                                                        value={section}
+                                                        onChange={(e) =>
+                                                            setSection(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
                                             </div>
                                             <div className="mb-4">
                                                 <label className="block mb-2 text-base font-bold text-gray-700">
-                                                    Lesson Section
-                                                </label>
-                                                <input
-                                                    className="w-full px-3 py-2 mb-3 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                                                    type="text"
-                                                    value={section}
-                                                    onChange={(e) =>
-                                                        setSection(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                />
-                                            </div>
-                                            <div className="mb-4">
-                                                <label className="block mb-2 text-base font-bold text-gray-700">
-                                                    Add Slot
+                                                    Slot
                                                 </label>
                                                 <div className="flex flex-row">
                                                     <input
                                                         className="w-full px-3 py-2 text-base leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                                         type="text"
                                                         value={slot}
+                                                        placeholder="2,2,0"
                                                         onChange={(e) =>
                                                             setSlot(
                                                                 e.target.value
