@@ -181,6 +181,7 @@ class UserModel(BaseModel):
 class UserAPIModel(BaseModel):
     id: Optional[str] = Field(alias="_id")
     email: Optional[EmailStr]
+    userGroup: Optional[str]
     curSemesterID: Optional[str]
     curUniversityID: Optional[str]
     entranceYear: Optional[int]
@@ -191,6 +192,7 @@ class UserAPIModel(BaseModel):
             "example": {
                 "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
                 "email": "hello@agu.edu.tr",
+                "userGroup": "default",
                 "curSemesterID": "stringID",
                 "curUniversityID": "stringID",
                 "entranceYear": 2018,

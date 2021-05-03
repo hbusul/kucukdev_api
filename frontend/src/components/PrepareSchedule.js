@@ -13,12 +13,14 @@ const PrepareSchedule = ({ history }) => {
     const [year, setYear] = useState(1)
     const [semester, setSemester] = useState(1)
     const [startYear, setStartYear] = useState(new Date().getFullYear())
+    const [nthSemester, setNthSemester] = useState(1)
     const [refresh, setRefresh] = useState(0)
 
     const [universities, setUniversities] = useState([])
     const [departments, setDepartments] = useState([])
     const [selectedUniversity, setSelectedUniversity] = useState("null")
     const [semesterLessons, setSemesterLessons] = useState([])
+    const [searchedLessons, setSearchedLessons] = useState([])
     const [selectedLessons, setSelectedLessons] = useState([])
     const [lessonGroups, setLessonGroups] = useState({})
 
@@ -58,7 +60,7 @@ const PrepareSchedule = ({ history }) => {
                             )
                             setDepartments(data)
                             if (data.length > 0) {
-                                setDepartment(data[0])
+                                setDepartment(data[0]._id)
                             }
                         }
                     }
@@ -69,9 +71,8 @@ const PrepareSchedule = ({ history }) => {
         }
     }, [history, refresh, login, setLogin])
 
-    let nthSemester = 1
     useEffect(() => {
-        nthSemester = 2 * Number(year) - 2 + Number(semester)
+        setNthSemester(2 * Number(year) - 2 + Number(semester))
     }, [year, semester])
 
     const selectLessons = (newLesson) => {
@@ -81,6 +82,22 @@ const PrepareSchedule = ({ history }) => {
             )
         } else {
             setSelectedLessons([...selectedLessons, newLesson])
+        }
+    }
+
+    const onSearchLesson = (key) => {
+        if (key !== "") {
+            setSearchedLessons(
+                semesterLessons.filter(
+                    (lesson) =>
+                        lesson.code.toUpperCase().includes(key.toUpperCase()) ||
+                        lesson.name.toUpperCase().includes(key.toUpperCase())
+                )
+            )
+            setStart(0)
+            setEnd(10)
+        } else {
+            setSearchedLessons(semesterLessons)
         }
     }
 
@@ -106,6 +123,7 @@ const PrepareSchedule = ({ history }) => {
                         setLogin({
                             userToken: login.userToken,
                             userID: login.userID,
+                            userGroup: login.userGroup,
                             semesterID: login.semesterID,
                             universityID: selectedUniversity,
                         })
@@ -121,7 +139,7 @@ const PrepareSchedule = ({ history }) => {
 
         let apiInstance = new Kucukdevapi.CurriculumsApi()
         let unid = login.universityID
-        let depid = department._id
+        let depid = department
         apiInstance.listUniversityDepartmentCurriculums(
             unid,
             depid,
@@ -135,7 +153,6 @@ const PrepareSchedule = ({ history }) => {
                     console.log(
                         "API called successfully. Returned data: " + data
                     )
-                    console.log(data)
                     for (let i = 0; i < data.length; i++) {
                         if (
                             startYear >= data[i].startYear &&
@@ -147,16 +164,28 @@ const PrepareSchedule = ({ history }) => {
                                     nthSemester ===
                                     data[i].semesters[j].semester
                                 ) {
-                                    console.log(data[i].semesters[j])
                                     const selectedLessons = []
                                     for (
                                         let k = 0;
                                         k < data[i].semesters[j].lessons.length;
                                         k++
                                     ) {
-                                        if(!(data[i].semesters[j].lessons[k].lessonType in localLessonGroups))
-                                            localLessonGroups[data[i].semesters[j].lessons[k].lessonType] = []
-                                        localLessonGroups[data[i].semesters[j].lessons[k].lessonType].push(data[i].semesters[j].lessons[k])
+                                        if (
+                                            !(
+                                                data[i].semesters[j].lessons[k]
+                                                    .lessonType in
+                                                localLessonGroups
+                                            )
+                                        )
+                                            localLessonGroups[
+                                                data[i].semesters[j].lessons[
+                                                    k
+                                                ].lessonType
+                                            ] = []
+                                        localLessonGroups[
+                                            data[i].semesters[j].lessons[k]
+                                                .lessonType
+                                        ].push(data[i].semesters[j].lessons[k])
 
                                         if (
                                             data[i].semesters[j].lessons[k]
@@ -166,9 +195,15 @@ const PrepareSchedule = ({ history }) => {
                                                 data[i].semesters[j].lessons[k]
                                             )
                                         } else {
-                                            if (localLessonGroups[data[i].semesters[j].lessons[k].lessonType].length === 1) {
+                                            if (
+                                                localLessonGroups[
+                                                    data[i].semesters[j]
+                                                        .lessons[k].lessonType
+                                                ].length === 1
+                                            ) {
                                                 selectedLessons.push(
-                                                    data[i].semesters[j].lessons[k]
+                                                    data[i].semesters[j]
+                                                        .lessons[k]
                                                 )
                                             }
                                         }
@@ -198,10 +233,28 @@ const PrepareSchedule = ({ history }) => {
                         "API called successfully. Returned data: " + data
                     )
                     setSemesterLessons(data.lessons)
+                    setSearchedLessons(data.lessons)
                 }
             }
         )
     }
+
+    const priColors = [
+        "bg-blue-400",
+        "bg-purple-400",
+        "bg-yellow-400",
+        "bg-pink-400",
+        "bg-green-400",
+    ]
+    const secColors = [
+        "bg-blue-300",
+        "bg-purple-300",
+        "bg-yellow-300",
+        "bg-pink-300",
+        "bg-green-300",
+    ]
+
+    const suffixes = ["st", "nd", "rd", "th"]
 
     const currentYear = new Date().getFullYear()
     const years = []
@@ -217,7 +270,7 @@ const PrepareSchedule = ({ history }) => {
     }
 
     const setNext = () => {
-        if (start + 10 < semesterLessons.length) {
+        if (start + 10 < searchedLessons.length) {
             setStart(start + 10)
             setEnd(end + 10)
         }
@@ -303,7 +356,7 @@ const PrepareSchedule = ({ history }) => {
             ) : (
                 <div>
                     {!showAdditionalLesson ? (
-                        <div className="flex flex-col xl:mx-40">
+                        <div className="flex flex-col">
                             {!showCurriculum ? (
                                 <div className="flex h-full">
                                     <div className="flex bg-white shadow-xl rounded flex-col md:w-2/3 sm:w-full mx-auto mt-4">
@@ -330,6 +383,7 @@ const PrepareSchedule = ({ history }) => {
                                                             department?
                                                         </label>
                                                         <select
+                                                            value={department}
                                                             onChange={(e) =>
                                                                 setDepartment(
                                                                     e.target
@@ -349,7 +403,7 @@ const PrepareSchedule = ({ history }) => {
                                                                             index
                                                                         }
                                                                         value={
-                                                                            department
+                                                                            department._id
                                                                         }
                                                                     >
                                                                         {
@@ -367,6 +421,7 @@ const PrepareSchedule = ({ history }) => {
                                                                 you study?
                                                             </label>
                                                             <select
+                                                                value={year}
                                                                 onChange={(e) =>
                                                                     setYear(
                                                                         e.target
@@ -396,10 +451,10 @@ const PrepareSchedule = ({ history }) => {
                                                         </div>
                                                         <div className="md:w-1/2  md:ml-2 sm:w-full">
                                                             <label className="block mb-2 text-md font-bold text-gray-700 text-left">
-                                                                Which semester
-                                                                will you study?
+                                                                Fall or Spring?
                                                             </label>
                                                             <select
+                                                                value={semester}
                                                                 onChange={(e) =>
                                                                     setSemester(
                                                                         e.target
@@ -424,6 +479,7 @@ const PrepareSchedule = ({ history }) => {
                                                             your 1st year?
                                                         </label>
                                                         <select
+                                                            value={startYear}
                                                             onChange={(e) =>
                                                                 setStartYear(
                                                                     e.target
@@ -470,15 +526,15 @@ const PrepareSchedule = ({ history }) => {
                                     </div>
                                 </div>
                             ) : (
-                                <div>
+                                <div className="xl:mx-40">
                                     <h1 className="flex justify-start text-2xl ml-8 md:ml-4">
                                         {department.name} Curriculum
                                         <div className="font-extralight ml-2">
                                             {` Semester ${nthSemester}`}
                                         </div>
                                     </h1>
-                                    <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
-                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
+                                    <div className="py-2 overflow-x-auto md:px-6 lg:px-8">
+                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard md:px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
                                             <table className="min-w-full">
                                                 <thead>
                                                     <tr className="">
@@ -494,73 +550,96 @@ const PrepareSchedule = ({ history }) => {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="bg-white">
-                                                {
-                                                    Object.keys(lessonGroups).map(
-                                                        (group) => (<><tr className="bg-blue-400">
-                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
-                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                {group}
-                                                            </td>
-                                                            <td className="px-6 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                {`${year}st Year, ${nthSemester}${
-                                                                    nthSemester %
-                                                                        2 ===
-                                                                    0
-                                                                        ? "nd"
-                                                                        : "st"
-                                                                } Semester`}
-                                                             </td>
-                                                            </tr>
-                                                        {lessonGroups[group].map(
-                                                        (lesson) => (
+                                                    {Object.keys(
+                                                        lessonGroups
+                                                    ).map((group, index) => (
+                                                        <>
+                                                            {index > 0 && (
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td>
+                                                                        . . .
+                                                                    </td>
+                                                                </tr>
+                                                            )}
                                                             <tr
-                                                                key={
-                                                                    lesson.code
+                                                                className={
+                                                                    priColors[
+                                                                        index %
+                                                                            priColors.length
+                                                                    ]
                                                                 }
-                                                                onClick={() =>
-                                                                    selectLessons(
-                                                                        lesson
-                                                                    )
-                                                                }
-                                                                className={`cursor-pointer ${
-                                                                    selectedLessons.includes(
-                                                                        lesson
-                                                                    )
-                                                                        ? `bg-blue-300`
-                                                                        : ``
-                                                                }`}
                                                             >
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                    {
-                                                                        lesson.code
-                                                                    }
+                                                                <td className="px-4 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
+                                                                <td className="px-4 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {`${group.toUpperCase()} LESSONS`}
                                                                 </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                    {
-                                                                        lesson.name
-                                                                    }
-                                                                </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
-                                                                    {`${year}st Year, ${nthSemester}${
+                                                                <td className="px-4 py-3 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                    {`${year}${
+                                                                        suffixes[
+                                                                            year -
+                                                                                1
+                                                                        ]
+                                                                    } Year, ${
                                                                         nthSemester %
                                                                             2 ===
-                                                                        0
-                                                                            ? "nd"
-                                                                            : "st"
+                                                                        1
+                                                                            ? "1"
+                                                                            : "2"
+                                                                    }${
+                                                                        suffixes[
+                                                                            nthSemester %
+                                                                                2 ===
+                                                                            1
+                                                                                ? 0
+                                                                                : 1
+                                                                        ]
                                                                     } Semester`}
                                                                 </td>
                                                             </tr>
-                                                        )
-                                                            )}
-                                                            </>
-                                                            )
-                                                    )
-                                                }
+                                                            {lessonGroups[
+                                                                group
+                                                            ].map((lesson) => (
+                                                                <tr
+                                                                    key={
+                                                                        lesson.code
+                                                                    }
+                                                                    onClick={() =>
+                                                                        selectLessons(
+                                                                            lesson
+                                                                        )
+                                                                    }
+                                                                    className={`cursor-pointer ${
+                                                                        selectedLessons.includes(
+                                                                            lesson
+                                                                        ) &&
+                                                                        secColors[
+                                                                            index %
+                                                                                secColors.length
+                                                                        ]
+                                                                    }`}
+                                                                >
+                                                                    <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                        {
+                                                                            lesson.code
+                                                                        }
+                                                                    </td>
+                                                                    <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                        {
+                                                                            lesson.name
+                                                                        }
+                                                                    </td>
+                                                                    <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5"></td>
+                                                                </tr>
+                                                            ))}
+                                                        </>
+                                                    ))}
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
-                                    <div className="flex flex-row justify-center lg:justify-end lg:mr-4">
+                                    <div className="flex flex-row justify-center lg:justify-end lg:mr-4 mb-8">
                                         <button
                                             onClick={() =>
                                                 setShowCurriculum(false)
@@ -582,24 +661,24 @@ const PrepareSchedule = ({ history }) => {
                             )}
                         </div>
                     ) : (
-                        <div className="xl:mx-32">
+                        <div className="xl:mx-36">
                             <div className="flex flex-col lg:flex-row lg:justify-around">
-                                <div className="w-full lg:w-4/12">
+                                <div className="w-full lg:w-4/12 xl:w-1/2">
                                     <h1 className="flex justify-start text-2xl ml-8 md:ml-20">
                                         Selected Lessons
                                     </h1>
-                                    <div className="py-2 sm:px-6 lg:px-8">
-                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
+                                    <div className="py-2 md:px-6 lg:px-8">
+                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard md:px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
                                             <table className="min-w-full">
                                                 <thead>
                                                     <tr className="">
-                                                        <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
                                                             Code
                                                         </th>
-                                                        <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
                                                             Name
                                                         </th>
-                                                        <th className="px-8 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
                                                             Action
                                                         </th>
                                                     </tr>
@@ -612,17 +691,17 @@ const PrepareSchedule = ({ history }) => {
                                                                     lesson.code
                                                                 }
                                                             >
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     {
                                                                         lesson.code
                                                                     }
                                                                 </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     {
                                                                         lesson.name
                                                                     }
                                                                 </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     <button
                                                                         onClick={(
                                                                             e
@@ -644,12 +723,20 @@ const PrepareSchedule = ({ history }) => {
                                     </div>
                                 </div>
 
-                                <div className="w-full lg:w-8/12">
+                                <div className="w-full lg:w-7/12 xl:w-9/12 mt-4 md:mt-0 ">
                                     <h1 className="flex justify-start text-2xl ml-8 md:ml-20">
                                         Add More Lessons
                                     </h1>
+                                    <input
+                                        className="w-11/12 px-3 py-2 my-1 text-sm leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                        type="text"
+                                        placeholder="Search (w/ Lesson Name, Lesson Code)"
+                                        onChange={(e) =>
+                                            onSearchLesson(e.target.value)
+                                        }
+                                    />
                                     <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
-                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 rounded-bl-lg rounded-br-lg">
+                                        <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard md:px-8 pt-2 rounded-bl-lg rounded-br-lg">
                                             <table className="min-w-full">
                                                 <thead>
                                                     <tr className="">
@@ -657,7 +744,7 @@ const PrepareSchedule = ({ history }) => {
                                                             Code
                                                         </th>
                                                         <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
-                                                            Lesson Name
+                                                            Name
                                                         </th>
                                                         <th className="px-4 py-2 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
                                                             Action
@@ -665,7 +752,7 @@ const PrepareSchedule = ({ history }) => {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="bg-white  ">
-                                                    {semesterLessons
+                                                    {searchedLessons
                                                         .slice(start, end)
                                                         .map((lesson) => (
                                                             <tr
@@ -673,17 +760,17 @@ const PrepareSchedule = ({ history }) => {
                                                                     lesson.code
                                                                 }
                                                             >
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b whitespace-nowrap text-blue-900 border-gray-500 text-sm leading-5">
                                                                     {
                                                                         lesson.code
                                                                     }
                                                                 </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     {
                                                                         lesson.name
                                                                     }
                                                                 </td>
-                                                                <td className="px-6 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                                                                <td className="px-4 py-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
                                                                     <button
                                                                         onClick={(
                                                                             e
@@ -693,7 +780,15 @@ const PrepareSchedule = ({ history }) => {
                                                                             )
                                                                         }
                                                                     >
-                                                                        <i className="fas fa-check"></i>
+                                                                        <i
+                                                                            className={
+                                                                                selectedLessons.includes(
+                                                                                    lesson
+                                                                                )
+                                                                                    ? "fas fa-times"
+                                                                                    : "fas fa-check"
+                                                                            }
+                                                                        ></i>
                                                                     </button>
                                                                 </td>
                                                             </tr>
@@ -710,14 +805,14 @@ const PrepareSchedule = ({ history }) => {
                                                         to
                                                         <span className="font-medium mx-1">
                                                             {end <
-                                                            semesterLessons.length
+                                                            searchedLessons.length
                                                                 ? end
-                                                                : semesterLessons.length}
+                                                                : searchedLessons.length}
                                                         </span>
                                                         of
                                                         <span className="font-medium mx-1">
                                                             {
-                                                                semesterLessons.length
+                                                                searchedLessons.length
                                                             }
                                                         </span>
                                                         results
@@ -772,20 +867,20 @@ const PrepareSchedule = ({ history }) => {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="flex flex-row justify-center lg:justify-end lg:mr-12 mb-8 mt-4">
+                                        <button
+                                            onClick={() =>
+                                                setShowAdditionalLesson(false)
+                                            }
+                                            className="w-4/12 md:w-5/12 lg:w-5/12 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+                                        >
+                                            Go Back
+                                        </button>
+                                        <button className="w-4/12 md:w-5/12 lg:w-5/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline">
+                                            Continue
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex flex-row justify-center lg:justify-end lg:mr-6">
-                                <button
-                                    onClick={() =>
-                                        setShowAdditionalLesson(false)
-                                    }
-                                    className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
-                                >
-                                    Go Back
-                                </button>
-                                <button className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline">
-                                    Continue
-                                </button>
                             </div>
                         </div>
                     )}

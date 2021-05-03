@@ -13,6 +13,7 @@ const AddUISLesson = ({ history }) => {
     const [selectedUniversity, setSelectedUniversity] = useState("null")
     const [universities, setUniversities] = useState([])
     const [lessons, setLessons] = useState([])
+    const [searchedLessons, setSearchedLessons] = useState([])
     const [selectedLessons, setSelectedLessons] = useState([])
     const [refresh, setRefresh] = useState(0)
     const [start, setStart] = useState(0)
@@ -86,6 +87,7 @@ const AddUISLesson = ({ history }) => {
                                     }
                                 }
                                 setLessons(lessonArray)
+                                setSearchedLessons(lessonArray)
                             }
                         }
                     )
@@ -95,6 +97,25 @@ const AddUISLesson = ({ history }) => {
             history.push("/signin")
         }
     }, [refresh, login, setLogin, history])
+
+    const onSearchLesson = (key) => {
+        if (key !== "") {
+            setSearchedLessons(
+                lessons.filter(
+                    (lesson) =>
+                        lesson.code.toUpperCase().includes(key.toUpperCase()) ||
+                        lesson.name.toUpperCase().includes(key.toUpperCase()) ||
+                        lesson.instructor
+                            .toUpperCase()
+                            .includes(key.toUpperCase())
+                )
+            )
+            setStart(0)
+            setEnd(10)
+        } else {
+            setSearchedLessons(lessons)
+        }
+    }
 
     const onSelectUniversity = (e) => {
         e.preventDefault()
@@ -121,6 +142,7 @@ const AddUISLesson = ({ history }) => {
                         setLogin({
                             userToken: login.userToken,
                             userID: login.userID,
+                            userGroup: login.userGroup,
                             semesterID: login.semesterID,
                             universityID: selectedUniversity,
                         })
@@ -193,7 +215,7 @@ const AddUISLesson = ({ history }) => {
     }
 
     const setNext = () => {
-        if (start + 10 < lessons.length) {
+        if (start + 10 < searchedLessons.length) {
             setStart(start + 10)
             setEnd(end + 10)
         }
@@ -303,6 +325,12 @@ const AddUISLesson = ({ history }) => {
                     <h1 className="flex justify-start text-2xl ml-8 md:ml-4">
                         System Lessons
                     </h1>
+                    <input
+                        className="w-11/12 px-3 py-2 my-1 text-sm leading-medium text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                        type="text"
+                        placeholder="Search (w/ Lesson Name, Lesson Code, Instructor Name)"
+                        onChange={(e) => onSearchLesson(e.target.value)}
+                    />
                     <div className="py-2 overflow-x-auto sm:px-6 lg:px-8">
                         <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-2 rounded-bl-lg rounded-br-lg">
                             <table className="min-w-full">
@@ -332,20 +360,22 @@ const AddUISLesson = ({ history }) => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white  ">
-                                    {lessons.slice(start, end).map((lesson) => {
-                                        return (
-                                            <UISLesson
-                                                key={`${lesson.code}.${lesson.section}`}
-                                                lesson={lesson}
-                                                selectedLessons={
-                                                    selectedLessons
-                                                }
-                                                onSelectLesson={() =>
-                                                    selectLessons(lesson)
-                                                }
-                                            />
-                                        )
-                                    })}
+                                    {searchedLessons
+                                        .slice(start, end)
+                                        .map((lesson) => {
+                                            return (
+                                                <UISLesson
+                                                    key={`${lesson.code}.${lesson.section}`}
+                                                    lesson={lesson}
+                                                    selectedLessons={
+                                                        selectedLessons
+                                                    }
+                                                    onSelectLesson={() =>
+                                                        selectLessons(lesson)
+                                                    }
+                                                />
+                                            )
+                                        })}
                                 </tbody>
                             </table>
                             <div className="sm:flex-1 sm:flex sm:items-center sm:justify-between my-4 work-sans">
@@ -357,13 +387,13 @@ const AddUISLesson = ({ history }) => {
                                         </span>
                                         to
                                         <span className="font-medium mx-1">
-                                            {end < lessons.length
+                                            {end < searchedLessons.length
                                                 ? end
-                                                : lessons.length}
+                                                : searchedLessons.length}
                                         </span>
                                         of
                                         <span className="font-medium mx-1">
-                                            {lessons.length}
+                                            {searchedLessons.length}
                                         </span>
                                         results
                                     </p>
@@ -413,7 +443,7 @@ const AddUISLesson = ({ history }) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex justify-center md:justify-end text-xs md:text-base mt-4 mr-6">
+                    <div className="flex justify-center md:justify-end text-xs md:text-base my-4 md:mr-6">
                         <button
                             onClick={() => setAddLessonModal(true)}
                             className="w-1/2 md:w-1/3 lg:w-1/5 px-8 py-2 font-bold text-white whitespace-nowrap bg-green-500 rounded-full hover:bg-green-700 focus:outline-none focus:shadow-outline"
