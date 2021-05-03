@@ -97,10 +97,11 @@ async def create_curriculum_lesson(
                             if curriculum["_id"] == curid:
                                 for semester in curriculum["semesters"]:
                                     if semester["_id"] == cursid:
-                                        return JSONResponse(
-                                            status_code=status.HTTP_200_OK,
-                                            content=semester["lessons"],
-                                        )
+                                        return [
+                                            x
+                                            for x in semester["lessons"]
+                                            if x["code"] == curriculum_lesson["code"]
+                                        ][0]
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

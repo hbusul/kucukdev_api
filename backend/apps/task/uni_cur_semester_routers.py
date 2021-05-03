@@ -92,10 +92,12 @@ async def create_curriculum_semester(
                     if department["_id"] == depid:
                         for curriculum in department["curriculums"]:
                             if curriculum["_id"] == curid:
-                                return JSONResponse(
-                                    status_code=status.HTTP_200_OK,
-                                    content=curriculum["semesters"],
-                                )
+                                semester = [
+                                    x
+                                    for x in curriculum["semesters"]
+                                    if x["semester"] == curriculum_semester["semester"]
+                                ][0]
+                                return semester
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

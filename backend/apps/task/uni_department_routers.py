@@ -60,10 +60,12 @@ async def create_university_department(
                     "universities"
                 ].find_one({"_id": unid})
             ) is not None:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content=created_university["departments"],
-                )
+                dep = [
+                    x
+                    for x in created_university["departments"]
+                    if x["name"] == university_department["name"]
+                ][0]
+                return dep
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

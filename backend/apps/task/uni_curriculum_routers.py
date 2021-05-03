@@ -68,11 +68,12 @@ async def create_department_curriculum(
             ) is not None:
                 for department in created_department["departments"]:
                     if department["_id"] == depid:
-                        return JSONResponse(
-                            status_code=status.HTTP_200_OK,
-                            content=department["curriculums"],
-                        )
-
+                        curr = [
+                            x
+                            for x in department["curriculums"]
+                            if x["name"] == department_curriculum["name"]
+                        ][0]
+                        return curr
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"message": "University not found"},
