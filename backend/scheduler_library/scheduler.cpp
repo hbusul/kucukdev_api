@@ -1,6 +1,6 @@
 #include "scheduler.h"
 
-std::vector<std::map<int, int>> map(
+std::vector<std::map<int, int>> schedule(
     std::map<int, std::map<int, std::vector<std::pair<int, int>>>> m) {
   // assume that lessons are 0 indexed
   // assume that sections are 0 indexed

@@ -18,4 +18,4 @@ namespace std {
 %}
 
 /* list functions to be interfaced: */
-std::vector<std::map<int, int>> map(std::map<int, std::map<int, std::vector<std::pair<int, int>>>> m);
+std::vector<std::map<int, int>> schedule(std::map<int, std::map<int, std::vector<std::pair<int, int>>>> m);
