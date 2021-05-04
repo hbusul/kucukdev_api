@@ -1,3 +1,10 @@
+FROM python:3.8.9-buster AS scheduler-builder
+RUN wget http://prdownloads.sourceforge.net/swig/swig-4.0.2.tar.gz
+RUN tar -xvf swig-4.0.2.tar.gz
+RUN cd swig-4.0.2 && ./configure && make && make install
+COPY scheduler_library /tmp/
+RUN cd /tmp/ && make
+
 FROM python:3.8-buster
 
 WORKDIR /usr/src/app
@@ -6,5 +13,6 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+COPY --from=scheduler-builder /tmp/_scheduler.so /tmp/scheduler.py ./
 
 CMD [ "uvicorn", "main:app", "--reload", "--host", "0.0.0.0" ]
