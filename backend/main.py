@@ -21,6 +21,7 @@ from apps.task.uni_department_routers import router as uni_department_router
 from apps.task.uni_curriculum_routers import router as uni_curriculum_router
 from apps.task.uni_cur_semester_routers import router as uni_cur_semester_router
 from apps.task.uni_cur_lesson_routers import router as uni_cur_lesson_router
+from apps.task.schedule_routers import router as schedule_router
 
 
 app = FastAPI()
@@ -96,6 +97,7 @@ app.include_router(
     uni_cur_lesson_router, tags=["curriculum lessons"], prefix="/universities"
 )
 
+app.include_router(schedule_router, tags=["scheduler"], prefix="/universities")
 
 if __name__ == "__main__":
     uvicorn.run(
