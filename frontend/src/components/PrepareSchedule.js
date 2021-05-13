@@ -15,6 +15,9 @@ const PrepareSchedule = ({ history }) => {
     const [semester, setSemester] = useState(1)
     const [startYear, setStartYear] = useState(new Date().getFullYear())
     const [nthSemester, setNthSemester] = useState(1)
+    const [schedules, setSchedules] = useState([])
+    const [scheduleIndex, setScheduleIndex] = useState(1)
+    const [scheduleIndexList, setScheduleIndexList] = useState([])
     const [refresh, setRefresh] = useState(0)
 
     const [universities, setUniversities] = useState([])
@@ -23,6 +26,9 @@ const PrepareSchedule = ({ history }) => {
     const [semesterLessons, setSemesterLessons] = useState([])
     const [searchedLessons, setSearchedLessons] = useState([])
     const [selectedLessons, setSelectedLessons] = useState([])
+    const [scheduleLessons, setScheduleLessons] = useState([])
+    const [scheduleRows, setScheduleRows] = useState([])
+    const [instructorRows, setInstructorRows] = useState([])
     const [lessonGroups, setLessonGroups] = useState({})
 
     const [start, setStart] = useState(0)
@@ -72,6 +78,175 @@ const PrepareSchedule = ({ history }) => {
         }
     }, [history, refresh, login, setLogin])
 
+    let strCol =
+        "240,196,196x220,196,240x255,194,126x255,240,126x202,255,126x126,246,255x126,200,255x184,126,255x238,126,255x126,128,255x255,126,194x196,224,240x126,255,219x196,240,229x243,255,126x126,255,128"
+    let colorArray = strCol.split("x")
+
+    useEffect(() => {
+        const scheduleIndexArray = []
+        for (let i = 0; i < schedules.length; i++) {
+            scheduleIndexArray.push(
+                <button
+                    onClick={() => setScheduleIndex(i + 1)}
+                    className={`mt-2 py-2 px-4 mr-2 ${
+                        scheduleIndex === i + 1 ? "bg-blue-400" : "bg-gray-300"
+                    }`}
+                >
+                    {i + 1}
+                </button>
+            )
+        }
+        setScheduleIndexList(scheduleIndexArray)
+
+        let lessonSlots = {
+            0: {},
+            1: {},
+            2: {},
+            3: {},
+            4: {},
+        }
+
+        const instructorArray = []
+
+        if (scheduleLessons.length > 0) {
+            for (
+                let i = 0;
+                i < scheduleLessons[scheduleIndex - 1].length;
+                i++
+            ) {
+                instructorArray.push(
+                    <tr key={scheduleLessons[scheduleIndex - 1][i].name}>
+                        <td className="px-4 py-2 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">
+                            {scheduleLessons[scheduleIndex - 1][i].name}
+                        </td>
+                        <td className="px-4 py-2 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">
+                            {scheduleLessons[scheduleIndex - 1][i].instructor}
+                        </td>
+                    </tr>
+                )
+                for (
+                    let j = 0;
+                    j < scheduleLessons[scheduleIndex - 1][i].slots.length;
+                    j++
+                ) {
+                    const day_hour =
+                        scheduleLessons[scheduleIndex - 1][i].slots[j].split(
+                            ","
+                        )
+                    const isLab = day_hour[2] === "1" ? true : false
+                    if (!lessonSlots[day_hour[0]][day_hour[1]])
+                        lessonSlots[day_hour[0]][day_hour[1]] = []
+                    lessonSlots[day_hour[0]][day_hour[1]].push({
+                        // id: scheduleLessons[scheduleIndex - 1][i]._id,
+                        name: scheduleLessons[scheduleIndex - 1][i].name,
+                        color: colorArray[i % colorArray.length],
+                        lab: isLab,
+                    })
+                }
+            }
+        }
+
+        setInstructorRows(instructorArray)
+
+        const scheduleArray = []
+        for (let index = 1; index <= 15; index++) {
+            scheduleArray.push(
+                <tr key={index}>
+                    <td className="px-1 pb-2 border-b text-blue-900 border-gray-500 text-sm leading-5">
+                        {index}
+                    </td>
+                    <td
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    >
+                        {lessonSlots[0][index] &&
+                            lessonSlots[0][index].map((e) => (
+                                <div
+                                    style={{
+                                        backgroundColor: `rgb(${e.color})`,
+                                    }}
+                                    className="py-1 m-1"
+                                >
+                                    <h1 to={`/lessons/${e.id}`}>{`${e.name} ${
+                                        e.lab ? " LAB" : ""
+                                    }`}</h1>
+                                </div>
+                            ))}
+                    </td>
+                    <td
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    >
+                        {lessonSlots[1][index] &&
+                            lessonSlots[1][index].map((e) => (
+                                <div
+                                    style={{
+                                        backgroundColor: `rgb(${e.color})`,
+                                    }}
+                                    className="py-1 m-1"
+                                >
+                                    <h1 to={`/lessons/${e.id}`}>{`${e.name} ${
+                                        e.lab ? " LAB" : ""
+                                    }`}</h1>
+                                </div>
+                            ))}
+                    </td>
+                    <td
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    >
+                        {lessonSlots[2][index] &&
+                            lessonSlots[2][index].map((e) => (
+                                <div
+                                    style={{
+                                        backgroundColor: `rgb(${e.color})`,
+                                    }}
+                                    className="py-1 m-1"
+                                >
+                                    <h1 to={`/lessons/${e.id}`}>{`${e.name} ${
+                                        e.lab ? " LAB" : ""
+                                    }`}</h1>
+                                </div>
+                            ))}
+                    </td>
+                    <td
+                        className={`border border-gray-500 text-blue-900 text-sm leading-5`}
+                    >
+                        {lessonSlots[3][index] &&
+                            lessonSlots[3][index].map((e) => (
+                                <div
+                                    style={{
+                                        backgroundColor: `rgb(${e.color})`,
+                                    }}
+                                    className="py-1 m-1"
+                                >
+                                    <h1 to={`/lessons/${e.id}`}>{`${e.name} ${
+                                        e.lab ? " LAB" : ""
+                                    }`}</h1>
+                                </div>
+                            ))}
+                    </td>
+                    <td
+                        className={`border-b border-gray-500 text-blue-900 text-sm leading-5`}
+                    >
+                        {lessonSlots[4][index] &&
+                            lessonSlots[4][index].map((e) => (
+                                <div
+                                    style={{
+                                        backgroundColor: `rgb(${e.color})`,
+                                    }}
+                                    className="py-1 m-1"
+                                >
+                                    <h1 to={`/lessons/${e.id}`}>{`${e.name} ${
+                                        e.lab ? " LAB" : ""
+                                    }`}</h1>
+                                </div>
+                            ))}
+                    </td>
+                </tr>
+            )
+        }
+
+        setScheduleRows(scheduleArray)
+    }, [scheduleIndex, schedules, scheduleLessons])
+
     useEffect(() => {
         setNthSemester(2 * Number(year) - 2 + Number(semester))
     }, [year, semester])
@@ -90,6 +265,32 @@ const PrepareSchedule = ({ history }) => {
                         "API called successfully. Returned data: " + data
                     )
                     console.log(data)
+                    setSchedules(data)
+
+                    const scheduleLessonArray = []
+                    for (let i = 0; i < data.length; i++) {
+                        const oneScheduleArray = []
+                        for (let j = 0; j < Object.keys(data[i]).length; j++) {
+                            let res = semesterLessons.find(
+                                (lesson) =>
+                                    lesson.code === Object.keys(data[i])[j]
+                            )
+                            let secCode = `${res.code}.${
+                                res.sections[Object.values(data[i])[j]].section
+                            }`
+                            oneScheduleArray.push({
+                                name: secCode,
+                                instructor:
+                                    res.sections[Object.values(data[i])[j]]
+                                        .instructor,
+                                slots: res.sections[Object.values(data[i])[j]]
+                                    .slots,
+                                absenceLimit: res.absenceLimit,
+                            })
+                        }
+                        scheduleLessonArray.push(oneScheduleArray)
+                    }
+                    setScheduleLessons(scheduleLessonArray)
                 }
             }
         )
@@ -97,8 +298,41 @@ const PrepareSchedule = ({ history }) => {
         console.log(selectedLessonCodes)
     }
 
+    const importProgram = () => {
+        let apiInstance = new Kucukdevapi.LessonsApi()
+        let uid = login.userID
+        let sid = login.semesterID
+
+        for (let i = 0; i < scheduleLessons[scheduleIndex - 1].length; i++) {
+            let lessonModel = new Kucukdevapi.LessonModel(
+                scheduleLessons[scheduleIndex - 1][i].name,
+                scheduleLessons[scheduleIndex - 1][i].instructor,
+                scheduleLessons[scheduleIndex - 1][i].absenceLimit,
+                scheduleLessons[scheduleIndex - 1][i].slots
+            )
+            apiInstance.createLesson(
+                uid,
+                sid,
+                lessonModel,
+                (error, data, response) => {
+                    if (error) {
+                        console.error(error)
+                    } else {
+                        console.log(
+                            "API called successfully. Returned data: " + data
+                        )
+                    }
+                }
+            )
+        }
+
+        history.push("/overview")
+    }
+
     const selectLessons = (newLesson) => {
-        let res = selectedLessons.find((o) => o.code === newLesson.code)
+        let res = selectedLessons.find(
+            (lesson) => lesson.code === newLesson.code
+        )
 
         if (res) {
             setSelectedLessons(
@@ -712,12 +946,12 @@ const PrepareSchedule = ({ history }) => {
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-row justify-center lg:justify-end lg:mr-4 mb-8">
+                                            <div className="flex flex-row justify-center mb-8">
                                                 <button
                                                     onClick={() =>
                                                         setShowCurriculum(false)
                                                     }
-                                                    className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+                                                    className="w-4/12 md:w-5/12 lg:w-1/5 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
                                                 >
                                                     Go Back
                                                 </button>
@@ -727,7 +961,7 @@ const PrepareSchedule = ({ history }) => {
                                                             true
                                                         )
                                                     }
-                                                    className="w-4/12 md:w-5/12 lg:w-2/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline"
+                                                    className="w-4/12 md:w-5/12 lg:w-1/5 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline"
                                                 >
                                                     Continue
                                                 </button>
@@ -955,14 +1189,14 @@ const PrepareSchedule = ({ history }) => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-row justify-center lg:justify-end lg:mr-12 mb-8 mt-4">
+                                            <div className="flex flex-row justify-center mb-8 mt-4">
                                                 <button
                                                     onClick={() =>
                                                         setShowAdditionalLesson(
                                                             false
                                                         )
                                                     }
-                                                    className="w-4/12 md:w-5/12 lg:w-5/12 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+                                                    className="w-4/12 md:w-5/12 lg:w-2/5 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
                                                 >
                                                     Go Back
                                                 </button>
@@ -973,7 +1207,7 @@ const PrepareSchedule = ({ history }) => {
                                                             true
                                                         )
                                                     }}
-                                                    className="w-4/12 md:w-5/12 lg:w-5/12 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline"
+                                                    className="w-4/12 md:w-5/12 lg:w-2/5 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline"
                                                 >
                                                     Continue
                                                 </button>
@@ -984,7 +1218,82 @@ const PrepareSchedule = ({ history }) => {
                             )}
                         </div>
                     ) : (
-                        <div>HEY</div>
+                        <div>
+                            <div className="flex flex-col mt-8 xl:ml-32">
+                                <h1 className="flex justify-start text-2xl ml-8 md:ml-4">
+                                    Schedules
+                                </h1>
+                                <div className="flex flex-row flex-wrap ml-4 md:w-7/12">
+                                    {scheduleIndexList}
+                                </div>
+                                <div className="flex flex-col lg:flex-row justify-start py-2 md:px-8">
+                                    <div className="inline-block shadow overflow-x-auto bg-white lg:w-7/12 shadow-dashboard md:px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
+                                        <table className="min-w-full">
+                                            <thead>
+                                                <tr className="">
+                                                    <th className="px-4 py-3 border-b-2 border-gray-300 text-sm text-left leading-4 text-blue-500 tracking-wider">
+                                                        #
+                                                    </th>
+                                                    <th className="px-4 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        Monday
+                                                    </th>
+                                                    <th className="px-4 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        Tuesday
+                                                    </th>
+                                                    <th className="px-4 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        Wednesday
+                                                    </th>
+                                                    <th className="px-4 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        Thursday
+                                                    </th>
+                                                    <th className="px-4 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        Friday
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white  ">
+                                                {scheduleRows}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div className="inline-block shadow overflow-x-auto bg-white shadow-dashboard lg:ml-8 md:px-8 pt-2 pb-8 rounded-bl-lg rounded-br-lg">
+                                        <table className="min-w-full">
+                                            <thead>
+                                                <tr className="">
+                                                    <th className="px-4 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        Code
+                                                    </th>
+                                                    <th className="px-4 py-3 border-b-2 border-gray-300 text-sm leading-4 text-blue-500 tracking-wider">
+                                                        Instructor
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white  ">
+                                                {instructorRows}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div className="flex flex-row justify-center mb-8 mt-4">
+                                    <button
+                                        onClick={() =>
+                                            setShowScheduleSelection(false)
+                                        }
+                                        className="w-4/12 md:w-5/12 lg:w-1/5 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+                                    >
+                                        Go Back
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            importProgram()
+                                        }}
+                                        className="w-4/12 md:w-5/12 lg:w-1/5 px-8 py-2 m-2 font-bold text-white bg-yellow-500 rounded-full hover:bg-yellow-700 focus:outline-none focus:shadow-outline"
+                                    >
+                                        Import
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </div>
             )}
