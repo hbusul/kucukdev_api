@@ -1276,9 +1276,10 @@ const PrepareSchedule = ({ history }) => {
                                 </div>
                                 <div className="flex flex-row justify-center mb-8 mt-4">
                                     <button
-                                        onClick={() =>
+                                        onClick={() => {
                                             setShowScheduleSelection(false)
-                                        }
+                                            setScheduleIndex(1)
+                                        }}
                                         className="w-4/12 md:w-5/12 lg:w-1/5 px-8 py-2 m-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
                                     >
                                         Go Back
