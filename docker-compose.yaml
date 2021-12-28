@@ -20,7 +20,7 @@ services:
     image: node:15.7.0-buster
     networks:
       - app-network
-    entrypoint: "sh -c 'cd frontend && npm start && npm run build:tailwind && tailwindcss build src/tailwind.css -o src/tailwind.output.css'"
+    entrypoint: "sh -c 'cd frontend && npm start'"
     volumes:
       - "./frontend:/frontend"
     ports:
