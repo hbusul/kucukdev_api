@@ -23,7 +23,6 @@ from apps.task.uni_cur_semester_routers import router as uni_cur_semester_router
 from apps.task.uni_cur_lesson_routers import router as uni_cur_lesson_router
 from apps.task.schedule_routers import router as schedule_router
 
-
 app = FastAPI()
 
 origins = ["*"]
