@@ -6,6 +6,9 @@ from pydantic import BaseModel, Field, EmailStr
 from datetime import timedelta, datetime
 from passlib.context import CryptContext
 from jose import JWTError, jwt
+from bson import ObjectId
+
+from .PyObjectId import PyObjectId
 
 SECRET_KEY = "c8fc6e033c9801ca3c7d580dfd4756d691b96b3c8cc6e2313723eb49d7bc5384"
 ALGORITHM = "HS256"
@@ -16,7 +19,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 class LessonModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     instructor: str = Field(...)
     absenceLimit: int = Field(..., ge=0)
@@ -25,6 +28,8 @@ class LessonModel(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "name": "EE203",
@@ -75,10 +80,13 @@ class UpdateLessonModel(BaseModel):
 
 
 class AbsenceModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     absence: str = Field(...)
 
     class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "absence": "1,0,2",
@@ -87,7 +95,7 @@ class AbsenceModel(BaseModel):
 
 
 class UserSemesterModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     startDate: datetime = Field(...)
     endDate: datetime = Field(...)
@@ -99,6 +107,8 @@ class UserSemesterModel(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "name": "2020-21 Spring",
@@ -163,13 +173,15 @@ class SemesterAPIModel(BaseModel):
 
 
 class UserModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     email: EmailStr = Field(...)
     password: str = Field(...)
     semesters: List[UserSemesterModel] = []
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "email": "hello@agu.edu.tr",
@@ -201,11 +213,13 @@ class UserAPIModel(BaseModel):
 
 
 class UpdatePasswordModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     password: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "password": "123456",
@@ -214,11 +228,13 @@ class UpdatePasswordModel(BaseModel):
 
 
 class UpdateSemesterModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     curSemesterID: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "curSemesterID": "c765c307-560c-47ab-b29e-0a1265eab860",
@@ -227,11 +243,13 @@ class UpdateSemesterModel(BaseModel):
 
 
 class UpdateEntranceYearModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     entranceYear: int = Field(...)
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "entranceYear": 2018,
@@ -240,11 +258,13 @@ class UpdateEntranceYearModel(BaseModel):
 
 
 class UpdateUniversityModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     curUniversityID: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "curUniversityID": "c765c307-560c-47ab-b29e-0a1265eab860",

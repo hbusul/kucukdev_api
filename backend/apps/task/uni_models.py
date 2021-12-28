@@ -1,16 +1,20 @@
 from typing import Optional, List
 from pydantic import BaseModel, Field
-import uuid
+from bson import ObjectId
+
+from .PyObjectId import PyObjectId
 
 
 class UniversitySectionModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     section: str = Field(...)
     instructor: str = Field(...)
     slots: List[str] = Field(...)
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "section": "01",
@@ -21,7 +25,7 @@ class UniversitySectionModel(BaseModel):
 
 
 class UniversityLessonModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     code: str = Field(...)
     ects: float = Field(..., ge=0)
@@ -32,6 +36,8 @@ class UniversityLessonModel(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "name": "ART OF COMPUTING",
@@ -46,7 +52,7 @@ class UniversityLessonModel(BaseModel):
 
 
 class UniversityAPILessonModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     code: str = Field(...)
     ects: float = Field(..., ge=0)
@@ -55,6 +61,8 @@ class UniversityAPILessonModel(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "name": "ART OF COMPUTING",
@@ -66,12 +74,14 @@ class UniversityAPILessonModel(BaseModel):
 
 
 class UniversitySemesterModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     lessons: List[UniversityAPILessonModel] = []
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "name": "20-21 Spring",
@@ -80,25 +90,29 @@ class UniversitySemesterModel(BaseModel):
 
 
 class CurriculumLessonModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     code: str = Field(...)
     lessonType: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {"name": "PHYSICS I", "code": "PHYS101", "lessonType": "science"}
         }
 
 
 class CurriculumSemesterModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     semester: int = Field(..., gt=0, lt=9)
     lessons: List[CurriculumLessonModel] = []
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "semester": 1,
@@ -107,7 +121,7 @@ class CurriculumSemesterModel(BaseModel):
 
 
 class UniversityCurriculumModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     startYear: int = Field(...)
     endYear: int = Field(...)
@@ -115,18 +129,22 @@ class UniversityCurriculumModel(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {"name": "2016 Later", "startYear": 2016, "endYear": 2100}
         }
 
 
 class UniversityDepartmentModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     curriculums: List[UniversityCurriculumModel] = []
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "name": "COMP",
@@ -135,13 +153,15 @@ class UniversityDepartmentModel(BaseModel):
 
 
 class UniversityModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     departments: List[UniversityDepartmentModel] = []
     semesters: List[UniversitySemesterModel] = []
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "name": "AGU",
@@ -156,6 +176,8 @@ class UniversityAPIModel(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
@@ -166,11 +188,13 @@ class UniversityAPIModel(BaseModel):
 
 
 class UpdateUniversityNameModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "name": "AGU",
