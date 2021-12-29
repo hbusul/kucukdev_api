@@ -10,9 +10,9 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import List
 
-from apps.task import user_models
-from .uni_models import UniversitySemesterModel
-from .user_models import UserModel, Message
+from ...dependencies import get_current_user
+from ...models.uni_models import UniversitySemesterModel
+from ...models.user_models import UserModel, Message
 
 router = APIRouter()
 
@@ -32,7 +32,7 @@ async def create_university_semester(
     unid: str,
     request: Request,
     university_semester: UniversitySemesterModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Create semester for a university with given universityID"""
 
@@ -140,7 +140,7 @@ async def update_university_semester(
     unisid: str,
     request: Request,
     university_semester: UniversitySemesterModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Update university of a semester with given universityID and universitySemesterID"""
 
@@ -207,7 +207,7 @@ async def delete_university_semester(
     unid: str,
     unisid: str,
     request: Request,
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Delete a university semester with given universityID and universitySemesterID"""
 

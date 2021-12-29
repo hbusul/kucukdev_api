@@ -9,9 +9,9 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import List
 
-from apps.task import user_models
-from .uni_models import CurriculumLessonModel
-from .user_models import UserModel, Message
+from ...dependencies import get_current_user
+from ...models.uni_models import CurriculumLessonModel
+from ...models.user_models import UserModel, Message
 
 router = APIRouter()
 
@@ -34,7 +34,7 @@ async def create_curriculum_lesson(
     cursid: str,
     request: Request,
     curriculum_lesson: CurriculumLessonModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Create lesson for a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID and curriculumSemesterID"""
 
@@ -211,7 +211,7 @@ async def update_curriculum_lesson(
     curlid: str,
     request: Request,
     curriculum_lesson: CurriculumLessonModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Update semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
 
@@ -314,7 +314,7 @@ async def delete_curriculum_lesson(
     cursid: str,
     curlid: str,
     request: Request,
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Delete a university department with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
 
