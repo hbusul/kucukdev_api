@@ -4,34 +4,34 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from config import settings
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.dependencies import router as token_router
+from .dependencies import router as token_router
 
-from app.routers.user_routers.user_routers import router as user_router
-from app.routers.user_routers.semester_routers import router as semester_router
-from app.routers.user_routers.lesson_routers import router as lesson_router
+from .routers.user_routers.user_routers import router as user_router
+from .routers.user_routers.semester_routers import router as semester_router
+from .routers.user_routers.lesson_routers import router as lesson_router
 
-from app.routers.university_routers.schedule_routers import router as schedule_router
-from app.routers.university_routers.uni_routers import router as uni_router
-from app.routers.university_routers.uni_semester_routers import (
+from .routers.university_routers.schedule_routers import router as schedule_router
+from .routers.university_routers.uni_routers import router as uni_router
+from .routers.university_routers.uni_semester_routers import (
     router as uni_semester_router,
 )
-from app.routers.university_routers.uni_lesson_routers import (
+from .routers.university_routers.uni_lesson_routers import (
     router as uni_lesson_router,
 )
-from app.routers.university_routers.uni_section_routers import (
+from .routers.university_routers.uni_section_routers import (
     router as uni_section_router,
 )
 
-from app.routers.university_routers.uni_department_routers import (
+from .routers.university_routers.uni_department_routers import (
     router as uni_department_router,
 )
-from app.routers.university_routers.uni_curriculum_routers import (
+from .routers.university_routers.uni_curriculum_routers import (
     router as uni_curriculum_router,
 )
-from app.routers.university_routers.uni_cur_semester_routers import (
+from .routers.university_routers.uni_cur_semester_routers import (
     router as uni_cur_semester_router,
 )
-from app.routers.university_routers.uni_cur_lesson_routers import (
+from .routers.university_routers.uni_cur_lesson_routers import (
     router as uni_cur_lesson_router,
 )
 
