@@ -15,4 +15,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 COPY --from=scheduler-builder /tmp/_scheduler.so /tmp/scheduler.py ./
 
-CMD [ "uvicorn", "main:app", "--reload", "--host", "0.0.0.0" ]
+CMD [ "uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0" ]

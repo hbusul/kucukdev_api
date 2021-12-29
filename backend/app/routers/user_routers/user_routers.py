@@ -3,7 +3,6 @@ from fastapi import (
     Body,
     Request,
     status,
-    Response,
     Depends,
 )
 from fastapi.responses import JSONResponse
@@ -11,8 +10,8 @@ from fastapi.encoders import jsonable_encoder
 from passlib.hash import bcrypt
 
 
-from apps.task import user_models
-from .user_models import (
+from ...dependencies import get_current_user
+from ...models.user_models import (
     UserModel,
     UserAPIModel,
     UpdatePasswordModel,
@@ -66,7 +65,7 @@ async def create_user(request: Request, user: UserModel = Body(...)):
     response_model=UserAPIModel,
     responses={401: {"model": Message}},
 )
-async def get_current(auth_user: UserModel = Depends(user_models.get_current_user)):
+async def get_current(auth_user: UserModel = Depends(get_current_user)):
     return auth_user
 
 
@@ -80,7 +79,7 @@ async def get_current(auth_user: UserModel = Depends(user_models.get_current_use
 async def show_user(
     uid: str,
     request: Request,
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Get a single user with given userID"""
 
@@ -114,7 +113,7 @@ async def update_password(
     uid: str,
     request: Request,
     password: UpdatePasswordModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Update password of a user with given userID"""
 
@@ -164,7 +163,7 @@ async def update_password(
 async def delete_user(
     uid: str,
     request: Request,
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Delete a user with given userID"""
 
@@ -203,7 +202,7 @@ async def update_current_semester(
     uid: str,
     request: Request,
     semester: UpdateSemesterModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Update current semester ID of a user with given userID"""
 
@@ -253,7 +252,7 @@ async def update_current_university(
     uid: str,
     request: Request,
     university: UpdateUniversityModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Update current university ID of a user with given userID"""
 
@@ -304,7 +303,7 @@ async def update_entrance_year(
     uid: str,
     request: Request,
     entranceYear: UpdateEntranceYearModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Update entrance year of a user with given userID"""
 

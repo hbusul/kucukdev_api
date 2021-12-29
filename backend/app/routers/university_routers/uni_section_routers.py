@@ -8,9 +8,9 @@ from fastapi import (
 )
 from fastapi.responses import JSONResponse
 
-from apps.task import user_models
-from .uni_models import UniversitySectionModel
-from .user_models import UserModel, Message
+from ...dependencies import get_current_user
+from ...models.uni_models import UniversitySectionModel
+from ...models.user_models import UserModel, Message
 
 router = APIRouter()
 
@@ -33,7 +33,7 @@ async def update_lesson_section(
     secid: str,
     request: Request,
     new_section: UniversitySectionModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Update section of a lesson with given universityID, universitySemesterID, universityLessonID and sectionID"""
     new_section = {k: v for k, v in new_section.dict().items() if v is not None}
@@ -159,7 +159,7 @@ async def delete_lesson_section(
     unilid: str,
     secid: str,
     request: Request,
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Delete a lesson section with given universityID, universitySemesterID, universityLessonID and sectionID"""
 

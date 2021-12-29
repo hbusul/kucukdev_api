@@ -9,9 +9,8 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import List, Dict
 
-from apps.task import user_models
-from .uni_models import CurriculumSemesterModel
-from .user_models import UserModel, Message
+
+from ...models.user_models import Message
 
 
 from scheduler import schedule

@@ -3,8 +3,9 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import List
 
-from apps.task import user_models
-from .user_models import (
+
+from ...dependencies import get_current_user
+from ...models.user_models import (
     UserModel,
     LessonModel,
     UpdateLessonModel,
@@ -33,7 +34,7 @@ async def create_lesson(
     sid: str,
     request: Request,
     lesson: LessonModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Create a lessons for a semester with given userID, semesterID"""
 
@@ -111,7 +112,7 @@ async def list_lessons(
     uid: str,
     sid: str,
     request: Request,
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """List all lessons of a semester with given userID, semesterID"""
 
@@ -151,7 +152,7 @@ async def show_lesson(
     sid: str,
     lid: str,
     request: Request,
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Get a single lesson with given userID, semesterID and lessonID"""
 
@@ -198,7 +199,7 @@ async def update_lesson(
     lid: str,
     request: Request,
     lesson: UpdateLessonModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Update a lesson with given userID, semesterID and lessonID"""
 
@@ -286,7 +287,7 @@ async def delete_lesson(
     sid: str,
     lid: str,
     request: Request,
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Delete a lesson with given userID, semesterID and lessonID"""
 
@@ -330,7 +331,7 @@ async def create_absence(
     lid: str,
     request: Request,
     absence: AbsenceModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Create an absence for a lesson with given userID, semesterID and lessonID"""
 
@@ -402,7 +403,7 @@ async def delete_absence(
     lid: str,
     request: Request,
     absence: AbsenceModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Delete an absence from a lesson with given userID, semesterID and lessonID"""
 

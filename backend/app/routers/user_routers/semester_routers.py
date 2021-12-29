@@ -4,8 +4,8 @@ from fastapi.encoders import jsonable_encoder
 from typing import List
 
 
-from apps.task import user_models
-from .user_models import (
+from ...dependencies import get_current_user
+from ...models.user_models import (
     UserModel,
     UserSemesterModel,
     SemesterAPIModel,
@@ -32,7 +32,7 @@ async def create_semester(
     uid: str,
     request: Request,
     semester: UserSemesterModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Create a semester for a user with given userID"""
 
@@ -98,7 +98,7 @@ async def create_semester(
 )
 async def list_semesters(
     uid: str,
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """list all semesters of a user with given userID"""
 
@@ -130,7 +130,7 @@ async def show_semester(
     uid: str,
     sid: str,
     request: Request,
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Get a single semester with given userID and semesterID"""
 
@@ -165,7 +165,7 @@ async def update_semester(
     sid: str,
     request: Request,
     semester: UpdateUserSemesterModel = Body(...),
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Update a semester with given userID and semesterID"""
 
@@ -204,7 +204,7 @@ async def update_semester(
 
             if update_result.modified_count == 1:
                 return JSONResponse(
-                    status_code=status.HTTP_404_NOT_FOUND,
+                    status_code=status.HTTP_200_OK,
                     content={"message": "Semester updated"},
                 )
 
@@ -239,7 +239,7 @@ async def delete_semester(
     uid: str,
     sid: str,
     request: Request,
-    auth_user: UserModel = Depends(user_models.get_current_user),
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Delete a semester with given userID and semesterID"""
 
