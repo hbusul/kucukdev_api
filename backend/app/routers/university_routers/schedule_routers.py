@@ -13,7 +13,7 @@ from typing import List, Dict
 from ...models.user_models import Message
 
 
-from scheduler import schedule
+from app.scheduler import schedule
 
 router = APIRouter()
 
