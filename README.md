@@ -23,3 +23,11 @@ replicate the behaviour for the back-end.
 # Development
 
 Use auto-formatting and use `Black` for it.  
+
+# Tests
+
+To run:
+`docker-compose -f docker-compose.test.yaml up --build`
+
+To down with cleaning the database:
+`docker-compose -f docker-compose.test.yaml down -v`
