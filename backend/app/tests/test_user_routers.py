@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from ..main import app, settings
+from app.main import app, settings
 
 app.mongodb_client = AsyncIOMotorClient(settings.DB_URL)
 app.mongodb = app.mongodb_client[settings.DB_NAME]
