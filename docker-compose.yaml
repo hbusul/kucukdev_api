@@ -17,12 +17,11 @@ services:
     networks:
       - app-network
   frontend:
-    image: node:15.7.0-buster
+    build: ./frontend
     networks:
       - app-network
-    entrypoint: "sh -c 'cd frontend && npm run build:tailwind && npm start'"
     volumes:
-      - "./frontend:/frontend"
+      - "./frontend:/app"
     ports:
       - "3000:3000"
 
