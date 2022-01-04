@@ -1,5 +1,6 @@
 version: "3.3"
 services:
+
   backend:
     build: ./backend
     ports:
@@ -9,6 +10,7 @@ services:
       DB_NAME: farmstack
     networks:
       - app-network
+
   mongo:
     image: mongo:bionic
     environment:
@@ -16,12 +18,14 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     networks:
       - app-network
+
   frontend:
     build: ./frontend
     networks:
       - app-network
     volumes:
       - "./frontend:/app"
+      - node-modules:/app/node_modules
     ports:
       - "3000:3000"
 
@@ -29,3 +33,7 @@ networks:
   app-network:
     driver: bridge
     internal: false
+
+volumes:
+  node-modules:
+

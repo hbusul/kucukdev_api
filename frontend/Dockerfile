@@ -10,4 +10,4 @@ COPY kucukdevapi /app/kucukdevapi/
 RUN npm install && npm run build:tailwind
 
 EXPOSE 3000
-CMD npm start
+CMD cp /app/node_modules/tailwind.output.css /app/src/tailwind.output.css && exec npm start
