@@ -9,6 +9,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
+from .main import settings
 from .models.user_models import Message
 
 router = APIRouter()
@@ -19,26 +20,14 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-
-class Token_Settings:
-    SECRET_KEY = Optional[str]
-
-
-token_settings = Token_Settings()
-
-
 def generate_random_key():
     source = string.ascii_letters + string.digits
     return "".join((random.choice(source) for i in range(64)))
-
-
 async def control_secret_key(request: Request):
     if await request["key"].count_documents({}) == 0:
         await request["key"].insert_one({"secret_key": generate_random_key()})
-
     for key in await request["key"].find().to_list(length=1):
-        token_settings.SECRET_KEY = key["secret_key"]
-
+        settings.SECRET_KEY = key["secret_key"]
 
 class Token(BaseModel):
     access_token: str
@@ -58,6 +47,7 @@ class TokenData(BaseModel):
 async def login_for_access_token(
     request: Request, form_data: OAuth2PasswordRequestForm = Depends()
 ):
+    print(settings.SECRET_KEY)
     user = await authenticate_user(request, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -96,7 +86,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, token_settings.SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
@@ -107,7 +97,7 @@ async def get_current_user(request: Request, token: str = Depends(oauth2_scheme)
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, token_settings.SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
             raise credentials_exception
