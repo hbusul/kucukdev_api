@@ -13,8 +13,7 @@ replicate the behaviour for the back-end.
 
 # Quick Start
 1. Install `Docker`, `Docker Compose` and `npm`
-1. `docker-compose build` to build the backend
-1. `cd frontend && npm install` to install dependencies for front-end
+1. `docker-compose build` to build the backend and frontend
 1. `docker-compose up -d` to start the Kucukdev API
 1. Go to `http://localhost:8000/docs` to see the swagger UI
 1. `docker-compose down` to down it
@@ -22,4 +21,4 @@ replicate the behaviour for the back-end.
 
 # Development
 
-Use auto-formatting and use `Black` for it.  
+Use auto-formatting and use `Black` for it.
