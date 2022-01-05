@@ -18,6 +18,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     networks:
       - app-network
+    volumes:
+      - mongo-data:/data/db
 
   frontend:
     build: ./frontend
@@ -36,4 +38,5 @@ networks:
 
 volumes:
   node-modules:
+  mongo-data:
 
