@@ -31,4 +31,3 @@ To run:
 
 To down with cleaning the database:
 `docker-compose -f docker-compose.test.yaml down -v`
-Use auto-formatting and use `Black` for it.
