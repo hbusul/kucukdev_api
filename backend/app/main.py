@@ -1,11 +1,9 @@
 import uvicorn
-from config import settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from .dependencies import control_secret_key
-from .dependencies import router as token_router
+from .dependencies import settings, control_secret_key, router as token_router
 from .routers.university_routers.schedule_routers import \
     router as schedule_router
 from .routers.university_routers.uni_cur_lesson_routers import \
@@ -36,11 +34,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 @app.on_event("startup")
 async def startup_db_client():
     app.mongodb_client = AsyncIOMotorClient(settings.DB_URL)
     app.mongodb = app.mongodb_client[settings.DB_NAME]
-    await control_secret_key(request=app.mongodb)
+    if settings.SECRET_KEY is None:
+        await control_secret_key(request=app.mongodb)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

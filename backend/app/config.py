@@ -21,5 +21,3 @@ class DatabaseSettings(BaseSettings):
 class Settings(CommonSettings, ServerSettings, DatabaseSettings):
     pass
 
-
-settings = Settings()

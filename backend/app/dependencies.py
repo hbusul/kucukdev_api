@@ -9,8 +9,11 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
-from .main import settings
+from .config import Settings
 from .models.user_models import Message
+
+
+settings = Settings()
 
 router = APIRouter()
 
@@ -23,6 +26,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 def generate_random_key():
     source = string.ascii_letters + string.digits
     return "".join((random.choice(source) for i in range(64)))
+
 async def control_secret_key(request: Request):
     if await request["key"].count_documents({}) == 0:
         await request["key"].insert_one({"secret_key": generate_random_key()})
