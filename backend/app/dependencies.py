@@ -50,7 +50,6 @@ class TokenData(BaseModel):
 async def login_for_access_token(
     request: Request, form_data: OAuth2PasswordRequestForm = Depends()
 ):
-    print(settings.SECRET_KEY)
     user = await authenticate_user(request, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
