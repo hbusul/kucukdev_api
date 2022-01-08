@@ -1,9 +1,11 @@
+from typing import Optional
 from pydantic import BaseSettings
 
 
 class CommonSettings(BaseSettings):
     APP_NAME: str = "Kucukdev"
     DEBUG_MODE: bool = False
+    SECRET_KEY: Optional[str]
 
 
 class ServerSettings(BaseSettings):
@@ -19,5 +21,3 @@ class DatabaseSettings(BaseSettings):
 class Settings(CommonSettings, ServerSettings, DatabaseSettings):
     pass
 
-
-settings = Settings()
