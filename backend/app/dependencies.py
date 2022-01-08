@@ -1,3 +1,4 @@
+import secrets
 import random
 import string
 from datetime import datetime, timedelta
@@ -23,15 +24,13 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-def generate_random_key():
-    source = string.ascii_letters + string.digits
-    return "".join((random.choice(source) for i in range(64)))
-
 async def control_secret_key(request: Request):
-    if await request["key"].count_documents({}) == 0:
-        await request["key"].insert_one({"secret_key": generate_random_key()})
-    for key in await request["key"].find().to_list(length=1):
-        settings.SECRET_KEY = key["secret_key"]
+    secret_key = secrets.token_urlsafe(64)
+    res = await request["key"].update_one({}, {"$setOnInsert": {"secret_key": secret_key}}, upsert=True)
+    if res.upserted_id is not None:
+        settings.SECRET_KEY = secret_key
+    else:
+        settings.SECRET_KEY = (await request["key"].find_one())["secret_key"]
 
 class Token(BaseModel):
     access_token: str
