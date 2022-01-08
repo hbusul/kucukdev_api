@@ -1,5 +1,6 @@
 version: "3.3"
 services:
+
   backend:
     build: 
       context: ./backend
@@ -11,6 +12,7 @@ services:
       DB_NAME: farmstack
     networks:
       - app-network
+
   mongo:
     image: mongo:bionic
     environment:
@@ -18,8 +20,13 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     networks:
       - app-network
+    volumes:
+      - mongo-data:/data/db
 
 networks:
   app-network:
     driver: bridge
     internal: false
+
+volumes:
+  mongo-data:

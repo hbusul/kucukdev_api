@@ -1,5 +1,6 @@
 version: "3.3"
 services:
+
   backend:
     build: ./backend
     ports:
@@ -9,6 +10,7 @@ services:
       DB_NAME: farmstack
     networks:
       - app-network
+
   mongo:
     image: mongo:bionic
     environment:
@@ -16,13 +18,16 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     networks:
       - app-network
+    volumes:
+      - mongo-data:/data/db
+
   frontend:
-    image: node:15.7.0-buster
+    build: ./frontend
     networks:
       - app-network
-    entrypoint: "sh -c 'cd frontend && npm start'"
     volumes:
-      - "./frontend:/frontend"
+      - "./frontend:/app"
+      - node-modules:/app/node_modules
     ports:
       - "3000:3000"
 
@@ -30,3 +35,8 @@ networks:
   app-network:
     driver: bridge
     internal: false
+
+volumes:
+  node-modules:
+  mongo-data:
+
