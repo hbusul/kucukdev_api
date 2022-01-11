@@ -11,7 +11,6 @@ from ...models.user_models import (
     LessonModel,
     UpdateLessonModel,
     LessonAPIModel,
-    AbsenceModel,
     Message,
 )
 
@@ -40,30 +39,6 @@ async def create_lesson(
 
     lesson = lesson.json(by_alias=True, models_as_dict=False)
     lesson = json.loads(lesson.replace("\\", ""))
-
-    # for slot in lesson["slots"]:
-    #     cur_slot = slot.split(",")
-    #     if len(cur_slot) == 3:
-    #         if int(cur_slot[0]) < 0 or int(cur_slot[0]) > 4:
-    #             return JSONResponse(
-    #                 status_code=status.HTTP_400_BAD_REQUEST,
-    #                 content={"message": "Slot day cannot be < 0 or > 4"},
-    #             )
-    #         if int(cur_slot[1]) < 0 or int(cur_slot[1]) > 15:
-    #             return JSONResponse(
-    #                 status_code=status.HTTP_400_BAD_REQUEST,
-    #                 content={"message": "Slot hour cannot be < 0 or > 15"},
-    #             )
-    #         if int(cur_slot[2]) < 0 or int(cur_slot[2]) > 1:
-    #             return JSONResponse(
-    #                 status_code=status.HTTP_400_BAD_REQUEST,
-    #                 content={"message": "Slot lab hour must be 0 or 1"},
-    #             )
-    #     else:
-    #         return JSONResponse(
-    #             status_code=status.HTTP_400_BAD_REQUEST,
-    #             content={"message": "Invalid lesson slot"},
-    #         )
 
     if auth_user["_id"] == uid:
         if (
@@ -196,30 +171,6 @@ async def update_lesson(
 
     lesson = lesson.json(by_alias=True, models_as_dict=False)
     lesson = json.loads(lesson.replace("\\", ""))
-
-    # for slot in lesson["slots"]:
-    #     cur_slot = slot.split(",")
-    #     if len(cur_slot) == 3:
-    #         if int(cur_slot[0]) < 0 or int(cur_slot[0]) > 4:
-    #             return JSONResponse(
-    #                 status_code=status.HTTP_400_BAD_REQUEST,
-    #                 content={"message": "Slot day cannot be < 0 or > 4"},
-    #             )
-    #         if int(cur_slot[1]) < 0 or int(cur_slot[1]) > 15:
-    #             return JSONResponse(
-    #                 status_code=status.HTTP_400_BAD_REQUEST,
-    #                 content={"message": "Slot hour cannot be < 0 or > 15"},
-    #             )
-    #         if int(cur_slot[2]) < 0 or int(cur_slot[2]) > 1:
-    #             return JSONResponse(
-    #                 status_code=status.HTTP_400_BAD_REQUEST,
-    #                 content={"message": "Slot lab hour must be 0 or 1"},
-    #             )
-    #     else:
-    #         return JSONResponse(
-    #             status_code=status.HTTP_400_BAD_REQUEST,
-    #             content={"message": "Invalid lesson"},
-    #         )
 
     if auth_user["_id"] == uid:
         update_result = await request.app.mongodb["users"].update_many(
