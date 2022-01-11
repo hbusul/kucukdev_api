@@ -6,18 +6,43 @@ from bson import ObjectId
 from .PyObjectId import PyObjectId
 
 
+class SlotModel(BaseModel):
+    day: int = Field(..., ge=0, le=4)
+    hour: int = Field(..., ge=0, le=15)
+    isLab: int = Field(..., ge=0, le=1)
+
+
+class AbsenceModel(BaseModel):
+    week: int = Field(..., ge=0)
+    day: int = Field(..., ge=0, le=4)
+    hour: int = Field(..., ge=0, le=15)
+    isLab: int = Field(..., ge=0, le=1)
+
+
+class LessonAbsenceModel(BaseModel):
+    absence: AbsenceModel = Field(...)
+
+    class Config:
+        json_encoders = {
+            AbsenceModel: lambda x: f"{x.week},{x.day},{x.hour},{x.isLab}",
+        }
+
+
 class LessonModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
-    instructor: str = Field(...)
+    name: str = Field(..., min_length=1)
+    instructor: str = Field(..., min_length=1)
     absenceLimit: int = Field(..., ge=0)
-    slots: List[str] = Field(...)
-    absences: List[str] = []
+    slots: List[SlotModel] = Field(...)
+    absences: List[AbsenceModel] = []
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+        json_encoders = {
+            ObjectId: str,
+            SlotModel: lambda x: f"{x.day},{x.hour},{x.isLab}",
+        }
         schema_extra = {
             "example": {
                 "name": "EE203",
@@ -54,30 +79,18 @@ class UpdateLessonModel(BaseModel):
     name: str = Field(...)
     instructor: str = Field(...)
     absenceLimit: int = Field(..., ge=0)
-    slots: List[str] = Field(...)
+    slots: List[SlotModel] = Field(...)
 
     class Config:
+        json_encoders = {
+            SlotModel: lambda x: f"{x.day},{x.hour},{x.isLab}",
+        }
         schema_extra = {
             "example": {
                 "name": "EE203",
                 "instructor": "Ali Veli",
                 "absenceLimit": 0,
                 "slots": ["2,7,0", "2,8,0"],
-            }
-        }
-
-
-class AbsenceModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    absence: str = Field(...)
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "absence": "1,0,2",
             }
         }
 

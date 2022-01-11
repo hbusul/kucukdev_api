@@ -214,9 +214,17 @@ const AddLesson = ({ history, match }) => {
         for (let i = 0; i < slots.length; i++) {
             let resSlot = slots[i].split(",")
             if (isLabSlots.includes(`${resSlot[0]},${resSlot[1]},1`)) {
-                finalSlots.push(`${resSlot[0]},${resSlot[1]},1`)
+                finalSlots.push({
+                    day: parseInt(resSlot[0]),
+                    hour: parseInt(resSlot[1]),
+                    isLab: 1,
+                })
             } else {
-                finalSlots.push(`${resSlot[0]},${resSlot[1]},0`)
+                finalSlots.push({
+                    day: parseInt(resSlot[0]),
+                    hour: parseInt(resSlot[1]),
+                    isLab: 0,
+                })
             }
         }
 
@@ -284,9 +292,17 @@ const AddLesson = ({ history, match }) => {
         for (let i = 0; i < slots.length; i++) {
             let resSlot = slots[i].split(",")
             if (isLabSlots.includes(`${resSlot[0]},${resSlot[1]},1`)) {
-                finalSlots.push(`${resSlot[0]},${resSlot[1]},1`)
+                finalSlots.push({
+                    day: parseInt(resSlot[0]),
+                    hour: parseInt(resSlot[1]),
+                    isLab: 1,
+                })
             } else {
-                finalSlots.push(`${resSlot[0]},${resSlot[1]},0`)
+                finalSlots.push({
+                    day: parseInt(resSlot[0]),
+                    hour: parseInt(resSlot[1]),
+                    isLab: 0,
+                })
             }
         }
 

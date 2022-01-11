@@ -194,9 +194,14 @@ const LessonDetail = ({ history, match }) => {
 
     const deleteAbsence = (e, absence) => {
         e.preventDefault()
-
+        let splittedAbsence = absence.split(",")
         let apiInstance = new Kucukdevapi.LessonsApi()
-        let absenceModel = new Kucukdevapi.AbsenceModel(absence)
+        let absenceModel = new Kucukdevapi.AbsenceModel({
+            week: splittedAbsence[0],
+            day: splittedAbsence[1],
+            hour: splittedAbsence[2],
+            isLab: splittedAbsence[3],
+        })
         apiInstance.deleteAbsence(
             uid,
             sid,
