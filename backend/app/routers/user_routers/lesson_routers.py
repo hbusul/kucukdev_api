@@ -84,17 +84,23 @@ async def list_lessons(
 
     if auth_user["_id"] == uid:
         if (
-            user := await request.app.mongodb["users"].find_one(
-                {"_id": uid, "semesters._id": sid}
+            semester := (
+                await request.app.mongodb["users"]
+                .aggregate(
+                    [
+                        {"$match": {"_id": uid}},
+                        {"$unwind": "$semesters"},
+                        {"$match": {"semesters._id": sid}},
+                    ]
+                )
+                .to_list(length=None)
             )
-        ) is not None:
-            for semester in user["semesters"]:
-                if semester["_id"] == sid:
-                    return semester["lessons"]
+        ) :
+            return semester[0]["semesters"]["lessons"]
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Semester not found"},
+            content={"message": "Lessons not found"},
         )
 
     return JSONResponse(
@@ -124,19 +130,25 @@ async def show_lesson(
 
     if auth_user["_id"] == uid:
         if (
-            user := await request.app.mongodb["users"].find_one(
-                {
-                    "_id": uid,
-                    "semesters._id": sid,
-                    "semesters.lessons._id": lid,
-                }
+            lesson := (
+                await request.app.mongodb["users"]
+                .aggregate(
+                    [
+                        {"$match": {"_id": uid}},
+                        {"$unwind": "$semesters"},
+                        {"$unwind": "$semesters.lessons"},
+                        {
+                            "$match": {
+                                "semesters._id": sid,
+                                "semesters.lessons._id": lid,
+                            }
+                        },
+                    ]
+                )
+                .to_list(length=None)
             )
-        ) is not None:
-            for semester in user["semesters"]:
-                if semester["_id"] == sid:
-                    for lesson in semester["lessons"]:
-                        if lesson["_id"] == lid:
-                            return lesson
+        ) :
+            return lesson[0]["semesters"]["lessons"]
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
