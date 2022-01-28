@@ -136,10 +136,10 @@ async def show_lesson(
                     [
                         {"$match": {"_id": uid}},
                         {"$unwind": "$semesters"},
+                        {"$match": {"semesters._id": sid}},
                         {"$unwind": "$semesters.lessons"},
                         {
                             "$match": {
-                                "semesters._id": sid,
                                 "semesters.lessons._id": lid,
                             }
                         },
