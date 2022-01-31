@@ -18,9 +18,11 @@ import CurriculumLessonModel from './model/CurriculumLessonModel';
 import CurriculumSemesterModel from './model/CurriculumSemesterModel';
 import HTTPValidationError from './model/HTTPValidationError';
 import LessonAPIModel from './model/LessonAPIModel';
+import LessonAbsenceModel from './model/LessonAbsenceModel';
 import LessonModel from './model/LessonModel';
 import Message from './model/Message';
 import SemesterAPIModel from './model/SemesterAPIModel';
+import SlotModel from './model/SlotModel';
 import Token from './model/Token';
 import UniversityAPILessonModel from './model/UniversityAPILessonModel';
 import UniversityAPIModel from './model/UniversityAPIModel';
@@ -44,11 +46,11 @@ import ValidationError from './model/ValidationError';
 import CurriculumLessonsApi from './api/CurriculumLessonsApi';
 import CurriculumSemestersApi from './api/CurriculumSemestersApi';
 import CurriculumsApi from './api/CurriculumsApi';
-import DefaultApi from './api/DefaultApi';
 import DepartmentsApi from './api/DepartmentsApi';
 import LessonsApi from './api/LessonsApi';
 import SchedulerApi from './api/SchedulerApi';
 import SemestersApi from './api/SemestersApi';
+import TokenApi from './api/TokenApi';
 import UniversitiesApi from './api/UniversitiesApi';
 import UniversityLessonsApi from './api/UniversityLessonsApi';
 import UniversitySectionsApi from './api/UniversitySectionsApi';
@@ -125,6 +127,12 @@ export {
     LessonAPIModel,
 
     /**
+     * The LessonAbsenceModel model constructor.
+     * @property {module:model/LessonAbsenceModel}
+     */
+    LessonAbsenceModel,
+
+    /**
      * The LessonModel model constructor.
      * @property {module:model/LessonModel}
      */
@@ -141,6 +149,12 @@ export {
      * @property {module:model/SemesterAPIModel}
      */
     SemesterAPIModel,
+
+    /**
+     * The SlotModel model constructor.
+     * @property {module:model/SlotModel}
+     */
+    SlotModel,
 
     /**
      * The Token model constructor.
@@ -281,12 +295,6 @@ export {
     CurriculumsApi,
 
     /**
-    * The DefaultApi service constructor.
-    * @property {module:api/DefaultApi}
-    */
-    DefaultApi,
-
-    /**
     * The DepartmentsApi service constructor.
     * @property {module:api/DepartmentsApi}
     */
@@ -309,6 +317,12 @@ export {
     * @property {module:api/SemestersApi}
     */
     SemestersApi,
+
+    /**
+    * The TokenApi service constructor.
+    * @property {module:api/TokenApi}
+    */
+    TokenApi,
 
     /**
     * The UniversitiesApi service constructor.

@@ -7,13 +7,15 @@ exports.default = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
 
+var _SlotModel = _interopRequireDefault(require("./SlotModel"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
  * The UpdateLessonModel model module.
@@ -27,7 +29,7 @@ var UpdateLessonModel = /*#__PURE__*/function () {
    * @param name {String} 
    * @param instructor {String} 
    * @param absenceLimit {Number} 
-   * @param slots {Array.<String>} 
+   * @param slots {Array.<module:model/SlotModel>} 
    */
   function UpdateLessonModel(name, instructor, absenceLimit, slots) {
     _classCallCheck(this, UpdateLessonModel);
@@ -76,7 +78,7 @@ var UpdateLessonModel = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('slots')) {
-          obj['slots'] = _ApiClient.default.convertToType(data['slots'], ['String']);
+          obj['slots'] = _ApiClient.default.convertToType(data['slots'], [_SlotModel.default]);
         }
       }
 
@@ -103,7 +105,7 @@ UpdateLessonModel.prototype['instructor'] = undefined;
 
 UpdateLessonModel.prototype['absenceLimit'] = undefined;
 /**
- * @member {Array.<String>} slots
+ * @member {Array.<module:model/SlotModel>} slots
  */
 
 UpdateLessonModel.prototype['slots'] = undefined;

@@ -28,7 +28,7 @@
   var instance;
 
   beforeEach(function() {
-    instance = new Kucukdevapi.UniversityModel();
+    instance = new Kucukdevapi.TokenApi();
   });
 
   var getProperty = function(object, getter, property) {
@@ -47,37 +47,17 @@
       object[property] = value;
   }
 
-  describe('UniversityModel', function() {
-    it('should create an instance of UniversityModel', function() {
-      // uncomment below and update the code to test UniversityModel
-      //var instance = new Kucukdevapi.UniversityModel();
-      //expect(instance).to.be.a(Kucukdevapi.UniversityModel);
+  describe('TokenApi', function() {
+    describe('loginForAccessTokenTokenPost', function() {
+      it('should call loginForAccessTokenTokenPost successfully', function(done) {
+        //uncomment below and update the code to test loginForAccessTokenTokenPost
+        //instance.loginForAccessTokenTokenPost(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
     });
-
-    it('should have the property id (base name: "_id")', function() {
-      // uncomment below and update the code to test the property id
-      //var instance = new Kucukdevapi.UniversityModel();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property name (base name: "name")', function() {
-      // uncomment below and update the code to test the property name
-      //var instance = new Kucukdevapi.UniversityModel();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property departments (base name: "departments")', function() {
-      // uncomment below and update the code to test the property departments
-      //var instance = new Kucukdevapi.UniversityModel();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property semesters (base name: "semesters")', function() {
-      // uncomment below and update the code to test the property semesters
-      //var instance = new Kucukdevapi.UniversityModel();
-      //expect(instance).to.be();
-    });
-
   });
 
 }));

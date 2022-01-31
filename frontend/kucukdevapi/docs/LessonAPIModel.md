@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **name** | **String** |  | [optional] 
 **instructor** | **String** |  | [optional] 
 **absenceLimit** | **Number** |  | [optional] 
-**slots** | **[String]** |  | [optional] 
-**absences** | **[String]** |  | [optional] 
+**slots** | **[[Number]]** |  | [optional] 
+**absences** | **[[Number]]** |  | [optional] 
 
 

@@ -28,7 +28,7 @@
   var instance;
 
   beforeEach(function() {
-    instance = new Kucukdevapi.UniversityModel();
+    instance = new Kucukdevapi.SlotModel();
   });
 
   var getProperty = function(object, getter, property) {
@@ -47,34 +47,28 @@
       object[property] = value;
   }
 
-  describe('UniversityModel', function() {
-    it('should create an instance of UniversityModel', function() {
-      // uncomment below and update the code to test UniversityModel
-      //var instance = new Kucukdevapi.UniversityModel();
-      //expect(instance).to.be.a(Kucukdevapi.UniversityModel);
+  describe('SlotModel', function() {
+    it('should create an instance of SlotModel', function() {
+      // uncomment below and update the code to test SlotModel
+      //var instance = new Kucukdevapi.SlotModel();
+      //expect(instance).to.be.a(Kucukdevapi.SlotModel);
     });
 
-    it('should have the property id (base name: "_id")', function() {
-      // uncomment below and update the code to test the property id
-      //var instance = new Kucukdevapi.UniversityModel();
+    it('should have the property day (base name: "day")', function() {
+      // uncomment below and update the code to test the property day
+      //var instance = new Kucukdevapi.SlotModel();
       //expect(instance).to.be();
     });
 
-    it('should have the property name (base name: "name")', function() {
-      // uncomment below and update the code to test the property name
-      //var instance = new Kucukdevapi.UniversityModel();
+    it('should have the property hour (base name: "hour")', function() {
+      // uncomment below and update the code to test the property hour
+      //var instance = new Kucukdevapi.SlotModel();
       //expect(instance).to.be();
     });
 
-    it('should have the property departments (base name: "departments")', function() {
-      // uncomment below and update the code to test the property departments
-      //var instance = new Kucukdevapi.UniversityModel();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property semesters (base name: "semesters")', function() {
-      // uncomment below and update the code to test the property semesters
-      //var instance = new Kucukdevapi.UniversityModel();
+    it('should have the property isLab (base name: "isLab")', function() {
+      // uncomment below and update the code to test the property isLab
+      //var instance = new Kucukdevapi.SlotModel();
       //expect(instance).to.be();
     });
 

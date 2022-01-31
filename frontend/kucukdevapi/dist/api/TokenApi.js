@@ -19,29 +19,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
-* Default service.
-* @module api/DefaultApi
+* Token service.
+* @module api/TokenApi
 * @version 1.0.0
 */
-var DefaultApi = /*#__PURE__*/function () {
+var TokenApi = /*#__PURE__*/function () {
   /**
-  * Constructs a new DefaultApi. 
-  * @alias module:api/DefaultApi
+  * Constructs a new TokenApi. 
+  * @alias module:api/TokenApi
   * @class
   * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
   * default to {@link module:ApiClient#instance} if unspecified.
   */
-  function DefaultApi(apiClient) {
-    _classCallCheck(this, DefaultApi);
+  function TokenApi(apiClient) {
+    _classCallCheck(this, TokenApi);
 
     this.apiClient = apiClient || _ApiClient.default.instance;
   }
   /**
    * Callback function to receive the result of the loginForAccessTokenTokenPost operation.
-   * @callback module:api/DefaultApi~loginForAccessTokenTokenPostCallback
+   * @callback module:api/TokenApi~loginForAccessTokenTokenPostCallback
    * @param {String} error Error message, if any.
    * @param {module:model/Token} data The data returned by the service call.
    * @param {String} response The complete HTTP response.
@@ -56,12 +56,12 @@ var DefaultApi = /*#__PURE__*/function () {
    * @param {String} opts.scope  (default to '')
    * @param {String} opts.clientId 
    * @param {String} opts.clientSecret 
-   * @param {module:api/DefaultApi~loginForAccessTokenTokenPostCallback} callback The callback function, accepting three arguments: error, data, response
+   * @param {module:api/TokenApi~loginForAccessTokenTokenPostCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link module:model/Token}
    */
 
 
-  _createClass(DefaultApi, [{
+  _createClass(TokenApi, [{
     key: "loginForAccessTokenTokenPost",
     value: function loginForAccessTokenTokenPost(username, password, opts, callback) {
       opts = opts || {};
@@ -95,7 +95,7 @@ var DefaultApi = /*#__PURE__*/function () {
     }
   }]);
 
-  return DefaultApi;
+  return TokenApi;
 }();
 
-exports.default = DefaultApi;
+exports.default = TokenApi;

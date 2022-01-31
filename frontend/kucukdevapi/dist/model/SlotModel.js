@@ -16,20 +16,22 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
- * The Message model module.
- * @module model/Message
+ * The SlotModel model module.
+ * @module model/SlotModel
  * @version 1.0.0
  */
-var Message = /*#__PURE__*/function () {
+var SlotModel = /*#__PURE__*/function () {
   /**
-   * Constructs a new <code>Message</code>.
-   * @alias module:model/Message
-   * @param message {String} 
+   * Constructs a new <code>SlotModel</code>.
+   * @alias module:model/SlotModel
+   * @param day {Number} 
+   * @param hour {Number} 
+   * @param isLab {Number} 
    */
-  function Message(message) {
-    _classCallCheck(this, Message);
+  function SlotModel(day, hour, isLab) {
+    _classCallCheck(this, SlotModel);
 
-    Message.initialize(this, message);
+    SlotModel.initialize(this, day, hour, isLab);
   }
   /**
    * Initializes the fields of this object.
@@ -38,27 +40,37 @@ var Message = /*#__PURE__*/function () {
    */
 
 
-  _createClass(Message, null, [{
+  _createClass(SlotModel, null, [{
     key: "initialize",
-    value: function initialize(obj, message) {
-      obj['message'] = message;
+    value: function initialize(obj, day, hour, isLab) {
+      obj['day'] = day;
+      obj['hour'] = hour;
+      obj['isLab'] = isLab;
     }
     /**
-     * Constructs a <code>Message</code> from a plain JavaScript object, optionally creating a new instance.
+     * Constructs a <code>SlotModel</code> from a plain JavaScript object, optionally creating a new instance.
      * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
      * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/Message} obj Optional instance to populate.
-     * @return {module:model/Message} The populated <code>Message</code> instance.
+     * @param {module:model/SlotModel} obj Optional instance to populate.
+     * @return {module:model/SlotModel} The populated <code>SlotModel</code> instance.
      */
 
   }, {
     key: "constructFromObject",
     value: function constructFromObject(data, obj) {
       if (data) {
-        obj = obj || new Message();
+        obj = obj || new SlotModel();
 
-        if (data.hasOwnProperty('message')) {
-          obj['message'] = _ApiClient.default.convertToType(data['message'], 'String');
+        if (data.hasOwnProperty('day')) {
+          obj['day'] = _ApiClient.default.convertToType(data['day'], 'Number');
+        }
+
+        if (data.hasOwnProperty('hour')) {
+          obj['hour'] = _ApiClient.default.convertToType(data['hour'], 'Number');
+        }
+
+        if (data.hasOwnProperty('isLab')) {
+          obj['isLab'] = _ApiClient.default.convertToType(data['isLab'], 'Number');
         }
       }
 
@@ -66,13 +78,23 @@ var Message = /*#__PURE__*/function () {
     }
   }]);
 
-  return Message;
+  return SlotModel;
 }();
 /**
- * @member {String} message
+ * @member {Number} day
  */
 
 
-Message.prototype['message'] = undefined;
-var _default = Message;
+SlotModel.prototype['day'] = undefined;
+/**
+ * @member {Number} hour
+ */
+
+SlotModel.prototype['hour'] = undefined;
+/**
+ * @member {Number} isLab
+ */
+
+SlotModel.prototype['isLab'] = undefined;
+var _default = SlotModel;
 exports.default = _default;

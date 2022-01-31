@@ -14,22 +14,21 @@
 import ApiClient from '../ApiClient';
 
 /**
- * The AbsenceModel model module.
- * @module model/AbsenceModel
+ * The SlotModel model module.
+ * @module model/SlotModel
  * @version 1.0.0
  */
-class AbsenceModel {
+class SlotModel {
     /**
-     * Constructs a new <code>AbsenceModel</code>.
-     * @alias module:model/AbsenceModel
-     * @param week {Number} 
+     * Constructs a new <code>SlotModel</code>.
+     * @alias module:model/SlotModel
      * @param day {Number} 
      * @param hour {Number} 
      * @param isLab {Number} 
      */
-    constructor(week, day, hour, isLab) { 
+    constructor(day, hour, isLab) { 
         
-        AbsenceModel.initialize(this, week, day, hour, isLab);
+        SlotModel.initialize(this, day, hour, isLab);
     }
 
     /**
@@ -37,27 +36,23 @@ class AbsenceModel {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj, week, day, hour, isLab) { 
-        obj['week'] = week;
+    static initialize(obj, day, hour, isLab) { 
         obj['day'] = day;
         obj['hour'] = hour;
         obj['isLab'] = isLab;
     }
 
     /**
-     * Constructs a <code>AbsenceModel</code> from a plain JavaScript object, optionally creating a new instance.
+     * Constructs a <code>SlotModel</code> from a plain JavaScript object, optionally creating a new instance.
      * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
      * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/AbsenceModel} obj Optional instance to populate.
-     * @return {module:model/AbsenceModel} The populated <code>AbsenceModel</code> instance.
+     * @param {module:model/SlotModel} obj Optional instance to populate.
+     * @return {module:model/SlotModel} The populated <code>SlotModel</code> instance.
      */
     static constructFromObject(data, obj) {
         if (data) {
-            obj = obj || new AbsenceModel();
+            obj = obj || new SlotModel();
 
-            if (data.hasOwnProperty('week')) {
-                obj['week'] = ApiClient.convertToType(data['week'], 'Number');
-            }
             if (data.hasOwnProperty('day')) {
                 obj['day'] = ApiClient.convertToType(data['day'], 'Number');
             }
@@ -75,29 +70,24 @@ class AbsenceModel {
 }
 
 /**
- * @member {Number} week
- */
-AbsenceModel.prototype['week'] = undefined;
-
-/**
  * @member {Number} day
  */
-AbsenceModel.prototype['day'] = undefined;
+SlotModel.prototype['day'] = undefined;
 
 /**
  * @member {Number} hour
  */
-AbsenceModel.prototype['hour'] = undefined;
+SlotModel.prototype['hour'] = undefined;
 
 /**
  * @member {Number} isLab
  */
-AbsenceModel.prototype['isLab'] = undefined;
+SlotModel.prototype['isLab'] = undefined;
 
 
 
 
 
 
-export default AbsenceModel;
+export default SlotModel;
 

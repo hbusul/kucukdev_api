@@ -7,6 +7,9 @@
   "paths": {
     "/token": {
       "post": {
+        "tags": [
+          "token"
+        ],
         "summary": "Login For Access Token",
         "operationId": "login_for_access_token_token_post",
         "requestBody": {
@@ -1227,7 +1230,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LessonAPIModel"
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
                 }
               }
             }
@@ -1244,16 +1257,6 @@
           },
           "403": {
             "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -1531,7 +1534,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LessonModel"
+                  "$ref": "#/components/schemas/Message"
                 }
               }
             }
@@ -1625,7 +1628,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AbsenceModel"
+                "$ref": "#/components/schemas/LessonAbsenceModel"
               }
             }
           },
@@ -1739,7 +1742,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AbsenceModel"
+                "$ref": "#/components/schemas/LessonAbsenceModel"
               }
             }
           },
@@ -5180,21 +5183,36 @@
       "AbsenceModel": {
         "title": "AbsenceModel",
         "required": [
-          "absence"
+          "week",
+          "day",
+          "hour",
+          "isLab"
         ],
         "type": "object",
         "properties": {
-          "_id": {
-            "title": " Id",
-            "type": "string"
+          "week": {
+            "title": "Week",
+            "minimum": 0,
+            "type": "integer"
           },
-          "absence": {
-            "title": "Absence",
-            "type": "string"
+          "day": {
+            "title": "Day",
+            "maximum": 4,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "hour": {
+            "title": "Hour",
+            "maximum": 15,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "isLab": {
+            "title": "Islab",
+            "maximum": 1,
+            "minimum": 0,
+            "type": "integer"
           }
-        },
-        "example": {
-          "absence": "1,0,2"
         }
       },
       "Body_login_for_access_token_token_post": {
@@ -5332,30 +5350,74 @@
             "title": "Slots",
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
             }
           },
           "absences": {
             "title": "Absences",
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
             }
           }
         },
         "example": {
-          "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
-          "name": "EE203",
-          "instructor": "Ali Veli",
-          "absenceLimit": 0,
+          "_id": "61ddea901311ecaed99afb7c",
+          "name": "Algebra",
+          "instructor": "Jack Joe",
+          "absenceLimit": 21,
           "slots": [
-            "2,7,0",
-            "2,8,0"
+            [
+              2,
+              7,
+              0
+            ],
+            [
+              2,
+              8,
+              0
+            ]
           ],
           "absences": [
-            "1,3,5",
-            "1,3,6"
+            [
+              0,
+              2,
+              7,
+              0
+            ],
+            [
+              0,
+              2,
+              8,
+              0
+            ]
           ]
+        }
+      },
+      "LessonAbsenceModel": {
+        "title": "LessonAbsenceModel",
+        "required": [
+          "absence"
+        ],
+        "type": "object",
+        "properties": {
+          "absence": {
+            "$ref": "#/components/schemas/AbsenceModel"
+          }
+        },
+        "example": {
+          "absence": {
+            "week": 0,
+            "day": 2,
+            "hour": 7,
+            "isLab": 0
+          }
         }
       },
       "LessonModel": {
@@ -5374,10 +5436,12 @@
           },
           "name": {
             "title": "Name",
+            "minLength": 1,
             "type": "string"
           },
           "instructor": {
             "title": "Instructor",
+            "minLength": 1,
             "type": "string"
           },
           "absenceLimit": {
@@ -5389,25 +5453,47 @@
             "title": "Slots",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/SlotModel"
             }
           },
           "absences": {
             "title": "Absences",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/AbsenceModel"
             },
             "default": []
           }
         },
         "example": {
-          "name": "EE203",
-          "instructor": "Ali Veli",
-          "absenceLimit": 0,
+          "name": "Algebra",
+          "instructor": "Jack Joe",
+          "absenceLimit": 21,
           "slots": [
-            "2,7,0",
-            "2,8,0"
+            {
+              "day": 2,
+              "hour": 7,
+              "isLab": 0
+            },
+            {
+              "day": 2,
+              "hour": 8,
+              "isLab": 0
+            }
+          ],
+          "absences": [
+            {
+              "week": 0,
+              "day": 2,
+              "hour": 7,
+              "isLab": 0
+            },
+            {
+              "week": 0,
+              "day": 2,
+              "hour": 8,
+              "isLab": 0
+            }
           ]
         }
       },
@@ -5464,14 +5550,43 @@
           }
         },
         "example": {
-          "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
+          "_id": "61ddea901311ecaed99afb7c",
           "name": "2020-21 Spring",
-          "startDate": "2016-02-18T00:00:00Z",
-          "endDate": "2016-06-18T00:00:00Z",
+          "startDate": "2022-02-18T00:00:00Z",
+          "endDate": "2022-06-18T00:00:00Z",
           "startHour": "8.10",
           "dLesson": 50,
           "dBreak": 10,
           "slotCount": 12
+        }
+      },
+      "SlotModel": {
+        "title": "SlotModel",
+        "required": [
+          "day",
+          "hour",
+          "isLab"
+        ],
+        "type": "object",
+        "properties": {
+          "day": {
+            "title": "Day",
+            "maximum": 4,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "hour": {
+            "title": "Hour",
+            "maximum": 15,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "isLab": {
+            "title": "Islab",
+            "maximum": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
         }
       },
       "Token": {
@@ -5844,17 +5959,25 @@
             "title": "Slots",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/SlotModel"
             }
           }
         },
         "example": {
-          "name": "EE203",
-          "instructor": "Ali Veli",
-          "absenceLimit": 0,
+          "name": "Algebra",
+          "instructor": "Jack Joe",
+          "absenceLimit": 21,
           "slots": [
-            "2,7,0",
-            "2,8,0"
+            {
+              "day": 2,
+              "hour": 7,
+              "isLab": 0
+            },
+            {
+              "day": 2,
+              "hour": 8,
+              "isLab": 0
+            }
           ]
         }
       },
@@ -5895,7 +6018,7 @@
           }
         },
         "example": {
-          "curSemesterID": "c765c307-560c-47ab-b29e-0a1265eab860"
+          "curSemesterID": "61ddea901311ecaed99afb7f"
         }
       },
       "UpdateUniversityModel": {
@@ -5915,7 +6038,7 @@
           }
         },
         "example": {
-          "curUniversityID": "c765c307-560c-47ab-b29e-0a1265eab860"
+          "curUniversityID": "61ddea901311ecaed99afb7g"
         }
       },
       "UpdateUniversityNameModel": {
@@ -5988,8 +6111,8 @@
         },
         "example": {
           "name": "2020-21 Spring",
-          "startDate": "2016-02-18T00:00:00Z",
-          "endDate": "2016-06-18T00:00:00Z",
+          "startDate": "2022-02-18T00:00:00Z",
+          "endDate": "2022-06-18T00:00:00Z",
           "startHour": "8.10",
           "dLesson": 50,
           "dBreak": 10,
@@ -6027,11 +6150,11 @@
           }
         },
         "example": {
-          "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
+          "_id": "61ddea901311ecaed99afb7c",
           "email": "hello@agu.edu.tr",
           "userGroup": "default",
-          "curSemesterID": "stringID",
-          "curUniversityID": "stringID",
+          "curSemesterID": "61ddea901311ecaed99afb7d",
+          "curUniversityID": "61ddea901311ecaed99afb7e",
           "entranceYear": 2018
         }
       },
@@ -6132,8 +6255,8 @@
         },
         "example": {
           "name": "2020-21 Spring",
-          "startDate": "2016-02-18T00:00:00Z",
-          "endDate": "2016-06-18T00:00:00Z",
+          "startDate": "2022-02-18T00:00:00Z",
+          "endDate": "2022-06-18T00:00:00Z",
           "startHour": "8.10",
           "dLesson": 50,
           "dBreak": 10,

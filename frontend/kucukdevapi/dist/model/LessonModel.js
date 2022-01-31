@@ -7,13 +7,17 @@ exports.default = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
 
+var _AbsenceModel = _interopRequireDefault(require("./AbsenceModel"));
+
+var _SlotModel = _interopRequireDefault(require("./SlotModel"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
  * The LessonModel model module.
@@ -27,7 +31,7 @@ var LessonModel = /*#__PURE__*/function () {
    * @param name {String} 
    * @param instructor {String} 
    * @param absenceLimit {Number} 
-   * @param slots {Array.<String>} 
+   * @param slots {Array.<module:model/SlotModel>} 
    */
   function LessonModel(name, instructor, absenceLimit, slots) {
     _classCallCheck(this, LessonModel);
@@ -80,11 +84,11 @@ var LessonModel = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('slots')) {
-          obj['slots'] = _ApiClient.default.convertToType(data['slots'], ['String']);
+          obj['slots'] = _ApiClient.default.convertToType(data['slots'], [_SlotModel.default]);
         }
 
         if (data.hasOwnProperty('absences')) {
-          obj['absences'] = _ApiClient.default.convertToType(data['absences'], ['String']);
+          obj['absences'] = _ApiClient.default.convertToType(data['absences'], [_AbsenceModel.default]);
         }
       }
 
@@ -116,12 +120,12 @@ LessonModel.prototype['instructor'] = undefined;
 
 LessonModel.prototype['absenceLimit'] = undefined;
 /**
- * @member {Array.<String>} slots
+ * @member {Array.<module:model/SlotModel>} slots
  */
 
 LessonModel.prototype['slots'] = undefined;
 /**
- * @member {Array.<String>} absences
+ * @member {Array.<module:model/AbsenceModel>} absences
  */
 
 LessonModel.prototype['absences'] = undefined;
