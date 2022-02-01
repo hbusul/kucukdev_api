@@ -260,5 +260,18 @@ class UpdateUniversityModel(BaseModel):
         }
 
 
+class MessageCreate(BaseModel):
+    _id: str
+    message: str
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "_id": "61ddea901311ecaed99afb7c",
+                "message": "string",
+            }
+        }
+
+
 class Message(BaseModel):
     message: str

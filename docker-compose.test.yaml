@@ -10,6 +10,7 @@ services:
     environment:
       DB_URL: "mongodb://root:example@mongo/"
       DB_NAME: farmstack
+      SECRET_KEY: "TEST_SECRET_KEY"
     networks:
       - app-network
 
@@ -21,7 +22,7 @@ services:
     networks:
       - app-network
     volumes:
-      - mongo-data:/data/db
+      - mongo-data-test:/data/db
 
 networks:
   app-network:
@@ -29,4 +30,4 @@ networks:
     internal: false
 
 volumes:
-  mongo-data:
+  mongo-data-test:

@@ -1,24 +1,18 @@
-from fastapi import (
-    APIRouter,
-    Body,
-    Request,
-    status,
-    Depends,
-)
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Body, Depends, Request, status
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from passlib.hash import bcrypt
-
 
 from ...dependencies import get_current_user
 from ...models.user_models import (
-    UserModel,
-    UserAPIModel,
+    Message,
+    MessageCreate,
+    UpdateEntranceYearModel,
     UpdatePasswordModel,
     UpdateSemesterModel,
     UpdateUniversityModel,
-    UpdateEntranceYearModel,
-    Message,
+    UserAPIModel,
+    UserModel,
 )
 
 router = APIRouter()
@@ -28,8 +22,12 @@ router = APIRouter()
     "",
     response_description="Add new user",
     operation_id="createUser",
-    response_model=UserAPIModel,
-    responses={409: {"model": Message}},
+    response_model=MessageCreate,
+    responses={
+        201: {"model": MessageCreate},
+        400: {"model": Message},
+        409: {"model": Message},
+    },
 )
 async def create_user(request: Request, user: UserModel = Body(...)):
     """Create a user"""
@@ -40,17 +38,23 @@ async def create_user(request: Request, user: UserModel = Body(...)):
     user["curUniversityID"] = "null"
     user["entranceYear"] = 0
 
-    if (
-        find_user := await request.app.mongodb["users"].find_one(
-            {"email": user["email"]}
-        )
-    ) is None:
+    if (await request.app.mongodb["users"].find_one({"email": user["email"]})) is None:
         user["password"] = bcrypt.hash(user["password"])
         new_user = await request.app.mongodb["users"].insert_one(user)
-        created_user = await request.app.mongodb["users"].find_one(
-            {"_id": new_user.inserted_id}
+
+        if new_user.inserted_id is not None:
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content={
+                    "_id": user["_id"],
+                    "message": "User created",
+                },
+            )
+
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "User not created"},
         )
-        return created_user
 
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,

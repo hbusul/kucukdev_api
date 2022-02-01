@@ -1,17 +1,18 @@
-from fastapi import APIRouter, Body, Request, status, Depends, Response
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 from typing import List
 
+from fastapi import APIRouter, Body, Depends, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.user_models import (
-    UserModel,
-    LessonModel,
-    UpdateLessonModel,
-    LessonAPIModel,
     AbsenceModel,
+    LessonAPIModel,
+    LessonModel,
     Message,
+    MessageCreate,
+    UpdateLessonModel,
+    UserModel,
 )
 
 router = APIRouter()
@@ -21,12 +22,13 @@ router = APIRouter()
     "/{uid}/semesters/{sid}/lessons",
     response_description="Add new lesson into a semester",
     operation_id="createLesson",
-    response_model=LessonAPIModel,
+    response_model=MessageCreate,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
-        401: {"model": Message},
+        201: {"model": MessageCreate},
         400: {"model": Message},
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def create_lesson(
@@ -76,16 +78,14 @@ async def create_lesson(
             {"$push": {"semesters.$.lessons": lesson}},
         )
 
-        if (
-            existing_user := await request.app.mongodb["users"].find_one(
-                {"_id": uid, "semesters._id": sid},
-                {"semesters.lessons": {"$slice": -1}},
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content={
+                    "_id": lesson["_id"],
+                    "message": "Lesson created",
+                },
             )
-        ) is not None:
-            for semester in existing_user["semesters"]:
-                if semester["_id"] == sid:
-                    for lesson in semester["lessons"]:
-                        return lesson
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -188,9 +188,9 @@ async def show_lesson(
     operation_id="updateLesson",
     response_model=Message,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def update_lesson(
@@ -275,11 +275,11 @@ async def update_lesson(
     "/{uid}/semesters/{sid}/lessons/{lid}",
     response_description="Delete lesson",
     operation_id="deleteLesson",
-    response_model=LessonModel,
+    response_model=Message,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def delete_lesson(
@@ -366,13 +366,13 @@ async def create_absence(
                                     ),
                                 )
                                 return JSONResponse(
-                                    status_code=status.HTTP_200_OK,
+                                    status_code=status.HTTP_201_CREATED,
                                     content={"message": "Absence created"},
                                 )
 
                             return JSONResponse(
                                 status_code=status.HTTP_400_BAD_REQUEST,
-                                content={"message": "Absence is already exists"},
+                                content={"message": "Absence already exists"},
                             )
 
         return JSONResponse(
@@ -443,7 +443,7 @@ async def delete_absence(
                                 )
                             return JSONResponse(
                                 status_code=status.HTTP_400_BAD_REQUEST,
-                                content={"message": "Absence not found"},
+                                content={"message": "Absence does not exist"},
                             )
 
         return JSONResponse(

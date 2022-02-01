@@ -57,23 +57,10 @@ async def create_semester(
         )
 
         if update_result.modified_count == 1:
-            if (
-                created_semester := await request.app.mongodb["users"].find_one(
-                    {"_id": uid}
-                )
-            ) is not None:
-                semesters = []
-                for semester in created_semester["semesters"]:
-                    semester.pop("lessons")
-                    semesters.append(semester)
-
-                if len(semesters) == 1:
-                    update_result = await request.app.mongodb["users"].update_one(
-                        {"_id": uid},
-                        {"$set": {"curSemesterID": semesters[0]["_id"]}},
-                    )
-
-                return semesters
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content={"_id": semester["_id"], "message": "Semester created"},
+            )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
