@@ -82,16 +82,16 @@ const AddLesson = ({ history, match }) => {
                             setInstructorName(data.instructor)
                             const slotArray = []
                             for (let i = 0; i < data.slots.length; i++) {
-                                let resSlot = data.slots[i].split(",")
+                                let resSlot = data.slots[i]
                                 slotArray.push(`${resSlot[0]},${resSlot[1]}`)
                             }
                             setSlots(slotArray)
 
                             const labArray = []
                             for (let i = 0; i < data.slots.length; i++) {
-                                let resSlot = data.slots[i].split(",")
-                                if (resSlot[2] === "1") {
-                                    labArray.push(data.slots[i])
+                                let resSlot = data.slots[i]
+                                if (resSlot[2]) {
+                                    labArray.push(`${resSlot[0]},${resSlot[1]},${resSlot[2]}`)
                                 }
                             }
                             setIsLabSlots(labArray)
@@ -261,12 +261,17 @@ const AddLesson = ({ history, match }) => {
 
         let lid = lessonID
 
+        console.log(changedAbsences)
+
         if (isDelete) {
             let apiInstance = new Kucukdevapi.LessonsApi()
             for (let i = 0; i < changedAbsences.length; i++) {
-                let absenceModel = new Kucukdevapi.AbsenceModel(
-                    changedAbsences[i]
-                )
+                let absenceModel = new Kucukdevapi.LessonAbsenceModel({
+                    week: changedAbsences[i][0],
+                    day: changedAbsences[i][1],
+                    hour: changedAbsences[i][2],
+                    isLab: changedAbsences[i][3]
+                })
                 apiInstance.deleteAbsence(
                     uid,
                     sid,
@@ -340,7 +345,7 @@ const AddLesson = ({ history, match }) => {
 
         const changedSlots = []
         for (let i = 0; i < absences.length; i++) {
-            let resAbsence = absences[i].split(",")
+            let resAbsence = absences[i]
             if (!slots.includes(`${resAbsence[1]},${resAbsence[2]}`)) {
                 changedSlots.push(absences[i])
             }
@@ -693,7 +698,7 @@ const AddLesson = ({ history, match }) => {
                                     <div className="flex flex-row flex-wrap mx-8">
                                         {changedAbsences.map(
                                             (absence, index) => {
-                                                let resAbs = absence.split(",")
+                                                let resAbs = absence
                                                 return (
                                                     <div
                                                         key={index}
