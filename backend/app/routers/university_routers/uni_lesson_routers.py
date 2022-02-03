@@ -1,3 +1,4 @@
+import json
 from typing import List
 
 from fastapi import APIRouter, Body, Depends, Request, status
@@ -6,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.uni_models import (
-    UniversityAPILessonModel,
+    UniversityLessonAPIModel,
     UniversityLessonModel,
     UniversitySectionModel,
 )
@@ -21,8 +22,9 @@ router = APIRouter()
     operation_id="createUniversityLesson",
     response_model=Message,
     responses={
-        404: {"model": Message},
         403: {"model": Message},
+        404: {"model": Message},
+        409: {"model": Message},
     },
 )
 async def create_university_lesson(
@@ -34,45 +36,16 @@ async def create_university_lesson(
 ):
     """Create a lesson for a semester of a university with given universityID and universitySemesterID"""
 
-    university_lesson = jsonable_encoder(university_lesson)
-
-    for slot in university_lesson["slots"]:
-        cur_slot = slot.split(",")
-        if len(cur_slot) == 3:
-            if int(cur_slot[0]) < 0 or int(cur_slot[0]) > 4:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot day cannot be < 0 or > 4"},
-                )
-            if int(cur_slot[1]) < 0 or int(cur_slot[1]) > 15:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot hour cannot be < 0 or > 15"},
-                )
-            if int(cur_slot[2]) < 0 or int(cur_slot[2]) > 1:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot lab hour must be 0 or 1"},
-                )
-        else:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Invalid lesson slot"},
-            )
-
-    if university_lesson["instructor"] == "" or university_lesson["section"] == "":
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Instructor name or section must be filled"},
-        )
-
     if auth_user["userGroup"] == "professor":
+        university_lesson = jsonable_encoder(university_lesson)
+
         section = UniversitySectionModel(
             section=university_lesson["section"],
             instructor=university_lesson["instructor"],
             slots=university_lesson["slots"],
         )
-        section = jsonable_encoder(section)
+        section = section.json(by_alias=True, models_as_dict=False)
+        section = json.loads(section.replace("\\", ""))
 
         if (
             await request.app.mongodb["universities"].find_one(
@@ -109,7 +82,7 @@ async def create_university_lesson(
                 .to_list(length=None)
             ):
                 return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
+                    status_code=status.HTTP_409_CONFLICT,
                     content={"message": "Section already exists"},
                 )
 
@@ -137,14 +110,15 @@ async def create_university_lesson(
                 content={"message": "Section could not be created"},
             )
 
-        new_lesson = UniversityAPILessonModel(
+        new_lesson = UniversityLessonAPIModel(
             name=university_lesson["name"],
             code=university_lesson["code"],
             ects=university_lesson["ects"],
             absenceLimit=university_lesson["absenceLimit"],
             sections=[],
         )
-        new_lesson = jsonable_encoder(new_lesson)
+        new_lesson = new_lesson.json(by_alias=True, models_as_dict=False)
+        new_lesson = json.loads(new_lesson.replace("\\", ""))
 
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid, "semesters._id": unisid},
@@ -190,7 +164,7 @@ async def create_university_lesson(
     "/{unid}/semesters/current-semester/lessons/find-code",
     response_description="Get a single lessons with code",
     operation_id="getSingleLessonWithCode",
-    response_model=UniversityAPILessonModel,
+    response_model=UniversityLessonAPIModel,
     responses={
         404: {"model": Message},
     },
@@ -233,7 +207,7 @@ async def show_lesson_with_code(unid: str, code: str, request: Request):
     "/{unid}/semesters/{unisid}/lessons",
     response_description="List all lessons of a university semester",
     operation_id="listUniversitySemesterLessons",
-    response_model=List[UniversityAPILessonModel],
+    response_model=List[UniversityLessonAPIModel],
     responses={
         404: {"model": Message},
     },
@@ -275,7 +249,7 @@ async def list_university_lessons(unid: str, unisid: str, request: Request):
     "/{unid}/semesters/{unisid}/lessons/{unilid}",
     response_description="Get a single lessons of a university semester",
     operation_id="getSingleUniversitySemesterLesson",
-    response_model=UniversityAPILessonModel,
+    response_model=UniversityLessonAPIModel,
     responses={
         404: {"model": Message},
     },
@@ -331,15 +305,14 @@ async def update_university_lesson(
     unisid: str,
     unilid: str,
     request: Request,
-    university_lesson: UniversityAPILessonModel = Body(...),
+    university_lesson: UniversityLessonAPIModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update lesson of a university semester with given universityID, universitySemesterID and universityLessonID"""
 
     if auth_user["userGroup"] == "professor":
-        university_lesson = {
-            k: v for k, v in university_lesson.dict().items() if v is not None
-        }
+        university_lesson = university_lesson.json(by_alias=True, models_as_dict=False)
+        university_lesson = json.loads(university_lesson.replace("\\", ""))
 
         if (
             await (
@@ -365,48 +338,50 @@ async def update_university_lesson(
                 )
                 .to_list(length=None)
             )
-        ) == []:
+        ) == [] and (
+            await request.app.mongodb["universities"].find_one(
+                {
+                    "_id": unid,
+                    "semesters._id": unisid,
+                    "semesters.lessons.code": university_lesson["code"],
+                }
+            )
+        ) is not None:
             return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_409_CONFLICT,
                 content={
                     "message": "University lesson could not be found or there exists another lesson with given code"
                 },
             )
 
-        if len(university_lesson) >= 1:
-            update_result = await request.app.mongodb["universities"].update_one(
-                {
-                    "_id": unid,
-                    "semesters._id": unisid,
-                    "semesters.lessons._id": unilid,
-                },
-                {
-                    "$set": {
-                        "semesters.$[i].lessons.$[j].name": university_lesson["name"],
-                        "semesters.$[i].lessons.$[j].code": university_lesson["code"],
-                        "semesters.$[i].lessons.$[j].ects": university_lesson["ects"],
-                        "semesters.$[i].lessons.$[j].absenceLimit": university_lesson[
-                            "absenceLimit"
-                        ],
-                    }
-                },
-                array_filters=[{"i._id": unisid}, {"j._id": unilid}],
-            )
+        update_result = await request.app.mongodb["universities"].update_one(
+            {
+                "_id": unid,
+                "semesters._id": unisid,
+                "semesters.lessons._id": unilid,
+            },
+            {
+                "$set": {
+                    "semesters.$[i].lessons.$[j].name": university_lesson["name"],
+                    "semesters.$[i].lessons.$[j].code": university_lesson["code"],
+                    "semesters.$[i].lessons.$[j].ects": university_lesson["ects"],
+                    "semesters.$[i].lessons.$[j].absenceLimit": university_lesson[
+                        "absenceLimit"
+                    ],
+                }
+            },
+            array_filters=[{"i._id": unisid}, {"j._id": unilid}],
+        )
 
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "University lesson updated"},
-                )
-
+        if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "University lesson could not be updated"},
+                status_code=status.HTTP_200_OK,
+                content={"message": "University lesson updated"},
             )
 
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid input"},
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "University lesson could not be updated"},
         )
 
     return JSONResponse(

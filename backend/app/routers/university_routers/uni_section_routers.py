@@ -1,3 +1,5 @@
+import json
+
 from fastapi import APIRouter, Body, Depends, Request, status
 from fastapi.responses import JSONResponse
 
@@ -14,9 +16,9 @@ router = APIRouter()
     operation_id="updateLessonSection",
     response_model=Message,
     responses={
-        404: {"model": Message},
         403: {"model": Message},
-        400: {"model": Message},
+        404: {"model": Message},
+        409: {"model": Message},
     },
 )
 async def update_lesson_section(
@@ -29,37 +31,9 @@ async def update_lesson_section(
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update section of a lesson with given universityID, universitySemesterID, universityLessonID and sectionID"""
-    new_section = {k: v for k, v in new_section.dict().items() if v is not None}
 
-    for slot in new_section["slots"]:
-        cur_slot = slot.split(",")
-        if len(cur_slot) == 3:
-            if int(cur_slot[0]) < 0 or int(cur_slot[0]) > 4:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot day cannot be < 0 or > 4"},
-                )
-            if int(cur_slot[1]) < 0 or int(cur_slot[1]) > 15:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot hour cannot be < 0 or > 15"},
-                )
-            if int(cur_slot[2]) < 0 or int(cur_slot[2]) > 1:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot lab hour must be 0 or 1"},
-                )
-        else:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Invalid lesson slot"},
-            )
-
-    if new_section["instructor"] == "" or new_section["section"] == "":
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Instructor name or section must be filled"},
-        )
+    new_section = new_section.json(by_alias=True, models_as_dict=False)
+    new_section = json.loads(new_section.replace("\\", ""))
 
     if auth_user["userGroup"] == "professor":
 
@@ -91,52 +65,73 @@ async def update_lesson_section(
                 )
                 .to_list(length=None)
             )
-        ) == []:
+        ) == [] and (
+            await (
+                request.app.mongodb["universities"]
+                .aggregate(
+                    [
+                        {
+                            "$match": {
+                                "_id": unid,
+                                "semesters._id": unisid,
+                                "semesters.lessons._id": unilid,
+                            },
+                        },
+                        {"$unwind": "$semesters"},
+                        {"$unwind": "$semesters.lessons"},
+                        {"$unwind": "$semesters.lessons.sections"},
+                        {
+                            "$match": {
+                                "semesters.lessons._id": unilid,
+                                "semesters.lessons.sections.section": new_section[
+                                    "section"
+                                ],
+                            },
+                        },
+                    ]
+                )
+                .to_list(length=None)
+            )
+        ):
             return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_409_CONFLICT,
                 content={
                     "message": "Section could not be found or there exists another section with given section number"
                 },
             )
 
-        if len(new_section) >= 1:
-            update_result = await request.app.mongodb["universities"].update_many(
-                {
-                    "_id": unid,
-                    "semesters._id": unisid,
-                    "semesters.lessons._id": unilid,
-                    "semesters.lessons.sections._id": secid,
-                },
-                {
-                    "$set": {
-                        "semesters.$[i].lessons.$[j].sections.$[k].section": new_section[
-                            "section"
-                        ],
-                        "semesters.$[i].lessons.$[j].sections.$[k].instructor": new_section[
-                            "instructor"
-                        ],
-                        "semesters.$[i].lessons.$[j].sections.$[k].slots": new_section[
-                            "slots"
-                        ],
-                    }
-                },
-                array_filters=[{"i._id": unisid}, {"j._id": unilid}, {"k._id": secid}],
-            )
+        update_result = await request.app.mongodb["universities"].update_many(
+            {
+                "_id": unid,
+                "semesters._id": unisid,
+                "semesters.lessons._id": unilid,
+                "semesters.lessons.sections._id": secid,
+            },
+            {
+                "$set": {
+                    "semesters.$[i].lessons.$[j].sections.$[k].section": new_section[
+                        "section"
+                    ],
+                    "semesters.$[i].lessons.$[j].sections.$[k].instructor": new_section[
+                        "instructor"
+                    ],
+                    "semesters.$[i].lessons.$[j].sections.$[k].slots": new_section[
+                        "slots"
+                    ],
+                }
+            },
+            array_filters=[{"i._id": unisid}, {"j._id": unilid}, {"k._id": secid}],
+        )
 
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "Section updated"},
-                )
-
+        if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Section could not be updated"},
+                status_code=status.HTTP_200_OK,
+                content={"message": "Section updated"},
             )
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "University lesson not found"},
+            content={"message": "Section could not be updated"},
         )
 
     return JSONResponse(
@@ -150,8 +145,8 @@ async def update_lesson_section(
     operation_id="deleteLessonSection",
     response_model=Message,
     responses={
-        404: {"model": Message},
         403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def delete_lesson_section(
