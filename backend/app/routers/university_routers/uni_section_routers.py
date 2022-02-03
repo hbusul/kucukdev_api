@@ -1,16 +1,9 @@
-from fastapi import (
-    APIRouter,
-    Body,
-    Request,
-    status,
-    Response,
-    Depends,
-)
+from fastapi import APIRouter, Body, Depends, Request, status
 from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.uni_models import UniversitySectionModel
-from ...models.user_models import UserModel, Message
+from ...models.user_models import Message, UserModel
 
 router = APIRouter()
 
@@ -71,23 +64,40 @@ async def update_lesson_section(
     if auth_user["userGroup"] == "professor":
 
         if (
-            existing_university := await request.app.mongodb["universities"].find_one(
-                {"_id": unid, "semesters._id": unisid, "semesters.lessons._id": unilid}
+            await (
+                request.app.mongodb["universities"]
+                .aggregate(
+                    [
+                        {
+                            "$match": {
+                                "_id": unid,
+                                "semesters._id": unisid,
+                                "semesters.lessons._id": unilid,
+                            },
+                        },
+                        {"$unwind": "$semesters"},
+                        {"$unwind": "$semesters.lessons"},
+                        {"$unwind": "$semesters.lessons.sections"},
+                        {
+                            "$match": {
+                                "semesters.lessons._id": unilid,
+                                "semesters.lessons.sections._id": secid,
+                                "semesters.lessons.sections.section": new_section[
+                                    "section"
+                                ],
+                            },
+                        },
+                    ]
+                )
+                .to_list(length=None)
             )
-        ) is not None:
-            for semester in existing_university["semesters"]:
-                if semester["_id"] == unisid:
-                    for lesson in semester["lessons"]:
-                        if lesson["_id"] == unilid:
-                            for section in lesson["sections"]:
-                                if (
-                                    section["section"] == new_section["section"]
-                                    and section["_id"] != secid
-                                ):
-                                    return JSONResponse(
-                                        status_code=status.HTTP_400_BAD_REQUEST,
-                                        content={"message": "Section already exists"},
-                                    )
+        ) == []:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "message": "Section could not be found or there exists another section with given section number"
+                },
+            )
 
         if len(new_section) >= 1:
             update_result = await request.app.mongodb["universities"].update_many(
@@ -113,28 +123,19 @@ async def update_lesson_section(
                 array_filters=[{"i._id": unisid}, {"j._id": unilid}, {"k._id": secid}],
             )
 
-            if (
-                updated_semester := await request.app.mongodb["universities"].find_one(
-                    {
-                        "_id": unid,
-                        "semesters._id": unisid,
-                        "semesters.lessons._id": unilid,
-                    }
+            if update_result.modified_count == 1:
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content={"message": "Section updated"},
                 )
-            ) is not None:
-                for semester in updated_semester["semesters"]:
-                    if semester["_id"] == unisid:
-                        for lesson in semester["lessons"]:
-                            if lesson["_id"] == unilid:
-                                for section in lesson["sections"]:
-                                    if section["_id"] == secid:
-                                        return JSONResponse(
-                                            status_code=status.HTTP_200_OK,
-                                            content=section,
-                                        )
+
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Section could not be updated"},
+            )
 
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content={"message": "University lesson not found"},
         )
 
@@ -182,7 +183,7 @@ async def delete_lesson_section(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Section not found"},
+            content={"message": "Section could not be deleted"},
         )
 
     return JSONResponse(
