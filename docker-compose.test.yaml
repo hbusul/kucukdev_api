@@ -23,6 +23,9 @@ services:
       - app-network
     volumes:
       - mongo-data-test:/data/db
+    command: mongod --quiet --logpath /dev/null # to ignore the log outputs from the MongoDB container
+    ports:
+      - "27017:27017"
 
 networks:
   app-network:
