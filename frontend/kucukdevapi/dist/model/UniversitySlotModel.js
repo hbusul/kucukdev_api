@@ -16,23 +16,22 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 /**
- * The AbsenceModel model module.
- * @module model/AbsenceModel
+ * The UniversitySlotModel model module.
+ * @module model/UniversitySlotModel
  * @version 1.0.0
  */
-var AbsenceModel = /*#__PURE__*/function () {
+var UniversitySlotModel = /*#__PURE__*/function () {
   /**
-   * Constructs a new <code>AbsenceModel</code>.
-   * @alias module:model/AbsenceModel
-   * @param week {Number} 
+   * Constructs a new <code>UniversitySlotModel</code>.
+   * @alias module:model/UniversitySlotModel
    * @param day {Number} 
    * @param hour {Number} 
    * @param isLab {Number} 
    */
-  function AbsenceModel(week, day, hour, isLab) {
-    _classCallCheck(this, AbsenceModel);
+  function UniversitySlotModel(day, hour, isLab) {
+    _classCallCheck(this, UniversitySlotModel);
 
-    AbsenceModel.initialize(this, week, day, hour, isLab);
+    UniversitySlotModel.initialize(this, day, hour, isLab);
   }
   /**
    * Initializes the fields of this object.
@@ -41,31 +40,26 @@ var AbsenceModel = /*#__PURE__*/function () {
    */
 
 
-  _createClass(AbsenceModel, null, [{
+  _createClass(UniversitySlotModel, null, [{
     key: "initialize",
-    value: function initialize(obj, week, day, hour, isLab) {
-      obj['week'] = week;
+    value: function initialize(obj, day, hour, isLab) {
       obj['day'] = day;
       obj['hour'] = hour;
       obj['isLab'] = isLab;
     }
     /**
-     * Constructs a <code>AbsenceModel</code> from a plain JavaScript object, optionally creating a new instance.
+     * Constructs a <code>UniversitySlotModel</code> from a plain JavaScript object, optionally creating a new instance.
      * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
      * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/AbsenceModel} obj Optional instance to populate.
-     * @return {module:model/AbsenceModel} The populated <code>AbsenceModel</code> instance.
+     * @param {module:model/UniversitySlotModel} obj Optional instance to populate.
+     * @return {module:model/UniversitySlotModel} The populated <code>UniversitySlotModel</code> instance.
      */
 
   }, {
     key: "constructFromObject",
     value: function constructFromObject(data, obj) {
       if (data) {
-        obj = obj || new AbsenceModel();
-
-        if (data.hasOwnProperty('week')) {
-          obj['week'] = _ApiClient.default.convertToType(data['week'], 'Number');
-        }
+        obj = obj || new UniversitySlotModel();
 
         if (data.hasOwnProperty('day')) {
           obj['day'] = _ApiClient.default.convertToType(data['day'], 'Number');
@@ -84,28 +78,23 @@ var AbsenceModel = /*#__PURE__*/function () {
     }
   }]);
 
-  return AbsenceModel;
+  return UniversitySlotModel;
 }();
-/**
- * @member {Number} week
- */
-
-
-AbsenceModel.prototype['week'] = undefined;
 /**
  * @member {Number} day
  */
 
-AbsenceModel.prototype['day'] = undefined;
+
+UniversitySlotModel.prototype['day'] = undefined;
 /**
  * @member {Number} hour
  */
 
-AbsenceModel.prototype['hour'] = undefined;
+UniversitySlotModel.prototype['hour'] = undefined;
 /**
  * @member {Number} isLab
  */
 
-AbsenceModel.prototype['isLab'] = undefined;
-var _default = AbsenceModel;
+UniversitySlotModel.prototype['isLab'] = undefined;
+var _default = UniversitySlotModel;
 exports.default = _default;

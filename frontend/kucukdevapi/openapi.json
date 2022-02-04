@@ -2680,7 +2680,7 @@
                   "title": "Response List University Lessons Universities  Unid  Semesters  Unisid  Lessons Get",
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UniversityAPILessonModel"
+                    "$ref": "#/components/schemas/UniversityLessonAPIModel"
                   }
                 }
               }
@@ -2756,6 +2756,16 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -2766,8 +2776,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden",
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
@@ -2828,7 +2838,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UniversityAPILessonModel"
+                  "$ref": "#/components/schemas/UniversityLessonAPIModel"
                 }
               }
             }
@@ -2899,7 +2909,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UniversityAPILessonModel"
+                  "$ref": "#/components/schemas/UniversityLessonAPIModel"
                 }
               }
             }
@@ -2966,7 +2976,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UniversityAPILessonModel"
+                "$ref": "#/components/schemas/UniversityLessonAPIModel"
               }
             }
           },
@@ -3192,16 +3202,6 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden",
             "content": {
@@ -3212,8 +3212,18 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
@@ -3295,8 +3305,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -3305,8 +3315,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -5607,54 +5617,6 @@
           }
         }
       },
-      "UniversityAPILessonModel": {
-        "title": "UniversityAPILessonModel",
-        "required": [
-          "name",
-          "code",
-          "ects",
-          "absenceLimit"
-        ],
-        "type": "object",
-        "properties": {
-          "_id": {
-            "title": " Id",
-            "type": "string"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "code": {
-            "title": "Code",
-            "type": "string"
-          },
-          "ects": {
-            "title": "Ects",
-            "minimum": 0,
-            "type": "number"
-          },
-          "absenceLimit": {
-            "title": "Absencelimit",
-            "minimum": 0,
-            "type": "integer"
-          },
-          "sections": {
-            "title": "Sections",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UniversitySectionModel"
-            },
-            "default": []
-          }
-        },
-        "example": {
-          "name": "ART OF COMPUTING",
-          "code": "COMP101",
-          "ects": 6,
-          "absenceLimit": 0
-        }
-      },
       "UniversityAPIModel": {
         "title": "UniversityAPIModel",
         "type": "object",
@@ -5673,9 +5635,9 @@
           }
         },
         "example": {
-          "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
+          "_id": "61fc266ae3d749b1d65c17c6",
           "name": "AGU",
-          "curSemesterID": "stringID"
+          "curSemesterID": "61fc266ae3d749b1d65c17c7"
         }
       },
       "UniversityCurriculumModel": {
@@ -5746,6 +5708,54 @@
           "name": "COMP"
         }
       },
+      "UniversityLessonAPIModel": {
+        "title": "UniversityLessonAPIModel",
+        "required": [
+          "name",
+          "code",
+          "ects",
+          "absenceLimit"
+        ],
+        "type": "object",
+        "properties": {
+          "_id": {
+            "title": " Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "ects": {
+            "title": "Ects",
+            "minimum": 0,
+            "type": "number"
+          },
+          "absenceLimit": {
+            "title": "Absencelimit",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "sections": {
+            "title": "Sections",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UniversitySectionAPIModel"
+            },
+            "default": []
+          }
+        },
+        "example": {
+          "name": "ART OF COMPUTING",
+          "code": "COMP101",
+          "ects": 6,
+          "absenceLimit": 0
+        }
+      },
       "UniversityLessonModel": {
         "title": "UniversityLessonModel",
         "required": [
@@ -5793,7 +5803,7 @@
             "title": "Slots",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/UniversitySlotModel"
             }
           }
         },
@@ -5801,12 +5811,20 @@
           "name": "ART OF COMPUTING",
           "code": "COMP101",
           "ects": 6,
-          "absenceLimit": 0,
+          "absenceLimit": 8,
           "section": "01",
-          "instructor": "Ali Veli",
+          "instructor": "JACK JOE",
           "slots": [
-            "2,7,0",
-            "2,8,0"
+            {
+              "day": 2,
+              "hour": 7,
+              "isLab": 0
+            },
+            {
+              "day": 2,
+              "hour": 8,
+              "isLab": 0
+            }
           ]
         }
       },
@@ -5846,6 +5864,50 @@
           "name": "AGU"
         }
       },
+      "UniversitySectionAPIModel": {
+        "title": "UniversitySectionAPIModel",
+        "type": "object",
+        "properties": {
+          "_id": {
+            "title": " Id",
+            "type": "string"
+          },
+          "section": {
+            "title": "Section",
+            "type": "string"
+          },
+          "instructor": {
+            "title": "Instructor",
+            "type": "string"
+          },
+          "slots": {
+            "title": "Slots",
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "example": {
+          "section": "01",
+          "instructor": "JACK JOE",
+          "slots": [
+            [
+              2,
+              7,
+              0
+            ],
+            [
+              2,
+              8,
+              0
+            ]
+          ]
+        }
+      },
       "UniversitySectionModel": {
         "title": "UniversitySectionModel",
         "required": [
@@ -5871,16 +5933,24 @@
             "title": "Slots",
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/UniversitySlotModel"
             }
           }
         },
         "example": {
           "section": "01",
-          "instructor": "Ali Veli",
+          "instructor": "JACK JOE",
           "slots": [
-            "2,7,0",
-            "2,8,0"
+            {
+              "day": 2,
+              "hour": 7,
+              "isLab": 0
+            },
+            {
+              "day": 2,
+              "hour": 8,
+              "isLab": 0
+            }
           ]
         }
       },
@@ -5903,13 +5973,42 @@
             "title": "Lessons",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UniversityAPILessonModel"
+              "$ref": "#/components/schemas/UniversityLessonAPIModel"
             },
             "default": []
           }
         },
         "example": {
           "name": "20-21 Spring"
+        }
+      },
+      "UniversitySlotModel": {
+        "title": "UniversitySlotModel",
+        "required": [
+          "day",
+          "hour",
+          "isLab"
+        ],
+        "type": "object",
+        "properties": {
+          "day": {
+            "title": "Day",
+            "maximum": 4,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "hour": {
+            "title": "Hour",
+            "maximum": 15,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "isLab": {
+            "title": "Islab",
+            "maximum": 1,
+            "minimum": 0,
+            "type": "integer"
+          }
         }
       },
       "UpdateEntranceYearModel": {

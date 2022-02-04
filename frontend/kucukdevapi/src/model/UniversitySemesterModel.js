@@ -12,7 +12,7 @@
  */
 
 import ApiClient from '../ApiClient';
-import UniversityAPILessonModel from './UniversityAPILessonModel';
+import UniversityLessonAPIModel from './UniversityLessonAPIModel';
 
 /**
  * The UniversitySemesterModel model module.
@@ -57,7 +57,7 @@ class UniversitySemesterModel {
                 obj['name'] = ApiClient.convertToType(data['name'], 'String');
             }
             if (data.hasOwnProperty('lessons')) {
-                obj['lessons'] = ApiClient.convertToType(data['lessons'], [UniversityAPILessonModel]);
+                obj['lessons'] = ApiClient.convertToType(data['lessons'], [UniversityLessonAPIModel]);
             }
         }
         return obj;
@@ -77,7 +77,7 @@ UniversitySemesterModel.prototype['_id'] = undefined;
 UniversitySemesterModel.prototype['name'] = undefined;
 
 /**
- * @member {Array.<module:model/UniversityAPILessonModel>} lessons
+ * @member {Array.<module:model/UniversityLessonAPIModel>} lessons
  */
 UniversitySemesterModel.prototype['lessons'] = undefined;
 

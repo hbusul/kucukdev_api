@@ -12,24 +12,20 @@
  */
 
 import ApiClient from '../ApiClient';
-import UniversitySlotModel from './UniversitySlotModel';
 
 /**
- * The UniversitySectionModel model module.
- * @module model/UniversitySectionModel
+ * The UniversitySectionAPIModel model module.
+ * @module model/UniversitySectionAPIModel
  * @version 1.0.0
  */
-class UniversitySectionModel {
+class UniversitySectionAPIModel {
     /**
-     * Constructs a new <code>UniversitySectionModel</code>.
-     * @alias module:model/UniversitySectionModel
-     * @param section {String} 
-     * @param instructor {String} 
-     * @param slots {Array.<module:model/UniversitySlotModel>} 
+     * Constructs a new <code>UniversitySectionAPIModel</code>.
+     * @alias module:model/UniversitySectionAPIModel
      */
-    constructor(section, instructor, slots) { 
+    constructor() { 
         
-        UniversitySectionModel.initialize(this, section, instructor, slots);
+        UniversitySectionAPIModel.initialize(this);
     }
 
     /**
@@ -37,22 +33,19 @@ class UniversitySectionModel {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj, section, instructor, slots) { 
-        obj['section'] = section;
-        obj['instructor'] = instructor;
-        obj['slots'] = slots;
+    static initialize(obj) { 
     }
 
     /**
-     * Constructs a <code>UniversitySectionModel</code> from a plain JavaScript object, optionally creating a new instance.
+     * Constructs a <code>UniversitySectionAPIModel</code> from a plain JavaScript object, optionally creating a new instance.
      * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
      * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/UniversitySectionModel} obj Optional instance to populate.
-     * @return {module:model/UniversitySectionModel} The populated <code>UniversitySectionModel</code> instance.
+     * @param {module:model/UniversitySectionAPIModel} obj Optional instance to populate.
+     * @return {module:model/UniversitySectionAPIModel} The populated <code>UniversitySectionAPIModel</code> instance.
      */
     static constructFromObject(data, obj) {
         if (data) {
-            obj = obj || new UniversitySectionModel();
+            obj = obj || new UniversitySectionAPIModel();
 
             if (data.hasOwnProperty('_id')) {
                 obj['_id'] = ApiClient.convertToType(data['_id'], 'String');
@@ -64,7 +57,7 @@ class UniversitySectionModel {
                 obj['instructor'] = ApiClient.convertToType(data['instructor'], 'String');
             }
             if (data.hasOwnProperty('slots')) {
-                obj['slots'] = ApiClient.convertToType(data['slots'], [UniversitySlotModel]);
+                obj['slots'] = ApiClient.convertToType(data['slots'], [['Number']]);
             }
         }
         return obj;
@@ -76,27 +69,27 @@ class UniversitySectionModel {
 /**
  * @member {String} _id
  */
-UniversitySectionModel.prototype['_id'] = undefined;
+UniversitySectionAPIModel.prototype['_id'] = undefined;
 
 /**
  * @member {String} section
  */
-UniversitySectionModel.prototype['section'] = undefined;
+UniversitySectionAPIModel.prototype['section'] = undefined;
 
 /**
  * @member {String} instructor
  */
-UniversitySectionModel.prototype['instructor'] = undefined;
+UniversitySectionAPIModel.prototype['instructor'] = undefined;
 
 /**
- * @member {Array.<module:model/UniversitySlotModel>} slots
+ * @member {Array.<Array.<Number>>} slots
  */
-UniversitySectionModel.prototype['slots'] = undefined;
+UniversitySectionAPIModel.prototype['slots'] = undefined;
 
 
 
 
 
 
-export default UniversitySectionModel;
+export default UniversitySectionAPIModel;
 

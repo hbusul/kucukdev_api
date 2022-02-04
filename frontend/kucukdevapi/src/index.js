@@ -24,14 +24,16 @@ import Message from './model/Message';
 import SemesterAPIModel from './model/SemesterAPIModel';
 import SlotModel from './model/SlotModel';
 import Token from './model/Token';
-import UniversityAPILessonModel from './model/UniversityAPILessonModel';
 import UniversityAPIModel from './model/UniversityAPIModel';
 import UniversityCurriculumModel from './model/UniversityCurriculumModel';
 import UniversityDepartmentModel from './model/UniversityDepartmentModel';
+import UniversityLessonAPIModel from './model/UniversityLessonAPIModel';
 import UniversityLessonModel from './model/UniversityLessonModel';
 import UniversityModel from './model/UniversityModel';
+import UniversitySectionAPIModel from './model/UniversitySectionAPIModel';
 import UniversitySectionModel from './model/UniversitySectionModel';
 import UniversitySemesterModel from './model/UniversitySemesterModel';
+import UniversitySlotModel from './model/UniversitySlotModel';
 import UpdateEntranceYearModel from './model/UpdateEntranceYearModel';
 import UpdateLessonModel from './model/UpdateLessonModel';
 import UpdatePasswordModel from './model/UpdatePasswordModel';
@@ -163,12 +165,6 @@ export {
     Token,
 
     /**
-     * The UniversityAPILessonModel model constructor.
-     * @property {module:model/UniversityAPILessonModel}
-     */
-    UniversityAPILessonModel,
-
-    /**
      * The UniversityAPIModel model constructor.
      * @property {module:model/UniversityAPIModel}
      */
@@ -187,6 +183,12 @@ export {
     UniversityDepartmentModel,
 
     /**
+     * The UniversityLessonAPIModel model constructor.
+     * @property {module:model/UniversityLessonAPIModel}
+     */
+    UniversityLessonAPIModel,
+
+    /**
      * The UniversityLessonModel model constructor.
      * @property {module:model/UniversityLessonModel}
      */
@@ -199,6 +201,12 @@ export {
     UniversityModel,
 
     /**
+     * The UniversitySectionAPIModel model constructor.
+     * @property {module:model/UniversitySectionAPIModel}
+     */
+    UniversitySectionAPIModel,
+
+    /**
      * The UniversitySectionModel model constructor.
      * @property {module:model/UniversitySectionModel}
      */
@@ -209,6 +217,12 @@ export {
      * @property {module:model/UniversitySemesterModel}
      */
     UniversitySemesterModel,
+
+    /**
+     * The UniversitySlotModel model constructor.
+     * @property {module:model/UniversitySlotModel}
+     */
+    UniversitySlotModel,
 
     /**
      * The UpdateEntranceYearModel model constructor.

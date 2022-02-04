@@ -16,20 +16,19 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 /**
- * The UpdateUniversityModel model module.
- * @module model/UpdateUniversityModel
+ * The UniversitySectionAPIModel model module.
+ * @module model/UniversitySectionAPIModel
  * @version 1.0.0
  */
-var UpdateUniversityModel = /*#__PURE__*/function () {
+var UniversitySectionAPIModel = /*#__PURE__*/function () {
   /**
-   * Constructs a new <code>UpdateUniversityModel</code>.
-   * @alias module:model/UpdateUniversityModel
-   * @param curUniversityID {String} 
+   * Constructs a new <code>UniversitySectionAPIModel</code>.
+   * @alias module:model/UniversitySectionAPIModel
    */
-  function UpdateUniversityModel(curUniversityID) {
-    _classCallCheck(this, UpdateUniversityModel);
+  function UniversitySectionAPIModel() {
+    _classCallCheck(this, UniversitySectionAPIModel);
 
-    UpdateUniversityModel.initialize(this, curUniversityID);
+    UniversitySectionAPIModel.initialize(this);
   }
   /**
    * Initializes the fields of this object.
@@ -38,31 +37,37 @@ var UpdateUniversityModel = /*#__PURE__*/function () {
    */
 
 
-  _createClass(UpdateUniversityModel, null, [{
+  _createClass(UniversitySectionAPIModel, null, [{
     key: "initialize",
-    value: function initialize(obj, curUniversityID) {
-      obj['curUniversityID'] = curUniversityID;
-    }
+    value: function initialize(obj) {}
     /**
-     * Constructs a <code>UpdateUniversityModel</code> from a plain JavaScript object, optionally creating a new instance.
+     * Constructs a <code>UniversitySectionAPIModel</code> from a plain JavaScript object, optionally creating a new instance.
      * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
      * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/UpdateUniversityModel} obj Optional instance to populate.
-     * @return {module:model/UpdateUniversityModel} The populated <code>UpdateUniversityModel</code> instance.
+     * @param {module:model/UniversitySectionAPIModel} obj Optional instance to populate.
+     * @return {module:model/UniversitySectionAPIModel} The populated <code>UniversitySectionAPIModel</code> instance.
      */
 
   }, {
     key: "constructFromObject",
     value: function constructFromObject(data, obj) {
       if (data) {
-        obj = obj || new UpdateUniversityModel();
+        obj = obj || new UniversitySectionAPIModel();
 
         if (data.hasOwnProperty('_id')) {
           obj['_id'] = _ApiClient.default.convertToType(data['_id'], 'String');
         }
 
-        if (data.hasOwnProperty('curUniversityID')) {
-          obj['curUniversityID'] = _ApiClient.default.convertToType(data['curUniversityID'], 'String');
+        if (data.hasOwnProperty('section')) {
+          obj['section'] = _ApiClient.default.convertToType(data['section'], 'String');
+        }
+
+        if (data.hasOwnProperty('instructor')) {
+          obj['instructor'] = _ApiClient.default.convertToType(data['instructor'], 'String');
+        }
+
+        if (data.hasOwnProperty('slots')) {
+          obj['slots'] = _ApiClient.default.convertToType(data['slots'], [['Number']]);
         }
       }
 
@@ -70,18 +75,28 @@ var UpdateUniversityModel = /*#__PURE__*/function () {
     }
   }]);
 
-  return UpdateUniversityModel;
+  return UniversitySectionAPIModel;
 }();
 /**
  * @member {String} _id
  */
 
 
-UpdateUniversityModel.prototype['_id'] = undefined;
+UniversitySectionAPIModel.prototype['_id'] = undefined;
 /**
- * @member {String} curUniversityID
+ * @member {String} section
  */
 
-UpdateUniversityModel.prototype['curUniversityID'] = undefined;
-var _default = UpdateUniversityModel;
+UniversitySectionAPIModel.prototype['section'] = undefined;
+/**
+ * @member {String} instructor
+ */
+
+UniversitySectionAPIModel.prototype['instructor'] = undefined;
+/**
+ * @member {Array.<Array.<Number>>} slots
+ */
+
+UniversitySectionAPIModel.prototype['slots'] = undefined;
+var _default = UniversitySectionAPIModel;
 exports.default = _default;

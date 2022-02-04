@@ -11,7 +11,7 @@ var _HTTPValidationError = _interopRequireDefault(require("../model/HTTPValidati
 
 var _Message = _interopRequireDefault(require("../model/Message"));
 
-var _UniversityAPILessonModel = _interopRequireDefault(require("../model/UniversityAPILessonModel"));
+var _UniversityLessonAPIModel = _interopRequireDefault(require("../model/UniversityLessonAPIModel"));
 
 var _UniversityLessonModel = _interopRequireDefault(require("../model/UniversityLessonModel"));
 
@@ -21,7 +21,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 /**
 * UniversityLessons service.
@@ -147,7 +147,7 @@ var UniversityLessonsApi = /*#__PURE__*/function () {
      * Callback function to receive the result of the getSingleLessonWithCode operation.
      * @callback module:api/UniversityLessonsApi~getSingleLessonWithCodeCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/UniversityAPILessonModel} data The data returned by the service call.
+     * @param {module:model/UniversityLessonAPIModel} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -157,7 +157,7 @@ var UniversityLessonsApi = /*#__PURE__*/function () {
      * @param {String} unid 
      * @param {String} code 
      * @param {module:api/UniversityLessonsApi~getSingleLessonWithCodeCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/UniversityAPILessonModel}
+     * data is of type: {@link module:model/UniversityLessonAPIModel}
      */
 
   }, {
@@ -185,14 +185,14 @@ var UniversityLessonsApi = /*#__PURE__*/function () {
       var authNames = [];
       var contentTypes = [];
       var accepts = ['application/json'];
-      var returnType = _UniversityAPILessonModel.default;
+      var returnType = _UniversityLessonAPIModel.default;
       return this.apiClient.callApi('/universities/{unid}/semesters/current-semester/lessons/find-code', 'GET', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**
      * Callback function to receive the result of the getSingleUniversitySemesterLesson operation.
      * @callback module:api/UniversityLessonsApi~getSingleUniversitySemesterLessonCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/UniversityAPILessonModel} data The data returned by the service call.
+     * @param {module:model/UniversityLessonAPIModel} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -203,7 +203,7 @@ var UniversityLessonsApi = /*#__PURE__*/function () {
      * @param {String} unisid 
      * @param {String} unilid 
      * @param {module:api/UniversityLessonsApi~getSingleUniversitySemesterLessonCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/UniversityAPILessonModel}
+     * data is of type: {@link module:model/UniversityLessonAPIModel}
      */
 
   }, {
@@ -236,14 +236,14 @@ var UniversityLessonsApi = /*#__PURE__*/function () {
       var authNames = [];
       var contentTypes = [];
       var accepts = ['application/json'];
-      var returnType = _UniversityAPILessonModel.default;
+      var returnType = _UniversityLessonAPIModel.default;
       return this.apiClient.callApi('/universities/{unid}/semesters/{unisid}/lessons/{unilid}', 'GET', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**
      * Callback function to receive the result of the listUniversitySemesterLessons operation.
      * @callback module:api/UniversityLessonsApi~listUniversitySemesterLessonsCallback
      * @param {String} error Error message, if any.
-     * @param {Array.<module:model/UniversityAPILessonModel>} data The data returned by the service call.
+     * @param {Array.<module:model/UniversityLessonAPIModel>} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -253,7 +253,7 @@ var UniversityLessonsApi = /*#__PURE__*/function () {
      * @param {String} unid 
      * @param {String} unisid 
      * @param {module:api/UniversityLessonsApi~listUniversitySemesterLessonsCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link Array.<module:model/UniversityAPILessonModel>}
+     * data is of type: {@link Array.<module:model/UniversityLessonAPIModel>}
      */
 
   }, {
@@ -280,7 +280,7 @@ var UniversityLessonsApi = /*#__PURE__*/function () {
       var authNames = [];
       var contentTypes = [];
       var accepts = ['application/json'];
-      var returnType = [_UniversityAPILessonModel.default];
+      var returnType = [_UniversityLessonAPIModel.default];
       return this.apiClient.callApi('/universities/{unid}/semesters/{unisid}/lessons', 'GET', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**
@@ -297,15 +297,15 @@ var UniversityLessonsApi = /*#__PURE__*/function () {
      * @param {String} unid 
      * @param {String} unisid 
      * @param {String} unilid 
-     * @param {module:model/UniversityAPILessonModel} universityAPILessonModel 
+     * @param {module:model/UniversityLessonAPIModel} universityLessonAPIModel 
      * @param {module:api/UniversityLessonsApi~updateUniversityLessonCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Message}
      */
 
   }, {
     key: "updateUniversityLesson",
-    value: function updateUniversityLesson(unid, unisid, unilid, universityAPILessonModel, callback) {
-      var postBody = universityAPILessonModel; // verify the required parameter 'unid' is set
+    value: function updateUniversityLesson(unid, unisid, unilid, universityLessonAPIModel, callback) {
+      var postBody = universityLessonAPIModel; // verify the required parameter 'unid' is set
 
       if (unid === undefined || unid === null) {
         throw new Error("Missing the required parameter 'unid' when calling updateUniversityLesson");
@@ -319,11 +319,11 @@ var UniversityLessonsApi = /*#__PURE__*/function () {
 
       if (unilid === undefined || unilid === null) {
         throw new Error("Missing the required parameter 'unilid' when calling updateUniversityLesson");
-      } // verify the required parameter 'universityAPILessonModel' is set
+      } // verify the required parameter 'universityLessonAPIModel' is set
 
 
-      if (universityAPILessonModel === undefined || universityAPILessonModel === null) {
-        throw new Error("Missing the required parameter 'universityAPILessonModel' when calling updateUniversityLesson");
+      if (universityLessonAPIModel === undefined || universityLessonAPIModel === null) {
+        throw new Error("Missing the required parameter 'universityLessonAPIModel' when calling updateUniversityLesson");
       }
 
       var pathParams = {

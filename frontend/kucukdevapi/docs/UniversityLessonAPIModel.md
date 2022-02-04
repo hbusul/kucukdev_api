@@ -1,4 +1,4 @@
-# Kucukdevapi.UniversityLessonModel
+# Kucukdevapi.UniversityLessonAPIModel
 
 ## Properties
 
@@ -9,8 +9,6 @@ Name | Type | Description | Notes
 **code** | **String** |  | 
 **ects** | **Number** |  | 
 **absenceLimit** | **Number** |  | 
-**section** | **String** |  | 
-**instructor** | **String** |  | 
-**slots** | [**[UniversitySlotModel]**](UniversitySlotModel.md) |  | 
+**sections** | [**[UniversitySectionAPIModel]**](UniversitySectionAPIModel.md) |  | [optional] 
 
 

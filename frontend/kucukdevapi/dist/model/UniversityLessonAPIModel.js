@@ -7,7 +7,7 @@ exports.default = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
 
-var _UniversitySlotModel = _interopRequireDefault(require("./UniversitySlotModel"));
+var _UniversitySectionAPIModel = _interopRequireDefault(require("./UniversitySectionAPIModel"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18,26 +18,23 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 /**
- * The UniversityLessonModel model module.
- * @module model/UniversityLessonModel
+ * The UniversityLessonAPIModel model module.
+ * @module model/UniversityLessonAPIModel
  * @version 1.0.0
  */
-var UniversityLessonModel = /*#__PURE__*/function () {
+var UniversityLessonAPIModel = /*#__PURE__*/function () {
   /**
-   * Constructs a new <code>UniversityLessonModel</code>.
-   * @alias module:model/UniversityLessonModel
+   * Constructs a new <code>UniversityLessonAPIModel</code>.
+   * @alias module:model/UniversityLessonAPIModel
    * @param name {String} 
    * @param code {String} 
    * @param ects {Number} 
    * @param absenceLimit {Number} 
-   * @param section {String} 
-   * @param instructor {String} 
-   * @param slots {Array.<module:model/UniversitySlotModel>} 
    */
-  function UniversityLessonModel(name, code, ects, absenceLimit, section, instructor, slots) {
-    _classCallCheck(this, UniversityLessonModel);
+  function UniversityLessonAPIModel(name, code, ects, absenceLimit) {
+    _classCallCheck(this, UniversityLessonAPIModel);
 
-    UniversityLessonModel.initialize(this, name, code, ects, absenceLimit, section, instructor, slots);
+    UniversityLessonAPIModel.initialize(this, name, code, ects, absenceLimit);
   }
   /**
    * Initializes the fields of this object.
@@ -46,30 +43,27 @@ var UniversityLessonModel = /*#__PURE__*/function () {
    */
 
 
-  _createClass(UniversityLessonModel, null, [{
+  _createClass(UniversityLessonAPIModel, null, [{
     key: "initialize",
-    value: function initialize(obj, name, code, ects, absenceLimit, section, instructor, slots) {
+    value: function initialize(obj, name, code, ects, absenceLimit) {
       obj['name'] = name;
       obj['code'] = code;
       obj['ects'] = ects;
       obj['absenceLimit'] = absenceLimit;
-      obj['section'] = section;
-      obj['instructor'] = instructor;
-      obj['slots'] = slots;
     }
     /**
-     * Constructs a <code>UniversityLessonModel</code> from a plain JavaScript object, optionally creating a new instance.
+     * Constructs a <code>UniversityLessonAPIModel</code> from a plain JavaScript object, optionally creating a new instance.
      * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
      * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/UniversityLessonModel} obj Optional instance to populate.
-     * @return {module:model/UniversityLessonModel} The populated <code>UniversityLessonModel</code> instance.
+     * @param {module:model/UniversityLessonAPIModel} obj Optional instance to populate.
+     * @return {module:model/UniversityLessonAPIModel} The populated <code>UniversityLessonAPIModel</code> instance.
      */
 
   }, {
     key: "constructFromObject",
     value: function constructFromObject(data, obj) {
       if (data) {
-        obj = obj || new UniversityLessonModel();
+        obj = obj || new UniversityLessonAPIModel();
 
         if (data.hasOwnProperty('_id')) {
           obj['_id'] = _ApiClient.default.convertToType(data['_id'], 'String');
@@ -91,16 +85,8 @@ var UniversityLessonModel = /*#__PURE__*/function () {
           obj['absenceLimit'] = _ApiClient.default.convertToType(data['absenceLimit'], 'Number');
         }
 
-        if (data.hasOwnProperty('section')) {
-          obj['section'] = _ApiClient.default.convertToType(data['section'], 'String');
-        }
-
-        if (data.hasOwnProperty('instructor')) {
-          obj['instructor'] = _ApiClient.default.convertToType(data['instructor'], 'String');
-        }
-
-        if (data.hasOwnProperty('slots')) {
-          obj['slots'] = _ApiClient.default.convertToType(data['slots'], [_UniversitySlotModel.default]);
+        if (data.hasOwnProperty('sections')) {
+          obj['sections'] = _ApiClient.default.convertToType(data['sections'], [_UniversitySectionAPIModel.default]);
         }
       }
 
@@ -108,48 +94,38 @@ var UniversityLessonModel = /*#__PURE__*/function () {
     }
   }]);
 
-  return UniversityLessonModel;
+  return UniversityLessonAPIModel;
 }();
 /**
  * @member {String} _id
  */
 
 
-UniversityLessonModel.prototype['_id'] = undefined;
+UniversityLessonAPIModel.prototype['_id'] = undefined;
 /**
  * @member {String} name
  */
 
-UniversityLessonModel.prototype['name'] = undefined;
+UniversityLessonAPIModel.prototype['name'] = undefined;
 /**
  * @member {String} code
  */
 
-UniversityLessonModel.prototype['code'] = undefined;
+UniversityLessonAPIModel.prototype['code'] = undefined;
 /**
  * @member {Number} ects
  */
 
-UniversityLessonModel.prototype['ects'] = undefined;
+UniversityLessonAPIModel.prototype['ects'] = undefined;
 /**
  * @member {Number} absenceLimit
  */
 
-UniversityLessonModel.prototype['absenceLimit'] = undefined;
+UniversityLessonAPIModel.prototype['absenceLimit'] = undefined;
 /**
- * @member {String} section
+ * @member {Array.<module:model/UniversitySectionAPIModel>} sections
  */
 
-UniversityLessonModel.prototype['section'] = undefined;
-/**
- * @member {String} instructor
- */
-
-UniversityLessonModel.prototype['instructor'] = undefined;
-/**
- * @member {Array.<module:model/UniversitySlotModel>} slots
- */
-
-UniversityLessonModel.prototype['slots'] = undefined;
-var _default = UniversityLessonModel;
+UniversityLessonAPIModel.prototype['sections'] = undefined;
+var _default = UniversityLessonAPIModel;
 exports.default = _default;
