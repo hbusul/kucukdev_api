@@ -1,16 +1,18 @@
-from fastapi import APIRouter, Body, Request, status, Depends, Response
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 from typing import List
 
+from app.routers.user_routers.user_routers import update_current_semester
+from fastapi import APIRouter, Body, Depends, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.user_models import (
+    Message,
+    SemesterAPIModel,
+    UpdateSemesterModel,
+    UpdateUserSemesterModel,
     UserModel,
     UserSemesterModel,
-    SemesterAPIModel,
-    UpdateUserSemesterModel,
-    Message,
 )
 
 router = APIRouter()
@@ -57,6 +59,14 @@ async def create_semester(
         )
 
         if update_result.modified_count == 1:
+            if len(auth_user["semesters"]) == 0:
+                await update_current_semester(
+                    uid,
+                    request,
+                    UpdateSemesterModel(curSemesterID=semester["_id"]),
+                    auth_user,
+                )
+
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
                 content={"_id": semester["_id"], "message": "Semester created"},
