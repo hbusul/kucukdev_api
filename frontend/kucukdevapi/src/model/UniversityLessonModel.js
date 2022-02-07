@@ -12,6 +12,7 @@
  */
 
 import ApiClient from '../ApiClient';
+import UniversitySlotModel from './UniversitySlotModel';
 
 /**
  * The UniversityLessonModel model module.
@@ -28,7 +29,7 @@ class UniversityLessonModel {
      * @param absenceLimit {Number} 
      * @param section {String} 
      * @param instructor {String} 
-     * @param slots {Array.<String>} 
+     * @param slots {Array.<module:model/UniversitySlotModel>} 
      */
     constructor(name, code, ects, absenceLimit, section, instructor, slots) { 
         
@@ -83,7 +84,7 @@ class UniversityLessonModel {
                 obj['instructor'] = ApiClient.convertToType(data['instructor'], 'String');
             }
             if (data.hasOwnProperty('slots')) {
-                obj['slots'] = ApiClient.convertToType(data['slots'], ['String']);
+                obj['slots'] = ApiClient.convertToType(data['slots'], [UniversitySlotModel]);
             }
         }
         return obj;
@@ -128,7 +129,7 @@ UniversityLessonModel.prototype['section'] = undefined;
 UniversityLessonModel.prototype['instructor'] = undefined;
 
 /**
- * @member {Array.<String>} slots
+ * @member {Array.<module:model/UniversitySlotModel>} slots
  */
 UniversityLessonModel.prototype['slots'] = undefined;
 

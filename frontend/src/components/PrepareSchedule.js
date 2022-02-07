@@ -304,11 +304,18 @@ const PrepareSchedule = ({ history }) => {
         let sid = login.semesterID
 
         for (let i = 0; i < scheduleLessons[scheduleIndex - 1].length; i++) {
+
+            const slotArray = []
+            for (let j = 0; j < scheduleLessons[scheduleIndex - 1][i].slots.length; j++) {
+                let slot = scheduleLessons[scheduleIndex - 1][i].slots[j].split(",");
+                slotArray.push({day: parseInt(slot[0]), hour: parseInt(slot[1]), isLab: parseInt(slot[2])})                
+            }
+
             let lessonModel = new Kucukdevapi.LessonModel(
                 scheduleLessons[scheduleIndex - 1][i].name,
                 scheduleLessons[scheduleIndex - 1][i].instructor,
                 scheduleLessons[scheduleIndex - 1][i].absenceLimit,
-                scheduleLessons[scheduleIndex - 1][i].slots
+                slotArray
             )
             apiInstance.createLesson(
                 uid,

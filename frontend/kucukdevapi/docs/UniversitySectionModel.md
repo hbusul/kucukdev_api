@@ -7,6 +7,6 @@ Name | Type | Description | Notes
 **id** | **String** |  | [optional] 
 **section** | **String** |  | 
 **instructor** | **String** |  | 
-**slots** | **[String]** |  | 
+**slots** | [**[UniversitySlotModel]**](UniversitySlotModel.md) |  | 
 
 

@@ -71,11 +71,11 @@ var LessonAPIModel = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('slots')) {
-          obj['slots'] = _ApiClient.default.convertToType(data['slots'], ['String']);
+          obj['slots'] = _ApiClient.default.convertToType(data['slots'], [['Number']]);
         }
 
         if (data.hasOwnProperty('absences')) {
-          obj['absences'] = _ApiClient.default.convertToType(data['absences'], ['String']);
+          obj['absences'] = _ApiClient.default.convertToType(data['absences'], [['Number']]);
         }
       }
 
@@ -107,12 +107,12 @@ LessonAPIModel.prototype['instructor'] = undefined;
 
 LessonAPIModel.prototype['absenceLimit'] = undefined;
 /**
- * @member {Array.<String>} slots
+ * @member {Array.<Array.<Number>>} slots
  */
 
 LessonAPIModel.prototype['slots'] = undefined;
 /**
- * @member {Array.<String>} absences
+ * @member {Array.<Array.<Number>>} absences
  */
 
 LessonAPIModel.prototype['absences'] = undefined;

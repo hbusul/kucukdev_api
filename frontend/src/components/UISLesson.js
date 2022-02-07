@@ -11,7 +11,7 @@ const UISLesson = ({ lesson, selectedLessons, onSelectLesson }) => {
         let daySlot = [[], [], [], [], []]
 
         for (let i = 0; i < slots.length; i++) {
-            const resSlot = slots[i].split(",")
+            const resSlot = slots[i]
             daySlot[resSlot[0]].push(resSlot[1])
         }
 

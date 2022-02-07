@@ -78,7 +78,8 @@ const Attendance = ({ history }) => {
                             const absenceIDArray = []
                             for (let i = 0; i < data.length; i++) {
                                 for (let j = 0; j < data[i].absences.length; j++) {
-                                    absenceArray.push(data[i].absences[j])
+                                    let absenceStr = `${data[i].absences[j][0]},${data[i].absences[j][1]},${data[i].absences[j][2]},${data[i].absences[j][3]}` 
+                                    absenceArray.push(absenceStr)
                                     absenceIDArray.push(data[i]._id)
                                 }
                             }
@@ -144,8 +145,7 @@ const Attendance = ({ history }) => {
 
         for (let i = 0; i < lessons.length; i++) {
             for (let j = 0; j < lessons[i].slots.length; j++) {
-                const day_hour = lessons[i].slots[j].split(",");
-                const isLab = day_hour[2] === "1" ? true : false;
+                const day_hour = lessons[i].slots[j]
                 if (!lessonSlots[day_hour[0]][day_hour[1]])
                     lessonSlots[day_hour[0]][day_hour[1]] = [];
                 const arr = absences.filter((absence, index) => absence === `${week},${day_hour[0]},${day_hour[1]},${day_hour[2]}` && absenceIDs[index] === lessons[i]._id)
@@ -155,7 +155,7 @@ const Attendance = ({ history }) => {
                     name: lessons[i].name,
                     color: colorArray[i % colorArray.length],
                     flag: !flag,
-                    lab: isLab
+                    lab: day_hour[2]
                 });
             }
         }
@@ -298,8 +298,14 @@ const Attendance = ({ history }) => {
         let apiInstance = new Kucukdevapi.LessonsApi();
 
         for (let k = 0; k < indexAbsence.length; k++) {
+            let absence = indexAbsence[k].split(",");
             let lid = indexID[k];
-            let absenceModel = new Kucukdevapi.AbsenceModel(indexAbsence[k]);
+            let absenceModel = new Kucukdevapi.LessonAbsenceModel({   
+                    week: parseInt(absence[0]), 
+                    day: parseInt(absence[1]), 
+                    hour: parseInt(absence[2]), 
+                    isLab: parseInt(absence[3])
+            });
             apiInstance.createAbsence(uid, sid, lid, absenceModel, (error, data, response) => {
                 if (error) {
                     console.error(error);
@@ -310,8 +316,14 @@ const Attendance = ({ history }) => {
         }
 
         for (let l = 0; l < presences.length; l++) {
+            let presence = presences[l].split(",");
             let lid = presenceIDs[l];
-            let absenceModel = new Kucukdevapi.AbsenceModel(presences[l]);
+            let absenceModel = new Kucukdevapi.LessonAbsenceModel({
+                week: parseInt(presence[0]), 
+                day: parseInt(presence[1]), 
+                hour: parseInt(presence[2]), 
+                isLab: parseInt(presence[3])
+            });
             apiInstance.deleteAbsence(uid, sid, lid, absenceModel, (error, data, response) => {
                 if (error) {
                     console.error(error);

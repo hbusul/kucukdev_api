@@ -28,13 +28,18 @@ import querystring from "querystring";
 * @class
 */
 class ApiClient {
-    constructor() {
+    /**
+     * The base URL against which to resolve every API call's (relative) path.
+     * Overrides the default value set in spec file if present
+     * @param {String} basePath
+     */
+    constructor(basePath = 'http://localhost:8000') {
         /**
          * The base URL against which to resolve every API call's (relative) path.
          * @type {String}
          * @default http://localhost:8000
          */
-        this.basePath = 'http://localhost:8000'.replace(/\/+$/, '');
+        this.basePath = basePath.replace(/\/+$/, '');
 
         /**
          * The authentication methods to be included for all API calls.
@@ -508,7 +513,7 @@ class ApiClient {
     */
     static parseDate(str) {
         if (isNaN(str)) {
-            return new Date(str);
+            return new Date(str.replace(/(\d)(T)(\d)/i, '$1 $3'));
         }
         return new Date(+str);
     }

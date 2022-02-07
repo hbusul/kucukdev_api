@@ -7,7 +7,7 @@ exports.default = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
 
-var _UniversityAPILessonModel = _interopRequireDefault(require("./UniversityAPILessonModel"));
+var _UniversityLessonAPIModel = _interopRequireDefault(require("./UniversityLessonAPIModel"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -68,7 +68,7 @@ var UniversitySemesterModel = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('lessons')) {
-          obj['lessons'] = _ApiClient.default.convertToType(data['lessons'], [_UniversityAPILessonModel.default]);
+          obj['lessons'] = _ApiClient.default.convertToType(data['lessons'], [_UniversityLessonAPIModel.default]);
         }
       }
 
@@ -90,7 +90,7 @@ UniversitySemesterModel.prototype['_id'] = undefined;
 
 UniversitySemesterModel.prototype['name'] = undefined;
 /**
- * @member {Array.<module:model/UniversityAPILessonModel>} lessons
+ * @member {Array.<module:model/UniversityLessonAPIModel>} lessons
  */
 
 UniversitySemesterModel.prototype['lessons'] = undefined;

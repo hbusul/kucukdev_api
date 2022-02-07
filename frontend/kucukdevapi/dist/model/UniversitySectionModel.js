@@ -7,6 +7,8 @@ exports.default = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
 
+var _UniversitySlotModel = _interopRequireDefault(require("./UniversitySlotModel"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -26,7 +28,7 @@ var UniversitySectionModel = /*#__PURE__*/function () {
    * @alias module:model/UniversitySectionModel
    * @param section {String} 
    * @param instructor {String} 
-   * @param slots {Array.<String>} 
+   * @param slots {Array.<module:model/UniversitySlotModel>} 
    */
   function UniversitySectionModel(section, instructor, slots) {
     _classCallCheck(this, UniversitySectionModel);
@@ -74,7 +76,7 @@ var UniversitySectionModel = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('slots')) {
-          obj['slots'] = _ApiClient.default.convertToType(data['slots'], ['String']);
+          obj['slots'] = _ApiClient.default.convertToType(data['slots'], [_UniversitySlotModel.default]);
         }
       }
 
@@ -101,7 +103,7 @@ UniversitySectionModel.prototype['section'] = undefined;
 
 UniversitySectionModel.prototype['instructor'] = undefined;
 /**
- * @member {Array.<String>} slots
+ * @member {Array.<module:model/UniversitySlotModel>} slots
  */
 
 UniversitySectionModel.prototype['slots'] = undefined;

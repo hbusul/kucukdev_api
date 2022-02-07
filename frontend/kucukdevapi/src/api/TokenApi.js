@@ -18,15 +18,15 @@ import Message from '../model/Message';
 import Token from '../model/Token';
 
 /**
-* Default service.
-* @module api/DefaultApi
+* Token service.
+* @module api/TokenApi
 * @version 1.0.0
 */
-export default class DefaultApi {
+export default class TokenApi {
 
     /**
-    * Constructs a new DefaultApi. 
-    * @alias module:api/DefaultApi
+    * Constructs a new TokenApi. 
+    * @alias module:api/TokenApi
     * @class
     * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
     * default to {@link module:ApiClient#instance} if unspecified.
@@ -38,7 +38,7 @@ export default class DefaultApi {
 
     /**
      * Callback function to receive the result of the loginForAccessTokenTokenPost operation.
-     * @callback module:api/DefaultApi~loginForAccessTokenTokenPostCallback
+     * @callback module:api/TokenApi~loginForAccessTokenTokenPostCallback
      * @param {String} error Error message, if any.
      * @param {module:model/Token} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
@@ -53,7 +53,7 @@ export default class DefaultApi {
      * @param {String} opts.scope  (default to '')
      * @param {String} opts.clientId 
      * @param {String} opts.clientSecret 
-     * @param {module:api/DefaultApi~loginForAccessTokenTokenPostCallback} callback The callback function, accepting three arguments: error, data, response
+     * @param {module:api/TokenApi~loginForAccessTokenTokenPostCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Token}
      */
     loginForAccessTokenTokenPost(username, password, opts, callback) {

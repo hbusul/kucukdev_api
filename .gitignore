@@ -2,4 +2,3 @@ __pycache__
 .vscode
 frontend/.eslintcache
 .pytest_cache
-frontend/src/tailwind.output.css

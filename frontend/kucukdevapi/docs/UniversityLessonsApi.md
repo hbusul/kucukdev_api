@@ -121,7 +121,7 @@ Name | Type | Description  | Notes
 
 ## getSingleLessonWithCode
 
-> UniversityAPILessonModel getSingleLessonWithCode(unid, code)
+> UniversityLessonAPIModel getSingleLessonWithCode(unid, code)
 
 Show Lesson With Code
 
@@ -154,7 +154,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**UniversityAPILessonModel**](UniversityAPILessonModel.md)
+[**UniversityLessonAPIModel**](UniversityLessonAPIModel.md)
 
 ### Authorization
 
@@ -168,7 +168,7 @@ No authorization required
 
 ## getSingleUniversitySemesterLesson
 
-> UniversityAPILessonModel getSingleUniversitySemesterLesson(unid, unisid, unilid)
+> UniversityLessonAPIModel getSingleUniversitySemesterLesson(unid, unisid, unilid)
 
 Show University Lesson
 
@@ -203,7 +203,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**UniversityAPILessonModel**](UniversityAPILessonModel.md)
+[**UniversityLessonAPIModel**](UniversityLessonAPIModel.md)
 
 ### Authorization
 
@@ -217,7 +217,7 @@ No authorization required
 
 ## listUniversitySemesterLessons
 
-> [UniversityAPILessonModel] listUniversitySemesterLessons(unid, unisid)
+> [UniversityLessonAPIModel] listUniversitySemesterLessons(unid, unisid)
 
 List University Lessons
 
@@ -250,7 +250,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**[UniversityAPILessonModel]**](UniversityAPILessonModel.md)
+[**[UniversityLessonAPIModel]**](UniversityLessonAPIModel.md)
 
 ### Authorization
 
@@ -264,7 +264,7 @@ No authorization required
 
 ## updateUniversityLesson
 
-> Message updateUniversityLesson(unid, unisid, unilid, universityAPILessonModel)
+> Message updateUniversityLesson(unid, unisid, unilid, universityLessonAPIModel)
 
 Update University Lesson
 
@@ -283,8 +283,8 @@ let apiInstance = new Kucukdevapi.UniversityLessonsApi();
 let unid = "unid_example"; // String | 
 let unisid = "unisid_example"; // String | 
 let unilid = "unilid_example"; // String | 
-let universityAPILessonModel = new Kucukdevapi.UniversityAPILessonModel(); // UniversityAPILessonModel | 
-apiInstance.updateUniversityLesson(unid, unisid, unilid, universityAPILessonModel, (error, data, response) => {
+let universityLessonAPIModel = new Kucukdevapi.UniversityLessonAPIModel(); // UniversityLessonAPIModel | 
+apiInstance.updateUniversityLesson(unid, unisid, unilid, universityLessonAPIModel, (error, data, response) => {
   if (error) {
     console.error(error);
   } else {
@@ -301,7 +301,7 @@ Name | Type | Description  | Notes
  **unid** | **String**|  | 
  **unisid** | **String**|  | 
  **unilid** | **String**|  | 
- **universityAPILessonModel** | [**UniversityAPILessonModel**](UniversityAPILessonModel.md)|  | 
+ **universityLessonAPIModel** | [**UniversityLessonAPIModel**](UniversityLessonAPIModel.md)|  | 
 
 ### Return type
 

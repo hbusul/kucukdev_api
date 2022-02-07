@@ -7,11 +7,11 @@ exports.default = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
 
-var _AbsenceModel = _interopRequireDefault(require("../model/AbsenceModel"));
-
 var _HTTPValidationError = _interopRequireDefault(require("../model/HTTPValidationError"));
 
 var _LessonAPIModel = _interopRequireDefault(require("../model/LessonAPIModel"));
+
+var _LessonAbsenceModel = _interopRequireDefault(require("../model/LessonAbsenceModel"));
 
 var _LessonModel = _interopRequireDefault(require("../model/LessonModel"));
 
@@ -59,7 +59,7 @@ var LessonsApi = /*#__PURE__*/function () {
    * @param {String} uid 
    * @param {String} sid 
    * @param {String} lid 
-   * @param {module:model/AbsenceModel} absenceModel 
+   * @param {module:model/LessonAbsenceModel} lessonAbsenceModel 
    * @param {module:api/LessonsApi~createAbsenceCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link module:model/Message}
    */
@@ -67,8 +67,8 @@ var LessonsApi = /*#__PURE__*/function () {
 
   _createClass(LessonsApi, [{
     key: "createAbsence",
-    value: function createAbsence(uid, sid, lid, absenceModel, callback) {
-      var postBody = absenceModel; // verify the required parameter 'uid' is set
+    value: function createAbsence(uid, sid, lid, lessonAbsenceModel, callback) {
+      var postBody = lessonAbsenceModel; // verify the required parameter 'uid' is set
 
       if (uid === undefined || uid === null) {
         throw new Error("Missing the required parameter 'uid' when calling createAbsence");
@@ -82,11 +82,11 @@ var LessonsApi = /*#__PURE__*/function () {
 
       if (lid === undefined || lid === null) {
         throw new Error("Missing the required parameter 'lid' when calling createAbsence");
-      } // verify the required parameter 'absenceModel' is set
+      } // verify the required parameter 'lessonAbsenceModel' is set
 
 
-      if (absenceModel === undefined || absenceModel === null) {
-        throw new Error("Missing the required parameter 'absenceModel' when calling createAbsence");
+      if (lessonAbsenceModel === undefined || lessonAbsenceModel === null) {
+        throw new Error("Missing the required parameter 'lessonAbsenceModel' when calling createAbsence");
       }
 
       var pathParams = {
@@ -107,7 +107,7 @@ var LessonsApi = /*#__PURE__*/function () {
      * Callback function to receive the result of the createLesson operation.
      * @callback module:api/LessonsApi~createLessonCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/LessonAPIModel} data The data returned by the service call.
+     * @param {module:model/Message} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -118,7 +118,7 @@ var LessonsApi = /*#__PURE__*/function () {
      * @param {String} sid 
      * @param {module:model/LessonModel} lessonModel 
      * @param {module:api/LessonsApi~createLessonCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/LessonAPIModel}
+     * data is of type: {@link module:model/Message}
      */
 
   }, {
@@ -150,7 +150,7 @@ var LessonsApi = /*#__PURE__*/function () {
       var authNames = ['OAuth2PasswordBearer'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = _LessonAPIModel.default;
+      var returnType = _Message.default;
       return this.apiClient.callApi('/users/{uid}/semesters/{sid}/lessons', 'POST', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**
@@ -167,15 +167,15 @@ var LessonsApi = /*#__PURE__*/function () {
      * @param {String} uid 
      * @param {String} sid 
      * @param {String} lid 
-     * @param {module:model/AbsenceModel} absenceModel 
+     * @param {module:model/LessonAbsenceModel} lessonAbsenceModel 
      * @param {module:api/LessonsApi~deleteAbsenceCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Message}
      */
 
   }, {
     key: "deleteAbsence",
-    value: function deleteAbsence(uid, sid, lid, absenceModel, callback) {
-      var postBody = absenceModel; // verify the required parameter 'uid' is set
+    value: function deleteAbsence(uid, sid, lid, lessonAbsenceModel, callback) {
+      var postBody = lessonAbsenceModel; // verify the required parameter 'uid' is set
 
       if (uid === undefined || uid === null) {
         throw new Error("Missing the required parameter 'uid' when calling deleteAbsence");
@@ -189,11 +189,11 @@ var LessonsApi = /*#__PURE__*/function () {
 
       if (lid === undefined || lid === null) {
         throw new Error("Missing the required parameter 'lid' when calling deleteAbsence");
-      } // verify the required parameter 'absenceModel' is set
+      } // verify the required parameter 'lessonAbsenceModel' is set
 
 
-      if (absenceModel === undefined || absenceModel === null) {
-        throw new Error("Missing the required parameter 'absenceModel' when calling deleteAbsence");
+      if (lessonAbsenceModel === undefined || lessonAbsenceModel === null) {
+        throw new Error("Missing the required parameter 'lessonAbsenceModel' when calling deleteAbsence");
       }
 
       var pathParams = {
@@ -214,7 +214,7 @@ var LessonsApi = /*#__PURE__*/function () {
      * Callback function to receive the result of the deleteLesson operation.
      * @callback module:api/LessonsApi~deleteLessonCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/LessonModel} data The data returned by the service call.
+     * @param {module:model/Message} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -225,7 +225,7 @@ var LessonsApi = /*#__PURE__*/function () {
      * @param {String} sid 
      * @param {String} lid 
      * @param {module:api/LessonsApi~deleteLessonCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/LessonModel}
+     * data is of type: {@link module:model/Message}
      */
 
   }, {
@@ -258,7 +258,7 @@ var LessonsApi = /*#__PURE__*/function () {
       var authNames = ['OAuth2PasswordBearer'];
       var contentTypes = [];
       var accepts = ['application/json'];
-      var returnType = _LessonModel.default;
+      var returnType = _Message.default;
       return this.apiClient.callApi('/users/{uid}/semesters/{sid}/lessons/{lid}', 'DELETE', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**

@@ -82,7 +82,7 @@ const SemesterDetail = ({ history, match }) => {
         for (let i = 0; i < lessons.length; i++) {
             lessons[i].absences.sort()
             for (let j = 0; j < lessons[i].absences.length; j++) {
-                const resAbs = lessons[i].absences[j].split(",")
+                const resAbs = lessons[i].absences[j]
                 let date = addDays(
                     semStartDate,
                     (Number(resAbs[0]) - 1) * 7 + Number(resAbs[1])
@@ -169,7 +169,7 @@ const SemesterDetail = ({ history, match }) => {
 
     for (let i = 0; i < lessons.length; i++) {
         for (let j = 0; j < lessons[i].slots.length; j++) {
-            const day_hour = lessons[i].slots[j].split(",")
+            const day_hour = lessons[i].slots[j]
             if (!lessonSlots[day_hour[0]][day_hour[1]])
                 lessonSlots[day_hour[0]][day_hour[1]] = []
             lessonSlots[day_hour[0]][day_hour[1]].push({

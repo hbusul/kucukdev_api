@@ -115,7 +115,7 @@ const Overview = ({ history }) => {
 
     for (let i = 0; i < lessons.length; i++) {
         for (let j = 0; j < lessons[i].slots.length; j++) {
-            const day_hour = lessons[i].slots[j].split(",");
+            const day_hour = lessons[i].slots[j]
             const isLab = day_hour[2] === "1" ? true : false;
             if (!lessonSlots[day_hour[0]][day_hour[1]])
                 lessonSlots[day_hour[0]][day_hour[1]] = [];

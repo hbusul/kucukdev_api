@@ -12,6 +12,7 @@
  */
 
 import ApiClient from '../ApiClient';
+import SlotModel from './SlotModel';
 
 /**
  * The UpdateLessonModel model module.
@@ -25,7 +26,7 @@ class UpdateLessonModel {
      * @param name {String} 
      * @param instructor {String} 
      * @param absenceLimit {Number} 
-     * @param slots {Array.<String>} 
+     * @param slots {Array.<module:model/SlotModel>} 
      */
     constructor(name, instructor, absenceLimit, slots) { 
         
@@ -65,7 +66,7 @@ class UpdateLessonModel {
                 obj['absenceLimit'] = ApiClient.convertToType(data['absenceLimit'], 'Number');
             }
             if (data.hasOwnProperty('slots')) {
-                obj['slots'] = ApiClient.convertToType(data['slots'], ['String']);
+                obj['slots'] = ApiClient.convertToType(data['slots'], [SlotModel]);
             }
         }
         return obj;
@@ -90,7 +91,7 @@ UpdateLessonModel.prototype['instructor'] = undefined;
 UpdateLessonModel.prototype['absenceLimit'] = undefined;
 
 /**
- * @member {Array.<String>} slots
+ * @member {Array.<module:model/SlotModel>} slots
  */
 UpdateLessonModel.prototype['slots'] = undefined;
 

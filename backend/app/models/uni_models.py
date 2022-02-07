@@ -5,21 +5,50 @@ from bson import ObjectId
 from .PyObjectId import PyObjectId
 
 
+class UniversitySlotModel(BaseModel):
+    day: int = Field(..., ge=0, le=4)
+    hour: int = Field(..., ge=0, le=15)
+    isLab: int = Field(..., ge=0, le=1)
+
+
 class UniversitySectionModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     section: str = Field(...)
     instructor: str = Field(...)
-    slots: List[str] = Field(...)
+    slots: List[UniversitySlotModel] = Field(...)
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+        json_encoders = {
+            ObjectId: str,
+            UniversitySlotModel: lambda x: [x.day, x.hour, x.isLab],
+        }
         schema_extra = {
             "example": {
                 "section": "01",
-                "instructor": "Ali Veli",
-                "slots": ["2,7,0", "2,8,0"],
+                "instructor": "JACK JOE",
+                "slots": [
+                    {"day": 2, "hour": 7, "isLab": 0},
+                    {"day": 2, "hour": 8, "isLab": 0},
+                ],
+            }
+        }
+
+
+class UniversitySectionAPIModel(BaseModel):
+    id: Optional[str] = Field(alias="_id")
+    section: Optional[str]
+    instructor: Optional[str]
+    slots: Optional[List[List[int]]]
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "section": "01",
+                "instructor": "JACK JOE",
+                "slots": [[2, 7, 0], [2, 8, 0]],
             }
         }
 
@@ -32,32 +61,38 @@ class UniversityLessonModel(BaseModel):
     absenceLimit: int = Field(..., ge=0)
     section: str = Field(...)
     instructor: str = Field(...)
-    slots: List[str] = Field(...)
+    slots: List[UniversitySlotModel] = Field(...)
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+        json_encoders = {
+            ObjectId: str,
+            UniversitySlotModel: lambda x: [x.day, x.hour, x.isLab],
+        }
         schema_extra = {
             "example": {
                 "name": "ART OF COMPUTING",
                 "code": "COMP101",
                 "ects": 6,
-                "absenceLimit": 0,
+                "absenceLimit": 8,
                 "section": "01",
-                "instructor": "Ali Veli",
-                "slots": ["2,7,0", "2,8,0"],
+                "instructor": "JACK JOE",
+                "slots": [
+                    {"day": 2, "hour": 7, "isLab": 0},
+                    {"day": 2, "hour": 8, "isLab": 0},
+                ],
             }
         }
 
 
-class UniversityAPILessonModel(BaseModel):
+class UniversityLessonAPIModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     code: str = Field(...)
     ects: float = Field(..., ge=0)
     absenceLimit: int = Field(..., ge=0)
-    sections: List[UniversitySectionModel] = []
+    sections: List[UniversitySectionAPIModel] = []
 
     class Config:
         allow_population_by_field_name = True
@@ -76,7 +111,7 @@ class UniversityAPILessonModel(BaseModel):
 class UniversitySemesterModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
-    lessons: List[UniversityAPILessonModel] = []
+    lessons: List[UniversityLessonAPIModel] = []
 
     class Config:
         allow_population_by_field_name = True
@@ -180,9 +215,9 @@ class UniversityAPIModel(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "_id": "61fc266ae3d749b1d65c17c6",
                 "name": "AGU",
-                "curSemesterID": "stringID",
+                "curSemesterID": "61fc266ae3d749b1d65c17c7",
             }
         }
 

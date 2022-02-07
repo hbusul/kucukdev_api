@@ -4,7 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **String** |  | [optional] 
-**absence** | **String** |  | 
+**week** | **Number** |  | 
+**day** | **Number** |  | 
+**hour** | **Number** |  | 
+**isLab** | **Number** |  | 
 
 

@@ -175,13 +175,20 @@ const AddUISLesson = ({ history }) => {
             let uid = login.userID
             let sid = login.semesterID
 
+
             for (let i = 0; i < selectedLessons.length; i++) {
+                const slotArray = []
+                for (let j = 0; j < selectedLessons[i].slots.length; j++) {
+                    let slot = selectedLessons[i].slots[j]
+                    slotArray.push({day: slot[0], hour: slot[1], isLab: slot[2]})
+                }
+                
                 let lessonName = `${selectedLessons[i].code}.${selectedLessons[i].section}`
                 let lessonModel = new Kucukdevapi.LessonModel(
                     lessonName,
                     selectedLessons[i].instructor,
                     selectedLessons[i].absenceLimit,
-                    selectedLessons[i].slots
+                    slotArray
                 )
                 apiInstance.createLesson(
                     uid,

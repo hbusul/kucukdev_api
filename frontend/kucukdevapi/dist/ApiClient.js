@@ -32,7 +32,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 * @class
 */
 var ApiClient = /*#__PURE__*/function () {
+  /**
+   * The base URL against which to resolve every API call's (relative) path.
+   * Overrides the default value set in spec file if present
+   * @param {String} basePath
+   */
   function ApiClient() {
+    var basePath = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'http://localhost:8000';
+
     _classCallCheck(this, ApiClient);
 
     /**
@@ -40,7 +47,7 @@ var ApiClient = /*#__PURE__*/function () {
      * @type {String}
      * @default http://localhost:8000
      */
-    this.basePath = 'http://localhost:8000'.replace(/\/+$/, '');
+    this.basePath = basePath.replace(/\/+$/, '');
     /**
      * The authentication methods to be included for all API calls.
      * @type {Array.<String>}
@@ -616,7 +623,7 @@ var ApiClient = /*#__PURE__*/function () {
     key: "parseDate",
     value: function parseDate(str) {
       if (isNaN(str)) {
-        return new Date(str);
+        return new Date(str.replace(/(\d)(T)(\d)/i, '$1 $3'));
       }
 
       return new Date(+str);
