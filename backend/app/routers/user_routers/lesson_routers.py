@@ -1,16 +1,15 @@
-from fastapi import APIRouter, Body, Request, status, Depends, Response
+from fastapi import APIRouter, Body, Request, status, Depends
 from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 from typing import List
-
+import json
 
 from ...dependencies import get_current_user
 from ...models.user_models import (
+    LessonAbsenceModel,
     UserModel,
     LessonModel,
     UpdateLessonModel,
     LessonAPIModel,
-    AbsenceModel,
     Message,
 )
 
@@ -21,11 +20,11 @@ router = APIRouter()
     "/{uid}/semesters/{sid}/lessons",
     response_description="Add new lesson into a semester",
     operation_id="createLesson",
-    response_model=LessonAPIModel,
+    response_model=Message,
     responses={
+        201: {"model": Message},
         404: {"model": Message},
         403: {"model": Message},
-        401: {"model": Message},
         400: {"model": Message},
     },
 )
@@ -38,37 +37,8 @@ async def create_lesson(
 ):
     """Create a lessons for a semester with given userID, semesterID"""
 
-    lesson = jsonable_encoder(lesson)
-
-    for slot in lesson["slots"]:
-        cur_slot = slot.split(",")
-        if len(cur_slot) == 3:
-            if int(cur_slot[0]) < 0 or int(cur_slot[0]) > 4:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot day cannot be < 0 or > 4"},
-                )
-            if int(cur_slot[1]) < 0 or int(cur_slot[1]) > 15:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot hour cannot be < 0 or > 15"},
-                )
-            if int(cur_slot[2]) < 0 or int(cur_slot[2]) > 1:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot lab hour must be 0 or 1"},
-                )
-        else:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Invalid lesson slot"},
-            )
-
-    if lesson["name"] == "" or lesson["instructor"] == "":
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Lesson and instructor name must be filled"},
-        )
+    lesson = lesson.json(by_alias=True, models_as_dict=False)
+    lesson = json.loads(lesson.replace("\\", ""))
 
     if auth_user["_id"] == uid:
         update_result = await request.app.mongodb["users"].update_one(
@@ -76,20 +46,15 @@ async def create_lesson(
             {"$push": {"semesters.$.lessons": lesson}},
         )
 
-        if (
-            existing_user := await request.app.mongodb["users"].find_one(
-                {"_id": uid, "semesters._id": sid},
-                {"semesters.lessons": {"$slice": -1}},
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content={"message": "Lesson created"},
             )
-        ) is not None:
-            for semester in existing_user["semesters"]:
-                if semester["_id"] == sid:
-                    for lesson in semester["lessons"]:
-                        return lesson
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Semester not found"},
+            content={"message": "Lesson could not be created"},
         )
 
     return JSONResponse(
@@ -118,17 +83,23 @@ async def list_lessons(
 
     if auth_user["_id"] == uid:
         if (
-            user := await request.app.mongodb["users"].find_one(
-                {"_id": uid, "semesters._id": sid}
+            user := (
+                await request.app.mongodb["users"]
+                .aggregate(
+                    [
+                        {"$match": {"_id": uid}},
+                        {"$unwind": "$semesters"},
+                        {"$match": {"semesters._id": sid}},
+                    ]
+                )
+                .to_list(length=None)
             )
-        ) is not None:
-            for semester in user["semesters"]:
-                if semester["_id"] == sid:
-                    return semester["lessons"]
+        ) :
+            return user[0]["semesters"]["lessons"]
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Semester not found"},
+            content={"message": "Lessons not found"},
         )
 
     return JSONResponse(
@@ -158,19 +129,25 @@ async def show_lesson(
 
     if auth_user["_id"] == uid:
         if (
-            user := await request.app.mongodb["users"].find_one(
-                {
-                    "_id": uid,
-                    "semesters._id": sid,
-                    "semesters.lessons._id": lid,
-                }
+            user := (
+                await request.app.mongodb["users"]
+                .aggregate(
+                    [
+                        {"$match": {"_id": uid}},
+                        {"$unwind": "$semesters"},
+                        {"$match": {"semesters._id": sid}},
+                        {"$unwind": "$semesters.lessons"},
+                        {
+                            "$match": {
+                                "semesters.lessons._id": lid,
+                            }
+                        },
+                    ]
+                )
+                .to_list(length=None)
             )
-        ) is not None:
-            for semester in user["semesters"]:
-                if semester["_id"] == sid:
-                    for lesson in semester["lessons"]:
-                        if lesson["_id"] == lid:
-                            return lesson
+        ) :
+            return user[0]["semesters"]["lessons"]
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -203,67 +180,36 @@ async def update_lesson(
 ):
     """Update a lesson with given userID, semesterID and lessonID"""
 
-    lesson = {k: v for k, v in lesson.dict().items() if v is not None}
-
-    for slot in lesson["slots"]:
-        cur_slot = slot.split(",")
-        if len(cur_slot) == 3:
-            if int(cur_slot[0]) < 0 or int(cur_slot[0]) > 4:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot day cannot be < 0 or > 4"},
-                )
-            if int(cur_slot[1]) < 0 or int(cur_slot[1]) > 15:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot hour cannot be < 0 or > 15"},
-                )
-            if int(cur_slot[2]) < 0 or int(cur_slot[2]) > 1:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "Slot lab hour must be 0 or 1"},
-                )
-        else:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Invalid lesson"},
-            )
+    lesson = lesson.json(by_alias=True, models_as_dict=False)
+    lesson = json.loads(lesson.replace("\\", ""))
 
     if auth_user["_id"] == uid:
-        if len(lesson) >= 1:
-            update_result = await request.app.mongodb["users"].update_many(
-                {
-                    "_id": uid,
-                    "semesters._id": sid,
-                    "semesters.lessons._id": lid,
-                },
-                {
-                    "$set": {
-                        "semesters.$[i].lessons.$[j].name": lesson["name"],
-                        "semesters.$[i].lessons.$[j].instructor": lesson["instructor"],
-                        "semesters.$[i].lessons.$[j].absenceLimit": lesson[
-                            "absenceLimit"
-                        ],
-                        "semesters.$[i].lessons.$[j].slots": lesson["slots"],
-                    }
-                },
-                array_filters=[{"i._id": sid}, {"j._id": lid}],
-            )
+        update_result = await request.app.mongodb["users"].update_many(
+            {
+                "_id": uid,
+                "semesters._id": sid,
+                "semesters.lessons._id": lid,
+            },
+            {
+                "$set": {
+                    "semesters.$[i].lessons.$[j].name": lesson["name"],
+                    "semesters.$[i].lessons.$[j].instructor": lesson["instructor"],
+                    "semesters.$[i].lessons.$[j].absenceLimit": lesson["absenceLimit"],
+                    "semesters.$[i].lessons.$[j].slots": lesson["slots"],
+                }
+            },
+            array_filters=[{"i._id": sid}, {"j._id": lid}],
+        )
 
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "Lesson updated"},
-                )
-
+        if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "Lesson not found"},
+                status_code=status.HTTP_200_OK,
+                content={"message": "Lesson updated"},
             )
 
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid input"},
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Lesson could not be updated"},
         )
 
     return JSONResponse(
@@ -275,7 +221,7 @@ async def update_lesson(
     "/{uid}/semesters/{sid}/lessons/{lid}",
     response_description="Delete lesson",
     operation_id="deleteLesson",
-    response_model=LessonModel,
+    response_model=Message,
     responses={
         404: {"model": Message},
         403: {"model": Message},
@@ -305,7 +251,7 @@ async def delete_lesson(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Lesson not found"},
+            content={"message": "Lesson could not be deleted"},
         )
 
     return JSONResponse(
@@ -330,54 +276,53 @@ async def create_absence(
     sid: str,
     lid: str,
     request: Request,
-    absence: AbsenceModel = Body(...),
+    absence: LessonAbsenceModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Create an absence for a lesson with given userID, semesterID and lessonID"""
 
-    absence = jsonable_encoder(absence)
+    absence = absence.json(models_as_dict=False)
+    absence = json.loads(absence.replace("\\", ""))
 
     if auth_user["_id"] == uid:
         if (
-            absence_user := await request.app.mongodb["users"].find_one(
-                {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid}
+            await request.app.mongodb["users"].find_one(
+                {
+                    "_id": uid,
+                    "semesters._id": sid,
+                    "semesters.lessons._id": lid,
+                    "semesters.lessons.absences": absence["absence"],
+                }
             )
         ) is not None:
-            for semester in absence_user["semesters"]:
-                if semester["_id"] == sid:
-                    for lesson in semester["lessons"]:
-                        if lesson["_id"] == lid:
-                            if absence["absence"] not in lesson["absences"]:
-                                update_result = (
-                                    await request.app.mongodb["users"].update_one(
-                                        {
-                                            "_id": uid,
-                                            "semesters._id": sid,
-                                            "semesters.lessons._id": lid,
-                                        },
-                                        {
-                                            "$push": {
-                                                "semesters.$[i].lessons.$[j].absences": absence[
-                                                    "absence"
-                                                ],
-                                            }
-                                        },
-                                        array_filters=[{"i._id": sid}, {"j._id": lid}],
-                                    ),
-                                )
-                                return JSONResponse(
-                                    status_code=status.HTTP_200_OK,
-                                    content={"message": "Absence created"},
-                                )
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Absence already exists"},
+            )
 
-                            return JSONResponse(
-                                status_code=status.HTTP_400_BAD_REQUEST,
-                                content={"message": "Absence is already exists"},
-                            )
+        update_result = await request.app.mongodb["users"].update_one(
+            {
+                "_id": uid,
+                "semesters._id": sid,
+                "semesters.lessons._id": lid,
+            },
+            {
+                "$push": {
+                    "semesters.$[i].lessons.$[j].absences": absence["absence"],
+                }
+            },
+            array_filters=[{"i._id": sid}, {"j._id": lid}],
+        )
+
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "Absence created"},
+            )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Lesson not found"},
+            content={"message": "Absence could not be created"},
         )
 
     return JSONResponse(
@@ -402,53 +347,34 @@ async def delete_absence(
     sid: str,
     lid: str,
     request: Request,
-    absence: AbsenceModel = Body(...),
+    absence: LessonAbsenceModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Delete an absence from a lesson with given userID, semesterID and lessonID"""
 
-    absence = jsonable_encoder(absence)
+    absence = absence.json(models_as_dict=False)
+    absence = json.loads(absence.replace("\\", ""))
 
     if auth_user["_id"] == uid:
-        if (
-            existing_user := await request.app.mongodb["users"].find_one(
-                {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid}
+        update_result = await request.app.mongodb["users"].update_one(
+            {
+                "_id": uid,
+                "semesters._id": sid,
+                "semesters.lessons._id": lid,
+            },
+            {"$pull": {"semesters.$[i].lessons.$[j].absences": absence["absence"]}},
+            array_filters=[{"i._id": sid}, {"j._id": lid}],
+        )
+
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "Absence deleted"},
             )
-        ) is not None:
-            for semester in existing_user["semesters"]:
-                if semester["_id"] == sid:
-                    for lesson in semester["lessons"]:
-                        if lesson["_id"] == lid:
-                            if absence["absence"] in lesson["absences"]:
-                                update_result = (
-                                    await request.app.mongodb["users"].update_one(
-                                        {
-                                            "_id": uid,
-                                            "semesters._id": sid,
-                                            "semesters.lessons._id": lid,
-                                        },
-                                        {
-                                            "$pull": {
-                                                "semesters.$[i].lessons.$[j].absences": absence[
-                                                    "absence"
-                                                ]
-                                            }
-                                        },
-                                        array_filters=[{"i._id": sid}, {"j._id": lid}],
-                                    ),
-                                )
-                                return JSONResponse(
-                                    status_code=status.HTTP_200_OK,
-                                    content={"message": "Absence deleted"},
-                                )
-                            return JSONResponse(
-                                status_code=status.HTTP_400_BAD_REQUEST,
-                                content={"message": "Absence not found"},
-                            )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Lesson not found"},
+            content={"message": "Absence not found"},
         )
 
     return JSONResponse(

@@ -12,6 +12,8 @@
  */
 
 import ApiClient from '../ApiClient';
+import AbsenceModel from './AbsenceModel';
+import SlotModel from './SlotModel';
 
 /**
  * The LessonModel model module.
@@ -25,7 +27,7 @@ class LessonModel {
      * @param name {String} 
      * @param instructor {String} 
      * @param absenceLimit {Number} 
-     * @param slots {Array.<String>} 
+     * @param slots {Array.<module:model/SlotModel>} 
      */
     constructor(name, instructor, absenceLimit, slots) { 
         
@@ -68,10 +70,10 @@ class LessonModel {
                 obj['absenceLimit'] = ApiClient.convertToType(data['absenceLimit'], 'Number');
             }
             if (data.hasOwnProperty('slots')) {
-                obj['slots'] = ApiClient.convertToType(data['slots'], ['String']);
+                obj['slots'] = ApiClient.convertToType(data['slots'], [SlotModel]);
             }
             if (data.hasOwnProperty('absences')) {
-                obj['absences'] = ApiClient.convertToType(data['absences'], ['String']);
+                obj['absences'] = ApiClient.convertToType(data['absences'], [AbsenceModel]);
             }
         }
         return obj;
@@ -101,12 +103,12 @@ LessonModel.prototype['instructor'] = undefined;
 LessonModel.prototype['absenceLimit'] = undefined;
 
 /**
- * @member {Array.<String>} slots
+ * @member {Array.<module:model/SlotModel>} slots
  */
 LessonModel.prototype['slots'] = undefined;
 
 /**
- * @member {Array.<String>} absences
+ * @member {Array.<module:model/AbsenceModel>} absences
  */
 LessonModel.prototype['absences'] = undefined;
 

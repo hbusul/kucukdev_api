@@ -88,6 +88,11 @@ const ProfessorPanel = ({ history }) => {
     }, [login, setLogin, history, refresh])
 
     const selectSlots = (newSlot) => {
+        if (!Array.isArray(newSlot)) {
+            let dayHour = newSlot.split(",")
+            newSlot = [dayHour[0], dayHour[1], dayHour[2]]
+        }
+        
         if (slots.includes(newSlot)) {
             setSlots(slots.filter((slot) => slot !== newSlot))
         } else {
@@ -927,6 +932,10 @@ const ProfessorPanel = ({ history }) => {
                 }
             )
         } else if (key === "addLesson") {
+            const slotArray = []
+            for (let i = 0; i < slots.length; i++) {
+                slotArray.push({day: slots[i][0], hour: slots[i][1], isLab: slots[i][2]})
+            }
             let apiInstance = new Kucukdevapi.UniversityLessonsApi()
             let universityLessonModel = new Kucukdevapi.UniversityLessonModel(
                 name,
@@ -935,7 +944,7 @@ const ProfessorPanel = ({ history }) => {
                 absenceLimit,
                 section,
                 instructor,
-                slots
+                slotArray
             )
             apiInstance.createUniversityLesson(
                 unid,
@@ -960,13 +969,17 @@ const ProfessorPanel = ({ history }) => {
         let unisid = selectedSemDep._id
 
         if (key === "updateSection") {
+            const slotArray = []
+            for (let i = 0; i < slots.length; i++) {
+                slotArray.push({day: slots[i][0], hour: slots[i][1], isLab: slots[i][2]})
+            }
             let apiInstance = new Kucukdevapi.UniversitySectionsApi()
             let unilid = selectedLesCur._id
             let secid = selectedSecSem._id
             let universitySectionModel = new Kucukdevapi.UniversitySectionModel(
                 section,
                 instructor,
-                slots
+                slotArray
             )
             apiInstance.updateLessonSection(
                 unid,
@@ -1006,6 +1019,10 @@ const ProfessorPanel = ({ history }) => {
                 }
             )
         } else if (key === "addSection") {
+            const slotArray = []
+            for (let i = 0; i < slots.length; i++) {
+                slotArray.push({day: slots[i][0], hour: slots[i][1], isLab: slots[i][2]})
+            }
             let apiInstance = new Kucukdevapi.UniversityLessonsApi()
             let universityLessonModel = new Kucukdevapi.UniversityLessonModel(
                 name,
@@ -1014,7 +1031,7 @@ const ProfessorPanel = ({ history }) => {
                 absenceLimit,
                 section,
                 instructor,
-                slots
+                slotArray
             )
             apiInstance.createUniversityLesson(
                 unid,
@@ -2346,7 +2363,7 @@ const ProfessorPanel = ({ history }) => {
                                                                 key={index}
                                                                 className="mt-2 bg-gray-300 py-2 px-4 mr-2 rounded-full flex flex-row"
                                                             >
-                                                                {slot}
+                                                                {`${slot[0]},${slot[1]},${slot[2]}`}
                                                                 <div
                                                                     onClick={() =>
                                                                         selectSlots(

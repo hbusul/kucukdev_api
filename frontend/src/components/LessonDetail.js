@@ -67,14 +67,19 @@ const LessonDetail = ({ history, match }) => {
                         )
                         setLesson(data)
                         setAbsences(data.absences)
-                        setSlots(data.slots)
+
+                        const slotArray = []
                         for (let i = 0; i < data.slots.length; i++) {
-                            let resSlot = data.slots[i].split(",")
-                            if (resSlot[2] === "1") {
+                            let slotStr = `${data.slots[i][0]},${data.slots[i][1]},${data.slots[i][2]}`
+                            slotArray.push(slotStr)
+
+                            if (data.slots[i][2]) {
                                 setHasLabs("Yes")
-                                break
                             }
                         }
+
+                        setSlots(slotArray)
+
                     }
                 }
             )
@@ -97,20 +102,19 @@ const LessonDetail = ({ history, match }) => {
         const absenceStructs = []
         absences.sort()
         for (let j = 0; j < absences.length; j++) {
-            const resAbs = absences[j].split(",")
             let date = addDays(
                 semStartDate,
-                (Number(resAbs[0]) - 1) * 7 + Number(resAbs[1])
+                (Number(absences[j][0]) - 1) * 7 + Number(absences[j][1])
             )
             let resDate = String(date).split(" ")
             const finalDate = resDate[1] + " " + resDate[2] + ", " + resDate[3]
             absenceStructs.push({
                 name: lesson.name,
                 absence: absences[j],
-                week: resAbs[0],
-                day: resAbs[1],
-                slot: resAbs[2],
-                lab: resAbs[3],
+                week: absences[j][0],
+                day: absences[j][1],
+                slot: absences[j][2],
+                lab: absences[j][3],
                 date: finalDate,
             })
         }
@@ -194,9 +198,13 @@ const LessonDetail = ({ history, match }) => {
 
     const deleteAbsence = (e, absence) => {
         e.preventDefault()
-
         let apiInstance = new Kucukdevapi.LessonsApi()
-        let absenceModel = new Kucukdevapi.AbsenceModel(absence)
+        let absenceModel = new Kucukdevapi.LessonAbsenceModel({
+            week: absence[0],
+            day: absence[1],
+            hour: absence[2],
+            isLab: absence[3],
+        })
         apiInstance.deleteAbsence(
             uid,
             sid,

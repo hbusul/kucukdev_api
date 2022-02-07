@@ -21,7 +21,7 @@ const Login = (props) => {
     const onLoginUser = async (e) => {
         e.preventDefault()
 
-        var api = new Kucukdevapi.DefaultApi()
+        var api = new Kucukdevapi.TokenApi()
         var username = formEmail
         var password = formPassword
         var opts = {

@@ -22,11 +22,14 @@ class AbsenceModel {
     /**
      * Constructs a new <code>AbsenceModel</code>.
      * @alias module:model/AbsenceModel
-     * @param absence {String} 
+     * @param week {Number} 
+     * @param day {Number} 
+     * @param hour {Number} 
+     * @param isLab {Number} 
      */
-    constructor(absence) { 
+    constructor(week, day, hour, isLab) { 
         
-        AbsenceModel.initialize(this, absence);
+        AbsenceModel.initialize(this, week, day, hour, isLab);
     }
 
     /**
@@ -34,8 +37,11 @@ class AbsenceModel {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj, absence) { 
-        obj['absence'] = absence;
+    static initialize(obj, week, day, hour, isLab) { 
+        obj['week'] = week;
+        obj['day'] = day;
+        obj['hour'] = hour;
+        obj['isLab'] = isLab;
     }
 
     /**
@@ -49,11 +55,17 @@ class AbsenceModel {
         if (data) {
             obj = obj || new AbsenceModel();
 
-            if (data.hasOwnProperty('_id')) {
-                obj['_id'] = ApiClient.convertToType(data['_id'], 'String');
+            if (data.hasOwnProperty('week')) {
+                obj['week'] = ApiClient.convertToType(data['week'], 'Number');
             }
-            if (data.hasOwnProperty('absence')) {
-                obj['absence'] = ApiClient.convertToType(data['absence'], 'String');
+            if (data.hasOwnProperty('day')) {
+                obj['day'] = ApiClient.convertToType(data['day'], 'Number');
+            }
+            if (data.hasOwnProperty('hour')) {
+                obj['hour'] = ApiClient.convertToType(data['hour'], 'Number');
+            }
+            if (data.hasOwnProperty('isLab')) {
+                obj['isLab'] = ApiClient.convertToType(data['isLab'], 'Number');
             }
         }
         return obj;
@@ -63,14 +75,24 @@ class AbsenceModel {
 }
 
 /**
- * @member {String} _id
+ * @member {Number} week
  */
-AbsenceModel.prototype['_id'] = undefined;
+AbsenceModel.prototype['week'] = undefined;
 
 /**
- * @member {String} absence
+ * @member {Number} day
  */
-AbsenceModel.prototype['absence'] = undefined;
+AbsenceModel.prototype['day'] = undefined;
+
+/**
+ * @member {Number} hour
+ */
+AbsenceModel.prototype['hour'] = undefined;
+
+/**
+ * @member {Number} isLab
+ */
+AbsenceModel.prototype['isLab'] = undefined;
 
 
 

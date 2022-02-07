@@ -15,7 +15,7 @@
 import ApiClient from "../ApiClient";
 import HTTPValidationError from '../model/HTTPValidationError';
 import Message from '../model/Message';
-import UniversityAPILessonModel from '../model/UniversityAPILessonModel';
+import UniversityLessonAPIModel from '../model/UniversityLessonAPIModel';
 import UniversityLessonModel from '../model/UniversityLessonModel';
 
 /**
@@ -150,7 +150,7 @@ export default class UniversityLessonsApi {
      * Callback function to receive the result of the getSingleLessonWithCode operation.
      * @callback module:api/UniversityLessonsApi~getSingleLessonWithCodeCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/UniversityAPILessonModel} data The data returned by the service call.
+     * @param {module:model/UniversityLessonAPIModel} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -160,7 +160,7 @@ export default class UniversityLessonsApi {
      * @param {String} unid 
      * @param {String} code 
      * @param {module:api/UniversityLessonsApi~getSingleLessonWithCodeCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/UniversityAPILessonModel}
+     * data is of type: {@link module:model/UniversityLessonAPIModel}
      */
     getSingleLessonWithCode(unid, code, callback) {
       let postBody = null;
@@ -187,7 +187,7 @@ export default class UniversityLessonsApi {
       let authNames = [];
       let contentTypes = [];
       let accepts = ['application/json'];
-      let returnType = UniversityAPILessonModel;
+      let returnType = UniversityLessonAPIModel;
       return this.apiClient.callApi(
         '/universities/{unid}/semesters/current-semester/lessons/find-code', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
@@ -199,7 +199,7 @@ export default class UniversityLessonsApi {
      * Callback function to receive the result of the getSingleUniversitySemesterLesson operation.
      * @callback module:api/UniversityLessonsApi~getSingleUniversitySemesterLessonCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/UniversityAPILessonModel} data The data returned by the service call.
+     * @param {module:model/UniversityLessonAPIModel} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -210,7 +210,7 @@ export default class UniversityLessonsApi {
      * @param {String} unisid 
      * @param {String} unilid 
      * @param {module:api/UniversityLessonsApi~getSingleUniversitySemesterLessonCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/UniversityAPILessonModel}
+     * data is of type: {@link module:model/UniversityLessonAPIModel}
      */
     getSingleUniversitySemesterLesson(unid, unisid, unilid, callback) {
       let postBody = null;
@@ -242,7 +242,7 @@ export default class UniversityLessonsApi {
       let authNames = [];
       let contentTypes = [];
       let accepts = ['application/json'];
-      let returnType = UniversityAPILessonModel;
+      let returnType = UniversityLessonAPIModel;
       return this.apiClient.callApi(
         '/universities/{unid}/semesters/{unisid}/lessons/{unilid}', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
@@ -254,7 +254,7 @@ export default class UniversityLessonsApi {
      * Callback function to receive the result of the listUniversitySemesterLessons operation.
      * @callback module:api/UniversityLessonsApi~listUniversitySemesterLessonsCallback
      * @param {String} error Error message, if any.
-     * @param {Array.<module:model/UniversityAPILessonModel>} data The data returned by the service call.
+     * @param {Array.<module:model/UniversityLessonAPIModel>} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -264,7 +264,7 @@ export default class UniversityLessonsApi {
      * @param {String} unid 
      * @param {String} unisid 
      * @param {module:api/UniversityLessonsApi~listUniversitySemesterLessonsCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link Array.<module:model/UniversityAPILessonModel>}
+     * data is of type: {@link Array.<module:model/UniversityLessonAPIModel>}
      */
     listUniversitySemesterLessons(unid, unisid, callback) {
       let postBody = null;
@@ -291,7 +291,7 @@ export default class UniversityLessonsApi {
       let authNames = [];
       let contentTypes = [];
       let accepts = ['application/json'];
-      let returnType = [UniversityAPILessonModel];
+      let returnType = [UniversityLessonAPIModel];
       return this.apiClient.callApi(
         '/universities/{unid}/semesters/{unisid}/lessons', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
@@ -313,12 +313,12 @@ export default class UniversityLessonsApi {
      * @param {String} unid 
      * @param {String} unisid 
      * @param {String} unilid 
-     * @param {module:model/UniversityAPILessonModel} universityAPILessonModel 
+     * @param {module:model/UniversityLessonAPIModel} universityLessonAPIModel 
      * @param {module:api/UniversityLessonsApi~updateUniversityLessonCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Message}
      */
-    updateUniversityLesson(unid, unisid, unilid, universityAPILessonModel, callback) {
-      let postBody = universityAPILessonModel;
+    updateUniversityLesson(unid, unisid, unilid, universityLessonAPIModel, callback) {
+      let postBody = universityLessonAPIModel;
       // verify the required parameter 'unid' is set
       if (unid === undefined || unid === null) {
         throw new Error("Missing the required parameter 'unid' when calling updateUniversityLesson");
@@ -331,9 +331,9 @@ export default class UniversityLessonsApi {
       if (unilid === undefined || unilid === null) {
         throw new Error("Missing the required parameter 'unilid' when calling updateUniversityLesson");
       }
-      // verify the required parameter 'universityAPILessonModel' is set
-      if (universityAPILessonModel === undefined || universityAPILessonModel === null) {
-        throw new Error("Missing the required parameter 'universityAPILessonModel' when calling updateUniversityLesson");
+      // verify the required parameter 'universityLessonAPIModel' is set
+      if (universityLessonAPIModel === undefined || universityLessonAPIModel === null) {
+        throw new Error("Missing the required parameter 'universityLessonAPIModel' when calling updateUniversityLesson");
       }
 
       let pathParams = {

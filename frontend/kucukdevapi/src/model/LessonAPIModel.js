@@ -60,10 +60,10 @@ class LessonAPIModel {
                 obj['absenceLimit'] = ApiClient.convertToType(data['absenceLimit'], 'Number');
             }
             if (data.hasOwnProperty('slots')) {
-                obj['slots'] = ApiClient.convertToType(data['slots'], ['String']);
+                obj['slots'] = ApiClient.convertToType(data['slots'], [['Number']]);
             }
             if (data.hasOwnProperty('absences')) {
-                obj['absences'] = ApiClient.convertToType(data['absences'], ['String']);
+                obj['absences'] = ApiClient.convertToType(data['absences'], [['Number']]);
             }
         }
         return obj;
@@ -93,12 +93,12 @@ LessonAPIModel.prototype['instructor'] = undefined;
 LessonAPIModel.prototype['absenceLimit'] = undefined;
 
 /**
- * @member {Array.<String>} slots
+ * @member {Array.<Array.<Number>>} slots
  */
 LessonAPIModel.prototype['slots'] = undefined;
 
 /**
- * @member {Array.<String>} absences
+ * @member {Array.<Array.<Number>>} absences
  */
 LessonAPIModel.prototype['absences'] = undefined;
 

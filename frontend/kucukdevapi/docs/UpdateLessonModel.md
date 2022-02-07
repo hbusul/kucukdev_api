@@ -7,6 +7,6 @@ Name | Type | Description | Notes
 **name** | **String** |  | 
 **instructor** | **String** |  | 
 **absenceLimit** | **Number** |  | 
-**slots** | **[String]** |  | 
+**slots** | [**[SlotModel]**](SlotModel.md) |  | 
 
 

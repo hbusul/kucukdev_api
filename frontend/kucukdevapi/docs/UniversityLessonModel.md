@@ -11,6 +11,6 @@ Name | Type | Description | Notes
 **absenceLimit** | **Number** |  | 
 **section** | **String** |  | 
 **instructor** | **String** |  | 
-**slots** | **[String]** |  | 
+**slots** | [**[UniversitySlotModel]**](UniversitySlotModel.md) |  | 
 
 

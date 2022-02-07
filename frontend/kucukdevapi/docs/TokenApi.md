@@ -1,10 +1,10 @@
-# Kucukdevapi.DefaultApi
+# Kucukdevapi.TokenApi
 
 All URIs are relative to *http://localhost:8000*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**loginForAccessTokenTokenPost**](DefaultApi.md#loginForAccessTokenTokenPost) | **POST** /token | Login For Access Token
+[**loginForAccessTokenTokenPost**](TokenApi.md#loginForAccessTokenTokenPost) | **POST** /token | Login For Access Token
 
 
 
@@ -19,7 +19,7 @@ Login For Access Token
 ```javascript
 import Kucukdevapi from 'kucukdevapi';
 
-let apiInstance = new Kucukdevapi.DefaultApi();
+let apiInstance = new Kucukdevapi.TokenApi();
 let username = "username_example"; // String | 
 let password = "password_example"; // String | 
 let opts = {

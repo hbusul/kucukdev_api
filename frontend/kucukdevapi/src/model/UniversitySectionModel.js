@@ -12,6 +12,7 @@
  */
 
 import ApiClient from '../ApiClient';
+import UniversitySlotModel from './UniversitySlotModel';
 
 /**
  * The UniversitySectionModel model module.
@@ -24,7 +25,7 @@ class UniversitySectionModel {
      * @alias module:model/UniversitySectionModel
      * @param section {String} 
      * @param instructor {String} 
-     * @param slots {Array.<String>} 
+     * @param slots {Array.<module:model/UniversitySlotModel>} 
      */
     constructor(section, instructor, slots) { 
         
@@ -63,7 +64,7 @@ class UniversitySectionModel {
                 obj['instructor'] = ApiClient.convertToType(data['instructor'], 'String');
             }
             if (data.hasOwnProperty('slots')) {
-                obj['slots'] = ApiClient.convertToType(data['slots'], ['String']);
+                obj['slots'] = ApiClient.convertToType(data['slots'], [UniversitySlotModel]);
             }
         }
         return obj;
@@ -88,7 +89,7 @@ UniversitySectionModel.prototype['section'] = undefined;
 UniversitySectionModel.prototype['instructor'] = undefined;
 
 /**
- * @member {Array.<String>} slots
+ * @member {Array.<module:model/UniversitySlotModel>} slots
  */
 UniversitySectionModel.prototype['slots'] = undefined;
 

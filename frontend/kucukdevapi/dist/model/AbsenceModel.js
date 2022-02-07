@@ -24,12 +24,15 @@ var AbsenceModel = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>AbsenceModel</code>.
    * @alias module:model/AbsenceModel
-   * @param absence {String} 
+   * @param week {Number} 
+   * @param day {Number} 
+   * @param hour {Number} 
+   * @param isLab {Number} 
    */
-  function AbsenceModel(absence) {
+  function AbsenceModel(week, day, hour, isLab) {
     _classCallCheck(this, AbsenceModel);
 
-    AbsenceModel.initialize(this, absence);
+    AbsenceModel.initialize(this, week, day, hour, isLab);
   }
   /**
    * Initializes the fields of this object.
@@ -40,8 +43,11 @@ var AbsenceModel = /*#__PURE__*/function () {
 
   _createClass(AbsenceModel, null, [{
     key: "initialize",
-    value: function initialize(obj, absence) {
-      obj['absence'] = absence;
+    value: function initialize(obj, week, day, hour, isLab) {
+      obj['week'] = week;
+      obj['day'] = day;
+      obj['hour'] = hour;
+      obj['isLab'] = isLab;
     }
     /**
      * Constructs a <code>AbsenceModel</code> from a plain JavaScript object, optionally creating a new instance.
@@ -57,12 +63,20 @@ var AbsenceModel = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new AbsenceModel();
 
-        if (data.hasOwnProperty('_id')) {
-          obj['_id'] = _ApiClient.default.convertToType(data['_id'], 'String');
+        if (data.hasOwnProperty('week')) {
+          obj['week'] = _ApiClient.default.convertToType(data['week'], 'Number');
         }
 
-        if (data.hasOwnProperty('absence')) {
-          obj['absence'] = _ApiClient.default.convertToType(data['absence'], 'String');
+        if (data.hasOwnProperty('day')) {
+          obj['day'] = _ApiClient.default.convertToType(data['day'], 'Number');
+        }
+
+        if (data.hasOwnProperty('hour')) {
+          obj['hour'] = _ApiClient.default.convertToType(data['hour'], 'Number');
+        }
+
+        if (data.hasOwnProperty('isLab')) {
+          obj['isLab'] = _ApiClient.default.convertToType(data['isLab'], 'Number');
         }
       }
 
@@ -73,15 +87,25 @@ var AbsenceModel = /*#__PURE__*/function () {
   return AbsenceModel;
 }();
 /**
- * @member {String} _id
+ * @member {Number} week
  */
 
 
-AbsenceModel.prototype['_id'] = undefined;
+AbsenceModel.prototype['week'] = undefined;
 /**
- * @member {String} absence
+ * @member {Number} day
  */
 
-AbsenceModel.prototype['absence'] = undefined;
+AbsenceModel.prototype['day'] = undefined;
+/**
+ * @member {Number} hour
+ */
+
+AbsenceModel.prototype['hour'] = undefined;
+/**
+ * @member {Number} isLab
+ */
+
+AbsenceModel.prototype['isLab'] = undefined;
 var _default = AbsenceModel;
 exports.default = _default;

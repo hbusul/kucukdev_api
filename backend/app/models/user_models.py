@@ -6,24 +6,62 @@ from bson import ObjectId
 from .PyObjectId import PyObjectId
 
 
+class SlotModel(BaseModel):
+    day: int = Field(..., ge=0, le=4)
+    hour: int = Field(..., ge=0, le=15)
+    isLab: int = Field(..., ge=0, le=1)
+
+
+class AbsenceModel(BaseModel):
+    week: int = Field(..., ge=0)
+    day: int = Field(..., ge=0, le=4)
+    hour: int = Field(..., ge=0, le=15)
+    isLab: int = Field(..., ge=0, le=1)
+
+
+class LessonAbsenceModel(BaseModel):
+    absence: AbsenceModel = Field(...)
+
+    class Config:
+        json_encoders = {
+            AbsenceModel: lambda x: [x.week, x.day, x.hour, x.isLab],
+        }
+        schema_extra = {
+            "example": {
+                "absence": {"week": 0, "day": 2, "hour": 7, "isLab": 0},
+            }
+        }
+
+
 class LessonModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
-    instructor: str = Field(...)
+    name: str = Field(..., min_length=1)
+    instructor: str = Field(..., min_length=1)
     absenceLimit: int = Field(..., ge=0)
-    slots: List[str] = Field(...)
-    absences: List[str] = []
+    slots: List[SlotModel] = Field(...)
+    absences: List[AbsenceModel] = []
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+        json_encoders = {
+            ObjectId: str,
+            SlotModel: lambda x: [x.day, x.hour, x.isLab],
+            AbsenceModel: lambda x: [x.week, x.day, x.hour, x.isLab],
+        }
         schema_extra = {
             "example": {
-                "name": "EE203",
-                "instructor": "Ali Veli",
-                "absenceLimit": 0,
-                "slots": ["2,7,0", "2,8,0"],
+                "name": "Algebra",
+                "instructor": "Jack Joe",
+                "absenceLimit": 21,
+                "slots": [
+                    {"day": 2, "hour": 7, "isLab": 0},
+                    {"day": 2, "hour": 8, "isLab": 0},
+                ],
+                "absences": [
+                    {"week": 0, "day": 2, "hour": 7, "isLab": 0},
+                    {"week": 0, "day": 2, "hour": 8, "isLab": 0},
+                ],
             }
         }
 
@@ -33,19 +71,19 @@ class LessonAPIModel(BaseModel):
     name: Optional[str]
     instructor: Optional[str]
     absenceLimit: Optional[int]
-    slots: Optional[List[str]]
-    absences: Optional[List[str]]
+    slots: Optional[List[List[int]]]
+    absences: Optional[List[List[int]]]
 
     class Config:
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
-                "name": "EE203",
-                "instructor": "Ali Veli",
-                "absenceLimit": 0,
-                "slots": ["2,7,0", "2,8,0"],
-                "absences": ["1,3,5", "1,3,6"],
+                "_id": "61ddea901311ecaed99afb7c",
+                "name": "Algebra",
+                "instructor": "Jack Joe",
+                "absenceLimit": 21,
+                "slots": [[2, 7, 0], [2, 8, 0]],
+                "absences": [[0, 2, 7, 0], [0, 2, 8, 0]],
             }
         }
 
@@ -54,30 +92,21 @@ class UpdateLessonModel(BaseModel):
     name: str = Field(...)
     instructor: str = Field(...)
     absenceLimit: int = Field(..., ge=0)
-    slots: List[str] = Field(...)
+    slots: List[SlotModel] = Field(...)
 
     class Config:
-        schema_extra = {
-            "example": {
-                "name": "EE203",
-                "instructor": "Ali Veli",
-                "absenceLimit": 0,
-                "slots": ["2,7,0", "2,8,0"],
-            }
+        json_encoders = {
+            SlotModel: lambda x: [x.day, x.hour, x.isLab],
         }
-
-
-class AbsenceModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    absence: str = Field(...)
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "absence": "1,0,2",
+                "name": "Algebra",
+                "instructor": "Jack Joe",
+                "absenceLimit": 21,
+                "slots": [
+                    {"day": 2, "hour": 7, "isLab": 0},
+                    {"day": 2, "hour": 8, "isLab": 0},
+                ],
             }
         }
 
@@ -100,8 +129,8 @@ class UserSemesterModel(BaseModel):
         schema_extra = {
             "example": {
                 "name": "2020-21 Spring",
-                "startDate": "2016-02-18T00:00:00Z",
-                "endDate": "2016-06-18T00:00:00Z",
+                "startDate": "2022-02-18T00:00:00Z",
+                "endDate": "2022-06-18T00:00:00Z",
                 "startHour": "8.10",
                 "dLesson": 50,
                 "dBreak": 10,
@@ -124,8 +153,8 @@ class UpdateUserSemesterModel(BaseModel):
         schema_extra = {
             "example": {
                 "name": "2020-21 Spring",
-                "startDate": "2016-02-18T00:00:00Z",
-                "endDate": "2016-06-18T00:00:00Z",
+                "startDate": "2022-02-18T00:00:00Z",
+                "endDate": "2022-06-18T00:00:00Z",
                 "startHour": "8.10",
                 "dLesson": 50,
                 "dBreak": 10,
@@ -148,10 +177,10 @@ class SemesterAPIModel(BaseModel):
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "_id": "61ddea901311ecaed99afb7c",
                 "name": "2020-21 Spring",
-                "startDate": "2016-02-18T00:00:00Z",
-                "endDate": "2016-06-18T00:00:00Z",
+                "startDate": "2022-02-18T00:00:00Z",
+                "endDate": "2022-06-18T00:00:00Z",
                 "startHour": "8.10",
                 "dLesson": 50,
                 "dBreak": 10,
@@ -190,11 +219,11 @@ class UserAPIModel(BaseModel):
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "_id": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "_id": "61ddea901311ecaed99afb7c",
                 "email": "hello@agu.edu.tr",
                 "userGroup": "default",
-                "curSemesterID": "stringID",
-                "curUniversityID": "stringID",
+                "curSemesterID": "61ddea901311ecaed99afb7d",
+                "curUniversityID": "61ddea901311ecaed99afb7e",
                 "entranceYear": 2018,
             }
         }
@@ -225,7 +254,7 @@ class UpdateSemesterModel(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "curSemesterID": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "curSemesterID": "61ddea901311ecaed99afb7f",
             }
         }
 
@@ -255,7 +284,7 @@ class UpdateUniversityModel(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "curUniversityID": "c765c307-560c-47ab-b29e-0a1265eab860",
+                "curUniversityID": "61ddea901311ecaed99afb7g",
             }
         }
 

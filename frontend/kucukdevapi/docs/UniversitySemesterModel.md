@@ -6,6 +6,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  | [optional] 
 **name** | **String** |  | 
-**lessons** | [**[UniversityAPILessonModel]**](UniversityAPILessonModel.md) |  | [optional] 
+**lessons** | [**[UniversityLessonAPIModel]**](UniversityLessonAPIModel.md) |  | [optional] 
 
 

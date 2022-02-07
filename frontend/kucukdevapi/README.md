@@ -143,7 +143,6 @@ Class | Method | HTTP request | Description
 *Kucukdevapi.CurriculumsApi* | [**getSingleUniversityDepartmentCurriculum**](docs/CurriculumsApi.md#getSingleUniversityDepartmentCurriculum) | **GET** /universities/{unid}/departments/{depid}/curriculums/{curid} | Show Department Curriculum
 *Kucukdevapi.CurriculumsApi* | [**listUniversityDepartmentCurriculums**](docs/CurriculumsApi.md#listUniversityDepartmentCurriculums) | **GET** /universities/{unid}/departments/{depid}/curriculums | List Department Curriculums
 *Kucukdevapi.CurriculumsApi* | [**updateUniversityDepartmentCurriculum**](docs/CurriculumsApi.md#updateUniversityDepartmentCurriculum) | **PUT** /universities/{unid}/departments/{depid}/curriculums/{curid} | Update Department Curriculum
-*Kucukdevapi.DefaultApi* | [**loginForAccessTokenTokenPost**](docs/DefaultApi.md#loginForAccessTokenTokenPost) | **POST** /token | Login For Access Token
 *Kucukdevapi.DepartmentsApi* | [**createUniversityDepartment**](docs/DepartmentsApi.md#createUniversityDepartment) | **POST** /universities/{unid}/departments | Create University Department
 *Kucukdevapi.DepartmentsApi* | [**deleteUniversityDepartment**](docs/DepartmentsApi.md#deleteUniversityDepartment) | **DELETE** /universities/{unid}/departments/{depid} | Delete University Department
 *Kucukdevapi.DepartmentsApi* | [**getSingleUniversityDepartment**](docs/DepartmentsApi.md#getSingleUniversityDepartment) | **GET** /universities/{unid}/departments/{depid} | Show University Department
@@ -162,6 +161,7 @@ Class | Method | HTTP request | Description
 *Kucukdevapi.SemestersApi* | [**getSingleSemester**](docs/SemestersApi.md#getSingleSemester) | **GET** /users/{uid}/semesters/{sid} | Show Semester
 *Kucukdevapi.SemestersApi* | [**listSemestersOfUser**](docs/SemestersApi.md#listSemestersOfUser) | **GET** /users/{uid}/semesters | List Semesters
 *Kucukdevapi.SemestersApi* | [**updateSemester**](docs/SemestersApi.md#updateSemester) | **PUT** /users/{uid}/semesters/{sid} | Update Semester
+*Kucukdevapi.TokenApi* | [**loginForAccessTokenTokenPost**](docs/TokenApi.md#loginForAccessTokenTokenPost) | **POST** /token | Login For Access Token
 *Kucukdevapi.UniversitiesApi* | [**createUniversity**](docs/UniversitiesApi.md#createUniversity) | **POST** /universities | Create University
 *Kucukdevapi.UniversitiesApi* | [**deleteUniversity**](docs/UniversitiesApi.md#deleteUniversity) | **DELETE** /universities/{unid} | Delete University
 *Kucukdevapi.UniversitiesApi* | [**getCurrentUniversitySemester**](docs/UniversitiesApi.md#getCurrentUniversitySemester) | **GET** /universities/{unid}/current-semester | Show University Current Semester
@@ -199,18 +199,22 @@ Class | Method | HTTP request | Description
  - [Kucukdevapi.CurriculumSemesterModel](docs/CurriculumSemesterModel.md)
  - [Kucukdevapi.HTTPValidationError](docs/HTTPValidationError.md)
  - [Kucukdevapi.LessonAPIModel](docs/LessonAPIModel.md)
+ - [Kucukdevapi.LessonAbsenceModel](docs/LessonAbsenceModel.md)
  - [Kucukdevapi.LessonModel](docs/LessonModel.md)
  - [Kucukdevapi.Message](docs/Message.md)
  - [Kucukdevapi.SemesterAPIModel](docs/SemesterAPIModel.md)
+ - [Kucukdevapi.SlotModel](docs/SlotModel.md)
  - [Kucukdevapi.Token](docs/Token.md)
- - [Kucukdevapi.UniversityAPILessonModel](docs/UniversityAPILessonModel.md)
  - [Kucukdevapi.UniversityAPIModel](docs/UniversityAPIModel.md)
  - [Kucukdevapi.UniversityCurriculumModel](docs/UniversityCurriculumModel.md)
  - [Kucukdevapi.UniversityDepartmentModel](docs/UniversityDepartmentModel.md)
+ - [Kucukdevapi.UniversityLessonAPIModel](docs/UniversityLessonAPIModel.md)
  - [Kucukdevapi.UniversityLessonModel](docs/UniversityLessonModel.md)
  - [Kucukdevapi.UniversityModel](docs/UniversityModel.md)
+ - [Kucukdevapi.UniversitySectionAPIModel](docs/UniversitySectionAPIModel.md)
  - [Kucukdevapi.UniversitySectionModel](docs/UniversitySectionModel.md)
  - [Kucukdevapi.UniversitySemesterModel](docs/UniversitySemesterModel.md)
+ - [Kucukdevapi.UniversitySlotModel](docs/UniversitySlotModel.md)
  - [Kucukdevapi.UpdateEntranceYearModel](docs/UpdateEntranceYearModel.md)
  - [Kucukdevapi.UpdateLessonModel](docs/UpdateLessonModel.md)
  - [Kucukdevapi.UpdatePasswordModel](docs/UpdatePasswordModel.md)

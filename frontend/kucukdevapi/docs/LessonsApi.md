@@ -16,7 +16,7 @@ Method | HTTP request | Description
 
 ## createAbsence
 
-> Message createAbsence(uid, sid, lid, absenceModel)
+> Message createAbsence(uid, sid, lid, lessonAbsenceModel)
 
 Create Absence
 
@@ -35,8 +35,8 @@ let apiInstance = new Kucukdevapi.LessonsApi();
 let uid = "uid_example"; // String | 
 let sid = "sid_example"; // String | 
 let lid = "lid_example"; // String | 
-let absenceModel = new Kucukdevapi.AbsenceModel(); // AbsenceModel | 
-apiInstance.createAbsence(uid, sid, lid, absenceModel, (error, data, response) => {
+let lessonAbsenceModel = new Kucukdevapi.LessonAbsenceModel(); // LessonAbsenceModel | 
+apiInstance.createAbsence(uid, sid, lid, lessonAbsenceModel, (error, data, response) => {
   if (error) {
     console.error(error);
   } else {
@@ -53,7 +53,7 @@ Name | Type | Description  | Notes
  **uid** | **String**|  | 
  **sid** | **String**|  | 
  **lid** | **String**|  | 
- **absenceModel** | [**AbsenceModel**](AbsenceModel.md)|  | 
+ **lessonAbsenceModel** | [**LessonAbsenceModel**](LessonAbsenceModel.md)|  | 
 
 ### Return type
 
@@ -71,7 +71,7 @@ Name | Type | Description  | Notes
 
 ## createLesson
 
-> LessonAPIModel createLesson(uid, sid, lessonModel)
+> Message createLesson(uid, sid, lessonModel)
 
 Create Lesson
 
@@ -110,7 +110,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**LessonAPIModel**](LessonAPIModel.md)
+[**Message**](Message.md)
 
 ### Authorization
 
@@ -124,7 +124,7 @@ Name | Type | Description  | Notes
 
 ## deleteAbsence
 
-> Message deleteAbsence(uid, sid, lid, absenceModel)
+> Message deleteAbsence(uid, sid, lid, lessonAbsenceModel)
 
 Delete Absence
 
@@ -143,8 +143,8 @@ let apiInstance = new Kucukdevapi.LessonsApi();
 let uid = "uid_example"; // String | 
 let sid = "sid_example"; // String | 
 let lid = "lid_example"; // String | 
-let absenceModel = new Kucukdevapi.AbsenceModel(); // AbsenceModel | 
-apiInstance.deleteAbsence(uid, sid, lid, absenceModel, (error, data, response) => {
+let lessonAbsenceModel = new Kucukdevapi.LessonAbsenceModel(); // LessonAbsenceModel | 
+apiInstance.deleteAbsence(uid, sid, lid, lessonAbsenceModel, (error, data, response) => {
   if (error) {
     console.error(error);
   } else {
@@ -161,7 +161,7 @@ Name | Type | Description  | Notes
  **uid** | **String**|  | 
  **sid** | **String**|  | 
  **lid** | **String**|  | 
- **absenceModel** | [**AbsenceModel**](AbsenceModel.md)|  | 
+ **lessonAbsenceModel** | [**LessonAbsenceModel**](LessonAbsenceModel.md)|  | 
 
 ### Return type
 
@@ -179,7 +179,7 @@ Name | Type | Description  | Notes
 
 ## deleteLesson
 
-> LessonModel deleteLesson(uid, sid, lid)
+> Message deleteLesson(uid, sid, lid)
 
 Delete Lesson
 
@@ -218,7 +218,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**LessonModel**](LessonModel.md)
+[**Message**](Message.md)
 
 ### Authorization
 

@@ -7,6 +7,8 @@ exports.default = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
 
+var _SlotModel = _interopRequireDefault(require("./SlotModel"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -27,7 +29,7 @@ var UpdateLessonModel = /*#__PURE__*/function () {
    * @param name {String} 
    * @param instructor {String} 
    * @param absenceLimit {Number} 
-   * @param slots {Array.<String>} 
+   * @param slots {Array.<module:model/SlotModel>} 
    */
   function UpdateLessonModel(name, instructor, absenceLimit, slots) {
     _classCallCheck(this, UpdateLessonModel);
@@ -76,7 +78,7 @@ var UpdateLessonModel = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('slots')) {
-          obj['slots'] = _ApiClient.default.convertToType(data['slots'], ['String']);
+          obj['slots'] = _ApiClient.default.convertToType(data['slots'], [_SlotModel.default]);
         }
       }
 
@@ -103,7 +105,7 @@ UpdateLessonModel.prototype['instructor'] = undefined;
 
 UpdateLessonModel.prototype['absenceLimit'] = undefined;
 /**
- * @member {Array.<String>} slots
+ * @member {Array.<module:model/SlotModel>} slots
  */
 
 UpdateLessonModel.prototype['slots'] = undefined;

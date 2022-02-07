@@ -4,23 +4,25 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from .dependencies import settings, control_secret_key, router as token_router
-from .routers.university_routers.schedule_routers import \
-    router as schedule_router
-from .routers.university_routers.uni_cur_lesson_routers import \
-    router as uni_cur_lesson_router
-from .routers.university_routers.uni_cur_semester_routers import \
-    router as uni_cur_semester_router
-from .routers.university_routers.uni_curriculum_routers import \
-    router as uni_curriculum_router
-from .routers.university_routers.uni_department_routers import \
-    router as uni_department_router
-from .routers.university_routers.uni_lesson_routers import \
-    router as uni_lesson_router
+from .routers.university_routers.schedule_routers import router as schedule_router
+from .routers.university_routers.uni_cur_lesson_routers import (
+    router as uni_cur_lesson_router,
+)
+from .routers.university_routers.uni_cur_semester_routers import (
+    router as uni_cur_semester_router,
+)
+from .routers.university_routers.uni_curriculum_routers import (
+    router as uni_curriculum_router,
+)
+from .routers.university_routers.uni_department_routers import (
+    router as uni_department_router,
+)
+from .routers.university_routers.uni_lesson_routers import router as uni_lesson_router
 from .routers.university_routers.uni_routers import router as uni_router
-from .routers.university_routers.uni_section_routers import \
-    router as uni_section_router
-from .routers.university_routers.uni_semester_routers import \
-    router as uni_semester_router
+from .routers.university_routers.uni_section_routers import router as uni_section_router
+from .routers.university_routers.uni_semester_routers import (
+    router as uni_semester_router,
+)
 from .routers.user_routers.lesson_routers import router as lesson_router
 from .routers.user_routers.semester_routers import router as semester_router
 from .routers.user_routers.user_routers import router as user_router
@@ -35,6 +37,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.on_event("startup")
 async def startup_db_client():
     app.mongodb_client = AsyncIOMotorClient(settings.DB_URL)
@@ -42,9 +45,11 @@ async def startup_db_client():
     if settings.SECRET_KEY is None:
         await control_secret_key(request=app.mongodb)
 
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     app.mongodb_client.close()
+
 
 app.include_router(token_router, tags=["token"], prefix="/token")
 app.include_router(user_router, tags=["users"], prefix="/users")
