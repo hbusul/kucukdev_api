@@ -10,7 +10,6 @@ services:
     environment:
       DB_URL: "mongodb://root:example@mongo/"
       DB_NAME: farmstack
-      SECRET_KEY: "TEST_SECRET_KEY"
     networks:
       - app-network
 
