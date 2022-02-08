@@ -104,7 +104,7 @@ async def list_lessons(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Lessons not found"},
+            content={"message": "Semester not found"},
         )
 
     return JSONResponse(
@@ -214,7 +214,7 @@ async def update_lesson(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Lesson could not be updated"},
+            content={"message": "Lesson not found"},
         )
 
     return JSONResponse(
@@ -256,7 +256,7 @@ async def delete_lesson(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Lesson could not be deleted"},
+            content={"message": "Lesson not found"},
         )
 
     return JSONResponse(
@@ -270,6 +270,7 @@ async def delete_lesson(
     operation_id="createAbsence",
     response_model=Message,
     responses={
+        201: {"model": Message},
         400: {"model": Message},
         401: {"model": Message},
         403: {"model": Message},
@@ -321,7 +322,7 @@ async def create_absence(
 
         if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_200_OK,
+                status_code=status.HTTP_201_CREATED,
                 content={"message": "Absence created"},
             )
 

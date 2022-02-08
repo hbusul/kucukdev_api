@@ -34,7 +34,10 @@ def test_create_lesson():
             "name": "Test Lesson",
             "instructor": "Test Instructor",
             "absenceLimit": 0,
-            "slots": ["2,7,0", "2,8,0"],
+            "slots": [
+                {"day": 2, "hour": 7, "isLab": 0},
+                {"day": 2, "hour": 8, "isLab": 0},
+            ],
         },
     )
 
@@ -54,7 +57,10 @@ def test_create_lesson_with_another_user_id():
             "name": "Test Lesson",
             "instructor": "Test Instructor",
             "absenceLimit": 0,
-            "slots": ["2,7,0", "2,8,0"],
+            "slots": [
+                {"day": 2, "hour": 7, "isLab": 0},
+                {"day": 2, "hour": 8, "isLab": 0},
+            ],
         },
     )
 
@@ -73,12 +79,15 @@ def test_create_lesson_with_invalid_semester_id():
             "name": "Test Lesson",
             "instructor": "Test Instructor",
             "absenceLimit": 0,
-            "slots": ["2,7,0", "2,8,0"],
+            "slots": [
+                {"day": 2, "hour": 7, "isLab": 0},
+                {"day": 2, "hour": 8, "isLab": 0},
+            ],
         },
     )
 
     assert lesson.status_code == 404
-    assert lesson.json()["message"] == "Semester not found"
+    assert lesson.json()["message"] == "Lesson could not be created"
 
 
 def test_get_lesson():
@@ -95,7 +104,7 @@ def test_get_lesson():
         "name": "Test Lesson",
         "instructor": "Test Instructor",
         "absenceLimit": 0,
-        "slots": ["2,7,0", "2,8,0"],
+        "slots": [[2, 7, 0], [2, 8, 0]],
         "absences": [],
     }
 
@@ -149,7 +158,10 @@ def test_update_lesson():
             "name": "Test Lesson 2",
             "instructor": "Test Instructor 2",
             "absenceLimit": 0,
-            "slots": ["2,7,0", "2,8,0"],
+            "slots": [
+                {"day": 3, "hour": 5, "isLab": 0},
+                {"day": 3, "hour": 6, "isLab": 1},
+            ],
         },
     )
 
@@ -168,7 +180,10 @@ def test_update_lesson_with_another_user_id():
             "name": "Test Lesson 2",
             "instructor": "Test Instructor 2",
             "absenceLimit": 0,
-            "slots": ["2,7,0", "2,8,0"],
+            "slots": [
+                {"day": 3, "hour": 5, "isLab": 0},
+                {"day": 3, "hour": 6, "isLab": 1},
+            ],
         },
     )
 
@@ -187,7 +202,10 @@ def test_update_lesson_with_invalid_semester_id():
             "name": "Test Lesson 2",
             "instructor": "Test Instructor 2",
             "absenceLimit": 0,
-            "slots": ["2,7,0", "2,8,0"],
+            "slots": [
+                {"day": 3, "hour": 5, "isLab": 0},
+                {"day": 3, "hour": 6, "isLab": 1},
+            ],
         },
     )
 
@@ -206,7 +224,10 @@ def test_update_lesson_with_invalid_lesson_id():
             "name": "Test Lesson 2",
             "instructor": "Test Instructor 2",
             "absenceLimit": 0,
-            "slots": ["2,7,0", "2,8,0"],
+            "slots": [
+                {"day": 3, "hour": 5, "isLab": 0},
+                {"day": 3, "hour": 6, "isLab": 1},
+            ],
         },
     )
 
@@ -230,7 +251,7 @@ def test_list_lessons():
             "name": "Test Lesson 2",
             "instructor": "Test Instructor 2",
             "absenceLimit": 0,
-            "slots": ["2,7,0", "2,8,0"],
+            "slots": [[3, 5, 0], [3, 6, 1]],
             "absences": [],
         }
     ]
@@ -272,7 +293,10 @@ def test_create_second_lesson():
             "name": "Test Lesson 3",
             "instructor": "Test Instructor 3",
             "absenceLimit": 0,
-            "slots": ["2,7,0", "2,8,0"],
+            "slots": [
+                {"day": 2, "hour": 7, "isLab": 0},
+                {"day": 2, "hour": 8, "isLab": 0},
+            ],
         },
     )
 
@@ -295,7 +319,7 @@ def test_list_lessons_with_two_lessons():
             "name": "Test Lesson 2",
             "instructor": "Test Instructor 2",
             "absenceLimit": 0,
-            "slots": ["2,7,0", "2,8,0"],
+            "slots": [[3, 5, 0], [3, 6, 1]],
             "absences": [],
         },
         {
@@ -303,7 +327,7 @@ def test_list_lessons_with_two_lessons():
             "name": "Test Lesson 3",
             "instructor": "Test Instructor 3",
             "absenceLimit": 0,
-            "slots": ["2,7,0", "2,8,0"],
+            "slots": [[2, 7, 0], [2, 8, 0]],
             "absences": [],
         },
     ]
@@ -315,7 +339,7 @@ def test_create_absence():
     absence = client.post(
         f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
         headers={"Authorization": f"Bearer {test_user.token}"},
-        json={"absence": "2,7,0"},
+        json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
     )
 
     assert absence.status_code == 201
@@ -336,8 +360,8 @@ def test_get_lesson_after_adding_absence():
         "name": "Test Lesson 2",
         "instructor": "Test Instructor 2",
         "absenceLimit": 0,
-        "slots": ["2,7,0", "2,8,0"],
-        "absences": ["2,7,0"],
+        "slots": [[3, 5, 0], [3, 6, 1]],
+        "absences": [[0, 3, 5, 0]],
     }
 
 
@@ -347,7 +371,7 @@ def test_create_same_absence():
     absence = client.post(
         f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
         headers={"Authorization": f"Bearer {test_user.token}"},
-        json={"absence": "2,7,0"},
+        json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
     )
 
     assert absence.status_code == 400
@@ -361,7 +385,7 @@ def test_create_absence_with_another_user_id():
     absence = client.post(
         f"/users/{user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
         headers={"Authorization": f"Bearer {test_user.token}"},
-        json={"absence": "2,7,0"},
+        json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
     )
 
     assert absence.status_code == 403
@@ -375,11 +399,11 @@ def test_create_absence_with_invalid_semester_id():
     absence = client.post(
         f"/users/{test_user.user_id}/semesters/{semester_id}/lessons/{test_user.lesson_id}/absences",
         headers={"Authorization": f"Bearer {test_user.token}"},
-        json={"absence": "2,7,0"},
+        json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
     )
 
     assert absence.status_code == 404
-    assert absence.json()["message"] == "Lesson not found"
+    assert absence.json()["message"] == "Absence could not be created"
 
 
 def test_create_absence_with_invalid_lesson_id():
@@ -389,11 +413,11 @@ def test_create_absence_with_invalid_lesson_id():
     absence = client.post(
         f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{lesson_id}/absences",
         headers={"Authorization": f"Bearer {test_user.token}"},
-        json={"absence": "2,7,0"},
+        json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
     )
 
     assert absence.status_code == 404
-    assert absence.json()["message"] == "Lesson not found"
+    assert absence.json()["message"] == "Absence could not be created"
 
 
 def test_delete_absence():
@@ -402,7 +426,7 @@ def test_delete_absence():
     absence = client.delete(
         f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
         headers={"Authorization": f"Bearer {test_user.token}"},
-        json={"absence": "2,7,0"},
+        json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
     )
 
     assert absence.status_code == 200
@@ -423,7 +447,7 @@ def test_get_lesson_after_deleting_absence():
         "name": "Test Lesson 2",
         "instructor": "Test Instructor 2",
         "absenceLimit": 0,
-        "slots": ["2,7,0", "2,8,0"],
+        "slots": [[3, 5, 0], [3, 6, 1]],
         "absences": [],
     }
 
@@ -434,11 +458,11 @@ def test_delete_same_absence():
     absence = client.delete(
         f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
         headers={"Authorization": f"Bearer {test_user.token}"},
-        json={"absence": "2,7,0"},
+        json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
     )
 
-    assert absence.status_code == 400
-    assert absence.json()["message"] == "Absence does not exist"
+    assert absence.status_code == 404
+    assert absence.json()["message"] == "Absence not found"
 
 
 def test_delete_absence_with_another_user_id():
@@ -448,7 +472,7 @@ def test_delete_absence_with_another_user_id():
     absence = client.delete(
         f"/users/{user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
         headers={"Authorization": f"Bearer {test_user.token}"},
-        json={"absence": "2,7,0"},
+        json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
     )
 
     assert absence.status_code == 403
@@ -462,11 +486,11 @@ def test_delete_absence_with_invalid_semester_id():
     absence = client.delete(
         f"/users/{test_user.user_id}/semesters/{semester_id}/lessons/{test_user.lesson_id}/absences",
         headers={"Authorization": f"Bearer {test_user.token}"},
-        json={"absence": "2,7,0"},
+        json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
     )
 
     assert absence.status_code == 404
-    assert absence.json()["message"] == "Lesson not found"
+    assert absence.json()["message"] == "Absence not found"
 
 
 def test_delete_absence_with_invalid_lesson_id():
@@ -476,11 +500,11 @@ def test_delete_absence_with_invalid_lesson_id():
     absence = client.delete(
         f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{lesson_id}/absences",
         headers={"Authorization": f"Bearer {test_user.token}"},
-        json={"absence": "2,7,0"},
+        json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
     )
 
     assert absence.status_code == 404
-    assert absence.json()["message"] == "Lesson not found"
+    assert absence.json()["message"] == "Absence not found"
 
 
 def test_delete_lesson():
