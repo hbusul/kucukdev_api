@@ -21,6 +21,7 @@ import LessonAPIModel from './model/LessonAPIModel';
 import LessonAbsenceModel from './model/LessonAbsenceModel';
 import LessonModel from './model/LessonModel';
 import Message from './model/Message';
+import MessageCreate from './model/MessageCreate';
 import SemesterAPIModel from './model/SemesterAPIModel';
 import SlotModel from './model/SlotModel';
 import Token from './model/Token';
@@ -145,6 +146,12 @@ export {
      * @property {module:model/Message}
      */
     Message,
+
+    /**
+     * The MessageCreate model constructor.
+     * @property {module:model/MessageCreate}
+     */
+    MessageCreate,
 
     /**
      * The SemesterAPIModel model constructor.

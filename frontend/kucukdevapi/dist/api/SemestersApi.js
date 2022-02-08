@@ -11,6 +11,8 @@ var _HTTPValidationError = _interopRequireDefault(require("../model/HTTPValidati
 
 var _Message = _interopRequireDefault(require("../model/Message"));
 
+var _MessageCreate = _interopRequireDefault(require("../model/MessageCreate"));
+
 var _SemesterAPIModel = _interopRequireDefault(require("../model/SemesterAPIModel"));
 
 var _UpdateUserSemesterModel = _interopRequireDefault(require("../model/UpdateUserSemesterModel"));
@@ -47,7 +49,7 @@ var SemestersApi = /*#__PURE__*/function () {
    * Callback function to receive the result of the createSemester operation.
    * @callback module:api/SemestersApi~createSemesterCallback
    * @param {String} error Error message, if any.
-   * @param {Array.<module:model/SemesterAPIModel>} data The data returned by the service call.
+   * @param {module:model/MessageCreate} data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
 
@@ -57,7 +59,7 @@ var SemestersApi = /*#__PURE__*/function () {
    * @param {String} uid 
    * @param {module:model/UserSemesterModel} userSemesterModel 
    * @param {module:api/SemestersApi~createSemesterCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link Array.<module:model/SemesterAPIModel>}
+   * data is of type: {@link module:model/MessageCreate}
    */
 
 
@@ -84,7 +86,7 @@ var SemestersApi = /*#__PURE__*/function () {
       var authNames = ['OAuth2PasswordBearer'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = [_SemesterAPIModel.default];
+      var returnType = _MessageCreate.default;
       return this.apiClient.callApi('/users/{uid}/semesters', 'POST', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**

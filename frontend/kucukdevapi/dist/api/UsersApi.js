@@ -11,6 +11,8 @@ var _HTTPValidationError = _interopRequireDefault(require("../model/HTTPValidati
 
 var _Message = _interopRequireDefault(require("../model/Message"));
 
+var _MessageCreate = _interopRequireDefault(require("../model/MessageCreate"));
+
 var _UpdateEntranceYearModel = _interopRequireDefault(require("../model/UpdateEntranceYearModel"));
 
 var _UpdatePasswordModel = _interopRequireDefault(require("../model/UpdatePasswordModel"));
@@ -53,7 +55,7 @@ var UsersApi = /*#__PURE__*/function () {
    * Callback function to receive the result of the createUser operation.
    * @callback module:api/UsersApi~createUserCallback
    * @param {String} error Error message, if any.
-   * @param {module:model/UserAPIModel} data The data returned by the service call.
+   * @param {module:model/MessageCreate} data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
 
@@ -62,7 +64,7 @@ var UsersApi = /*#__PURE__*/function () {
    * Create a user
    * @param {module:model/UserModel} userModel 
    * @param {module:api/UsersApi~createUserCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link module:model/UserAPIModel}
+   * data is of type: {@link module:model/MessageCreate}
    */
 
 
@@ -82,7 +84,7 @@ var UsersApi = /*#__PURE__*/function () {
       var authNames = [];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = _UserAPIModel.default;
+      var returnType = _MessageCreate.default;
       return this.apiClient.callApi('/users', 'POST', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**

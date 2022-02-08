@@ -2,6 +2,7 @@ import json
 from typing import List
 
 from fastapi import APIRouter, Body, Depends, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
@@ -24,7 +25,7 @@ router = APIRouter()
     operation_id="createLesson",
     response_model=MessageCreate,
     responses={
-        201: {"model": Message},
+        201: {"model": MessageCreate},
         401: {"model": Message},
         403: {"model": Message},
         404: {"model": Message},
@@ -51,10 +52,9 @@ async def create_lesson(
         if update_result.modified_count == 1:
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
-                content={
-                    "_id": lesson["_id"],
-                    "message": "Lesson created",
-                },
+                content=jsonable_encoder(
+                    MessageCreate(id=lesson["_id"], message="Lesson created")
+                ),
             )
 
         return JSONResponse(
@@ -73,9 +73,9 @@ async def create_lesson(
     operation_id="listLessonsOfSemester",
     response_model=List[LessonAPIModel],
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def list_lessons(
@@ -118,9 +118,9 @@ async def list_lessons(
     operation_id="getSingleLesson",
     response_model=LessonAPIModel,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def show_lesson(
@@ -270,10 +270,10 @@ async def delete_lesson(
     operation_id="createAbsence",
     response_model=Message,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
-        401: {"model": Message},
         400: {"model": Message},
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def create_absence(

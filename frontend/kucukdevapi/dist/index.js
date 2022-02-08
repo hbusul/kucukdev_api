@@ -57,6 +57,12 @@ Object.defineProperty(exports, "Message", {
     return _Message.default;
   }
 });
+Object.defineProperty(exports, "MessageCreate", {
+  enumerable: true,
+  get: function get() {
+    return _MessageCreate.default;
+  }
+});
 Object.defineProperty(exports, "SemesterAPIModel", {
   enumerable: true,
   get: function get() {
@@ -297,6 +303,8 @@ var _LessonAbsenceModel = _interopRequireDefault(require("./model/LessonAbsenceM
 var _LessonModel = _interopRequireDefault(require("./model/LessonModel"));
 
 var _Message = _interopRequireDefault(require("./model/Message"));
+
+var _MessageCreate = _interopRequireDefault(require("./model/MessageCreate"));
 
 var _SemesterAPIModel = _interopRequireDefault(require("./model/SemesterAPIModel"));
 

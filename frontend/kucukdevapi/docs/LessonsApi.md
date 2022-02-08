@@ -71,7 +71,7 @@ Name | Type | Description  | Notes
 
 ## createLesson
 
-> Message createLesson(uid, sid, lessonModel)
+> MessageCreate createLesson(uid, sid, lessonModel)
 
 Create Lesson
 
@@ -110,7 +110,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Message**](Message.md)
+[**MessageCreate**](MessageCreate.md)
 
 ### Authorization
 

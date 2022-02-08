@@ -17,7 +17,7 @@ Method | HTTP request | Description
 
 ## createUser
 
-> UserAPIModel createUser(userModel)
+> MessageCreate createUser(userModel)
 
 Create User
 
@@ -48,7 +48,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**UserAPIModel**](UserAPIModel.md)
+[**MessageCreate**](MessageCreate.md)
 
 ### Authorization
 

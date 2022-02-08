@@ -202,6 +202,7 @@ Class | Method | HTTP request | Description
  - [Kucukdevapi.LessonAbsenceModel](docs/LessonAbsenceModel.md)
  - [Kucukdevapi.LessonModel](docs/LessonModel.md)
  - [Kucukdevapi.Message](docs/Message.md)
+ - [Kucukdevapi.MessageCreate](docs/MessageCreate.md)
  - [Kucukdevapi.SemesterAPIModel](docs/SemesterAPIModel.md)
  - [Kucukdevapi.SlotModel](docs/SlotModel.md)
  - [Kucukdevapi.Token](docs/Token.md)

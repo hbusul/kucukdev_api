@@ -45,10 +45,9 @@ async def create_user(request: Request, user: UserModel = Body(...)):
         if new_user.inserted_id is not None:
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
-                content={
-                    "_id": user["_id"],
-                    "message": "User created",
-                },
+                content=jsonable_encoder(
+                    MessageCreate(id=user["_id"], message="User created")
+                ),
             )
 
         return JSONResponse(

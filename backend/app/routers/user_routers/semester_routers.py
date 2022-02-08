@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from ...dependencies import get_current_user
 from ...models.user_models import (
     Message,
+    MessageCreate,
     SemesterAPIModel,
     UpdateSemesterModel,
     UpdateUserSemesterModel,
@@ -22,12 +23,13 @@ router = APIRouter()
     "/{uid}/semesters",
     response_description="Add new semester",
     operation_id="createSemester",
-    response_model=List[SemesterAPIModel],
+    response_model=MessageCreate,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
-        401: {"model": Message},
+        201: {"model": MessageCreate},
         400: {"model": Message},
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def create_semester(
@@ -69,7 +71,9 @@ async def create_semester(
 
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
-                content={"_id": semester["_id"], "message": "Semester created"},
+                content=jsonable_encoder(
+                    MessageCreate(id=semester["_id"], message="Semester created")
+                ),
             )
 
         return JSONResponse(
@@ -88,9 +92,9 @@ async def create_semester(
     operation_id="listSemestersOfUser",
     response_model=List[SemesterAPIModel],
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def list_semesters(
@@ -118,9 +122,9 @@ async def list_semesters(
     operation_id="getSingleSemester",
     response_model=SemesterAPIModel,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def show_semester(
@@ -152,9 +156,9 @@ async def show_semester(
     operation_id="updateSemester",
     response_model=Message,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def update_semester(
@@ -226,10 +230,10 @@ async def update_semester(
     operation_id="deleteSemester",
     response_model=Message,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
-        401: {"model": Message},
         400: {"model": Message},
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def delete_semester(

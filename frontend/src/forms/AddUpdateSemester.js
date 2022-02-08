@@ -117,12 +117,12 @@ const AddSemester = ({ history, match }) => {
                         console.log(
                             "API called successfully. Returned data: " + data
                         )
-                        if (data.length === 1) {
+                        if (login.semesterID === "null") {
                             setLogin({
                                 userToken: login.userToken,
                                 userGroup: login.userGroup,
                                 userID: login.userID,
-                                semesterID: data[0]._id,
+                                semesterID: data._id,
                                 universityID: login.universityID,
                             })
                         }

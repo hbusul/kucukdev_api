@@ -290,10 +290,11 @@ class UpdateUniversityModel(BaseModel):
 
 
 class MessageCreate(BaseModel):
-    _id: str
+    id: str = Field(alias="_id")
     message: str
 
     class Config:
+        allow_population_by_field_name = True
         schema_extra = {
             "example": {
                 "_id": "61ddea901311ecaed99afb7c",

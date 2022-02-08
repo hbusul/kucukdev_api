@@ -14,7 +14,7 @@ Method | HTTP request | Description
 
 ## createSemester
 
-> [SemesterAPIModel] createSemester(uid, userSemesterModel)
+> MessageCreate createSemester(uid, userSemesterModel)
 
 Create Semester
 
@@ -51,7 +51,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**[SemesterAPIModel]**](SemesterAPIModel.md)
+[**MessageCreate**](MessageCreate.md)
 
 ### Authorization
 
