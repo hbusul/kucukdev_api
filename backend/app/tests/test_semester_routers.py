@@ -13,6 +13,7 @@ class TestUser:
     user_id = None
     token = None
     semester_id = None
+    second_semester_id = None
 
 
 test_user = TestUser()
@@ -200,7 +201,7 @@ def test_list_semesters():
     ]
 
 
-def test_semesters_with_another_user_id():
+def test_list_semesters_with_another_user_id():
     """ "Test listing semesters with a user id other than auth user"""
 
     user_id = "non_existent_user_id"
@@ -232,6 +233,7 @@ def test_create_second_semester():
 
     assert semester.status_code == 201
     assert semester.json()["message"] == "Semester created"
+    test_user.second_semester_id = semester.json()["_id"]
 
 
 def test_list_semesters_with_two_semesters():
@@ -271,7 +273,7 @@ def test_delete_semester():
     """Test deleting semester"""
 
     semester = client.delete(
-        f"/users/{test_user.user_id}/semesters/{test_user.semester_id}",
+        f"/users/{test_user.user_id}/semesters/{test_user.second_semester_id}",
         headers={"Authorization": f"Bearer {test_user.token}"},
     )
 
@@ -283,7 +285,7 @@ def test_delete_same_semester():
     """ "Test deleting same semester"""
 
     semester = client.delete(
-        f"/users/{test_user.user_id}/semesters/{test_user.semester_id}",
+        f"/users/{test_user.user_id}/semesters/{test_user.second_semester_id}",
         headers={"Authorization": f"Bearer {test_user.token}"},
     )
 
@@ -315,3 +317,15 @@ def test_delete_semester_with_invalid_semester_id():
 
     assert semester.status_code == 404
     assert semester.json()["message"] == "Semester not found"
+
+
+def test_delete_current_semester():
+    """ "Test deleting current semester"""
+
+    semester = client.delete(
+        f"/users/{test_user.user_id}/semesters/{test_user.semester_id}",
+        headers={"Authorization": f"Bearer {test_user.token}"},
+    )
+
+    assert semester.status_code == 400
+    assert semester.json()["message"] == "Cannot delete current semester"

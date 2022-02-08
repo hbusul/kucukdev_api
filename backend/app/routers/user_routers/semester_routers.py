@@ -245,14 +245,10 @@ async def delete_semester(
     """Delete a semester with given userID and semesterID"""
 
     if auth_user["_id"] == uid:
-        find_user = await request.app.mongodb["users"].find_one(
-            {"_id": uid, "semesters._id": sid}
-        )
-
         if auth_user["curSemesterID"] == sid:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Current semester cannot be deleted"},
+                content={"message": "Cannot delete current semester"},
             )
 
         update_result = await request.app.mongodb["users"].update_one(
