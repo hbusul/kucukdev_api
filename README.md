@@ -31,10 +31,3 @@ To run:
 
 To down with cleaning the database:
 `docker-compose -f docker-compose.test.yaml down -v`
-
-To run university tests, an admin user is required to create professor users. Therefore, a file named `.env` should be added into `backend` folder. Content of the `.env` file is following:
-
-```
-ADMIN_USERNAME=<admin_email>
-ADMIN_PASSWORD=<admin_password>
-```
