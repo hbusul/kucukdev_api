@@ -74,9 +74,7 @@ async def create_university_semester(
     response_description="List all university semeseters",
     operation_id="listUniversitySemesters",
     response_model=List[UniversitySemesterModel],
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def list_university_semesters(unid: str, request: Request):
     """list all semesters of a university with given universityID"""
@@ -97,9 +95,7 @@ async def list_university_semesters(unid: str, request: Request):
     response_description="List a university semeseters",
     operation_id="getSingleUniversitySemesters",
     response_model=List[UniversitySemesterModel],
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def show_university_semester(unid: str, unisid: str, request: Request):
     """Get a single semester of a university with given universityID and universitySemesterID"""
@@ -198,10 +194,7 @@ async def update_university_semester(
     response_description="Delete university semester",
     operation_id="deleteUniversitySemester",
     response_model=Message,
-    responses={
-        404: {"model": Message},
-        403: {"model": Message},
-    },
+    responses={404: {"model": Message}, 403: {"model": Message},},
 )
 async def delete_university_semester(
     unid: str,
@@ -212,6 +205,16 @@ async def delete_university_semester(
     """Delete a university semester with given universityID and universitySemesterID"""
 
     if auth_user["userGroup"] == "professor":
+        if (
+            await request.app.mongodb["universities"].find_one(
+                {"_id": unid, "curSemesterID": unisid}
+            )
+        ) is not None:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Cannot delete current semester"},
+            )
+
         delete_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid}, {"$pull": {"semesters": {"_id": unisid}}}
         )
