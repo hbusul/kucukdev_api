@@ -1,18 +1,17 @@
 import secrets
-import random
-import string
 from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from passlib.hash import bcrypt
 from pydantic import BaseModel
 
 from .config import Settings
-from .models.user_models import Message
-
+from .models.user_models import Message, UserModel
 
 settings = Settings()
 
@@ -24,13 +23,32 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
+async def create_admin_user(request: Request):
+    if await request["users"].find_one({"email": settings.ADMIN_USERNAME}) is None:
+        user = UserModel(
+            email=settings.ADMIN_USERNAME, password=bcrypt.hash(settings.ADMIN_PASSWORD)
+        )
+        user = jsonable_encoder(user)
+        user["userGroup"] = "admin"
+        user["curSemesterID"] = "null"
+        user["curUniversityID"] = "null"
+        user["entranceYear"] = 0
+        res = await request["users"].insert_one(user)
+        if res.inserted_id is None:
+            raise HTTPException(status_code=500, detail="Could not create admin user")
+
+
 async def control_secret_key(request: Request):
     secret_key = secrets.token_urlsafe(64)
-    res = await request["key"].update_one({}, {"$setOnInsert": {"secret_key": secret_key}}, upsert=True)
+    res = await request["key"].update_one(
+        {}, {"$setOnInsert": {"secret_key": secret_key}}, upsert=True
+    )
     if res.upserted_id is not None:
         settings.SECRET_KEY = secret_key
     else:
         settings.SECRET_KEY = (await request["key"].find_one())["secret_key"]
+
 
 class Token(BaseModel):
     access_token: str

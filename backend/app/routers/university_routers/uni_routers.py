@@ -1,24 +1,17 @@
-from fastapi import (
-    APIRouter,
-    Body,
-    Request,
-    status,
-    Response,
-    Depends,
-)
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 from typing import List
 
+from fastapi import APIRouter, Body, Depends, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.uni_models import (
-    UniversityModel,
     UniversityAPIModel,
-    UpdateUniversityNameModel,
+    UniversityModel,
     UniversitySemesterModel,
+    UpdateUniversityNameModel,
 )
-from ...models.user_models import UserModel, Message, UpdateSemesterModel
+from ...models.user_models import Message, MessageCreate, UpdateSemesterModel, UserModel
 
 router = APIRouter()
 
@@ -27,10 +20,12 @@ router = APIRouter()
     "",
     response_description="Add new university",
     operation_id="createUniversity",
-    response_model=UniversityAPIModel,
+    response_model=MessageCreate,
     responses={
+        201: {"model": MessageCreate},
         400: {"model": Message},
         403: {"model": Message},
+        409: {"model": Message},
     },
 )
 async def create_university(
@@ -44,21 +39,30 @@ async def create_university(
         university = jsonable_encoder(university)
         university["curSemesterID"] = "null"
 
-        for doc in await request.app.mongodb["universities"].find().to_list(length=100):
-            if doc["name"] == university["name"]:
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"message": "University already exists"},
-                )
+        if await request.app.mongodb["universities"].find_one(
+            {"name": university["name"]}
+        ):
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"message": "University already exists"},
+            )
 
         new_university = await request.app.mongodb["universities"].insert_one(
             university
         )
-        created_university = await request.app.mongodb["universities"].find_one(
-            {"_id": new_university.inserted_id}
-        )
 
-        return created_university
+        if new_university.inserted_id is not None:
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=jsonable_encoder(
+                    MessageCreate(id=university["_id"], message="University created")
+                ),
+            )
+
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "University not created"},
+        )
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -70,9 +74,7 @@ async def create_university(
     response_description="List all universities",
     operation_id="listUniversities",
     response_model=List[UniversityAPIModel],
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def list_universities(request: Request):
     """list all universities"""
@@ -94,17 +96,13 @@ async def list_universities(request: Request):
     "/{unid}",
     response_description="Get a single university",
     operation_id="getSingleUniversity",
-    response_model=UniversityModel,
+    response_model=UniversityAPIModel,
     responses={404: {"model": Message}},
 )
 async def show_university(unid: str, request: Request):
     """Get a single university with given universityID"""
     if (
-        university := await request.app.mongodb["universities"].find_one(
-            {
-                "_id": unid,
-            }
-        )
+        university := await request.app.mongodb["universities"].find_one({"_id": unid})
     ) is not None:
         return university
 
@@ -234,11 +232,7 @@ async def update_university_current_semester(
 async def show_university_current_semester(unid: str, request: Request):
     """Get current semester of a university with given universityID"""
     if (
-        university := await request.app.mongodb["universities"].find_one(
-            {
-                "_id": unid,
-            }
-        )
+        university := await request.app.mongodb["universities"].find_one({"_id": unid,})
     ) is not None:
         for semester in university["semesters"]:
             if semester["_id"] == university["curSemesterID"]:
@@ -255,15 +249,10 @@ async def show_university_current_semester(unid: str, request: Request):
     response_description="Delete university",
     operation_id="deleteUniversity",
     response_model=Message,
-    responses={
-        404: {"model": Message},
-        403: {"model": Message},
-    },
+    responses={404: {"model": Message}, 403: {"model": Message},},
 )
 async def delete_university(
-    unid: str,
-    request: Request,
-    auth_user: UserModel = Depends(get_current_user),
+    unid: str, request: Request, auth_user: UserModel = Depends(get_current_user),
 ):
     """Delete a university with given universityID"""
 

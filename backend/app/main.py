@@ -3,7 +3,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from .dependencies import settings, control_secret_key, router as token_router
+from .dependencies import (
+    create_admin_user,
+    settings,
+    control_secret_key,
+    router as token_router,
+)
 from .routers.university_routers.schedule_routers import router as schedule_router
 from .routers.university_routers.uni_cur_lesson_routers import (
     router as uni_cur_lesson_router,
@@ -28,6 +33,7 @@ from .routers.user_routers.semester_routers import router as semester_router
 from .routers.user_routers.user_routers import router as user_router
 
 app = FastAPI()
+
 origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
@@ -42,6 +48,8 @@ app.add_middleware(
 async def startup_db_client():
     app.mongodb_client = AsyncIOMotorClient(settings.DB_URL)
     app.mongodb = app.mongodb_client[settings.DB_NAME]
+    if settings.ADMIN_USERNAME is not None and settings.ADMIN_PASSWORD is not None:
+        await create_admin_user(request=app.mongodb)
     if settings.SECRET_KEY is None:
         await control_secret_key(request=app.mongodb)
 
@@ -74,10 +82,9 @@ app.include_router(
     uni_cur_lesson_router, tags=["curriculum lessons"], prefix="/universities"
 )
 app.include_router(schedule_router, tags=["scheduler"], prefix="/universities")
+
+
 if __name__ == "__main__":
     uvicorn.run(
-        "main:app",
-        host=settings.HOST,
-        reload=settings.DEBUG_MODE,
-        port=settings.PORT,
+        "main:app", host=settings.HOST, reload=settings.DEBUG_MODE, port=settings.PORT,
     )
