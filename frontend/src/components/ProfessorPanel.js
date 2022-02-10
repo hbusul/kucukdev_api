@@ -795,6 +795,9 @@ const ProfessorPanel = ({ history }) => {
                         console.log(
                             "API called successfully. Returned data: " + data
                         )
+                        if (semesters.length === 0) {
+                            selectedUniversity.curSemesterID = data["_id"]
+                        }
                         onSelectUniversity(selectedUniversity, true)
                     }
                 }
