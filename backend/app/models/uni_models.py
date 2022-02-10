@@ -117,11 +117,7 @@ class UniversitySemesterModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "name": "20-21 Spring",
-            }
-        }
+        schema_extra = {"example": {"name": "20-21 Spring",}}
 
 
 class CurriculumLessonModel(BaseModel):
@@ -148,11 +144,7 @@ class CurriculumSemesterModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "semester": 1,
-            }
-        }
+        schema_extra = {"example": {"semester": 1,}}
 
 
 class UniversityCurriculumModel(BaseModel):
@@ -180,11 +172,7 @@ class UniversityDepartmentModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "name": "COMP",
-            }
-        }
+        schema_extra = {"example": {"name": "COMP",}}
 
 
 class UniversityModel(BaseModel):
@@ -197,11 +185,7 @@ class UniversityModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "name": "AGU",
-            }
-        }
+        schema_extra = {"example": {"name": "AGU",}}
 
 
 class UniversityAPIModel(BaseModel):
@@ -223,15 +207,8 @@ class UniversityAPIModel(BaseModel):
 
 
 class UpdateUniversityNameModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
 
     class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "name": "AGU",
-            }
-        }
+        schema_extra = {"example": {"name": "AGU",}}
+
