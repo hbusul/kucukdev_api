@@ -1,17 +1,12 @@
-from fastapi import (
-    APIRouter,
-    Body,
-    Request,
-    status,
-    Depends,
-)
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 from typing import List
+
+from fastapi import APIRouter, Body, Depends, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.uni_models import UniversityCurriculumModel
-from ...models.user_models import UserModel, Message
+from ...models.user_models import Message, MessageCreate, UserModel
 
 router = APIRouter()
 
@@ -20,11 +15,13 @@ router = APIRouter()
     "/{unid}/departments/{depid}/curriculums",
     response_description="Add new university department curriculum",
     operation_id="createUniversityDepartmentCurriculum",
-    response_model=UniversityCurriculumModel,
+    response_model=MessageCreate,
     responses={
-        400: {"model": Message},
+        201: {"model": MessageCreate},
+        401: {"model": Message},
         403: {"model": Message},
         404: {"model": Message},
+        409: {"model": Message},
     },
 )
 async def create_department_curriculum(
@@ -40,20 +37,18 @@ async def create_department_curriculum(
         department_curriculum = jsonable_encoder(department_curriculum)
 
         if (
-            university := await request.app.mongodb["universities"].find_one(
-                {"_id": unid, "departments._id": depid}
+            await request.app.mongodb["universities"].find_one(
+                {
+                    "_id": unid,
+                    "departments._id": depid,
+                    "departments.curriculums.name": department_curriculum["name"],
+                }
             )
         ) is not None:
-            for department in university["departments"]:
-                if department["_id"] == depid:
-                    for curriculum in department["curriculums"]:
-                        if curriculum["name"] == department_curriculum["name"]:
-                            return JSONResponse(
-                                status_code=status.HTTP_400_BAD_REQUEST,
-                                content={
-                                    "message": "University department curriculum already exists"
-                                },
-                            )
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"message": "University department curriculum already exists"},
+            )
 
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid, "departments._id": depid},
@@ -61,22 +56,19 @@ async def create_department_curriculum(
         )
 
         if update_result.modified_count == 1:
-            if (
-                created_department := await request.app.mongodb[
-                    "universities"
-                ].find_one({"_id": unid, "departments._id": depid})
-            ) is not None:
-                for department in created_department["departments"]:
-                    if department["_id"] == depid:
-                        curr = [
-                            x
-                            for x in department["curriculums"]
-                            if x["name"] == department_curriculum["name"]
-                        ][0]
-                        return curr
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=jsonable_encoder(
+                    MessageCreate(
+                        id=department_curriculum["_id"],
+                        message="Department curriculum created",
+                    )
+                ),
+            )
+
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "University not found"},
+            content={"message": "University or department not found"},
         )
 
     return JSONResponse(
@@ -89,9 +81,7 @@ async def create_department_curriculum(
     response_description="List all university curriculums",
     operation_id="listUniversityDepartmentCurriculums",
     response_model=List[UniversityCurriculumModel],
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def list_department_curriculums(unid: str, depid: str, request: Request):
     """list all curriculums of a department of a university with given universityID and universityDepartmentID"""
@@ -116,9 +106,7 @@ async def list_department_curriculums(unid: str, depid: str, request: Request):
     response_description="Show a university department curriculum",
     operation_id="getSingleUniversityDepartmentCurriculum",
     response_model=UniversityCurriculumModel,
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def show_department_curriculum(
     unid: str, depid: str, curid: str, request: Request
@@ -241,10 +229,7 @@ async def update_department_curriculum(
     response_description="Delete university department curriculum",
     operation_id="deleteUniversityDepartmentCurriculum",
     response_model=Message,
-    responses={
-        404: {"model": Message},
-        403: {"model": Message},
-    },
+    responses={404: {"model": Message}, 403: {"model": Message},},
 )
 async def delete_department_curriculum(
     unid: str,
@@ -257,10 +242,7 @@ async def delete_department_curriculum(
 
     if auth_user["userGroup"] == "professor":
         delete_result = await request.app.mongodb["universities"].update_one(
-            {
-                "_id": unid,
-                "departments._id": depid,
-            },
+            {"_id": unid, "departments._id": depid,},
             {"$pull": {"departments.$.curriculums": {"_id": curid}}},
         )
 

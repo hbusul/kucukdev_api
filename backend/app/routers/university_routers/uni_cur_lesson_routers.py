@@ -1,17 +1,12 @@
-from fastapi import (
-    APIRouter,
-    Body,
-    Request,
-    status,
-    Depends,
-)
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 from typing import List
+
+from fastapi import APIRouter, Body, Depends, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.uni_models import CurriculumLessonModel
-from ...models.user_models import UserModel, Message
+from ...models.user_models import Message, MessageCreate, UserModel
 
 router = APIRouter()
 
@@ -20,11 +15,13 @@ router = APIRouter()
     "/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons",
     response_description="Add new curriculum lesson",
     operation_id="createCurriculumLesson",
-    response_model=CurriculumLessonModel,
+    response_model=MessageCreate,
     responses={
-        400: {"model": Message},
+        201: {"model": MessageCreate},
+        401: {"model": Message},
         403: {"model": Message},
         404: {"model": Message},
+        409: {"model": Message},
     },
 )
 async def create_curriculum_lesson(
@@ -42,29 +39,22 @@ async def create_curriculum_lesson(
         curriculum_lesson = jsonable_encoder(curriculum_lesson)
 
         if (
-            university := await request.app.mongodb["universities"].find_one(
+            await request.app.mongodb["universities"].find_one(
                 {
                     "_id": unid,
                     "departments._id": depid,
                     "departments.curriculums._id": curid,
                     "departments.curriculums.semesters._id": cursid,
+                    "departments.curriculums.semesters.lessons.code": curriculum_lesson[
+                        "code"
+                    ],
                 }
             )
         ) is not None:
-            for department in university["departments"]:
-                if department["_id"] == depid:
-                    for curriculum in department["curriculums"]:
-                        if curriculum["_id"] == curid:
-                            for semester in curriculum["semesters"]:
-                                if semester["_id"] == cursid:
-                                    for lesson in semester["lessons"]:
-                                        if lesson["code"] == curriculum_lesson["code"]:
-                                            return JSONResponse(
-                                                status_code=status.HTTP_400_BAD_REQUEST,
-                                                content={
-                                                    "message": "Curriculum lesson already exists"
-                                                },
-                                            )
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"message": "Curriculum lesson already exists"},
+            )
 
         update_result = await request.app.mongodb["universities"].update_one(
             {
@@ -78,30 +68,18 @@ async def create_curriculum_lesson(
                     "departments.$[i].curriculums.$[j].semesters.$[k].lessons": curriculum_lesson
                 }
             },
-            array_filters=[
-                {"i._id": depid},
-                {"j._id": curid},
-                {"k._id": cursid},
-            ],
+            array_filters=[{"i._id": depid}, {"j._id": curid}, {"k._id": cursid},],
         )
 
         if update_result.modified_count == 1:
-            if (
-                created_department := await request.app.mongodb[
-                    "universities"
-                ].find_one({"_id": unid, "departments._id": depid})
-            ) is not None:
-                for department in created_department["departments"]:
-                    if department["_id"] == depid:
-                        for curriculum in department["curriculums"]:
-                            if curriculum["_id"] == curid:
-                                for semester in curriculum["semesters"]:
-                                    if semester["_id"] == cursid:
-                                        return [
-                                            x
-                                            for x in semester["lessons"]
-                                            if x["code"] == curriculum_lesson["code"]
-                                        ][0]
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=jsonable_encoder(
+                    MessageCreate(
+                        id=curriculum_lesson["_id"], message="Curriculum lesson created"
+                    )
+                ),
+            )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -118,9 +96,7 @@ async def create_curriculum_lesson(
     response_description="List all curriculum lessons",
     operation_id="listCurriculumLessons",
     response_model=List[CurriculumLessonModel],
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def list_curriculum_lessons(
     unid: str, depid: str, curid: str, cursid: str, request: Request
@@ -156,9 +132,7 @@ async def list_curriculum_lessons(
     response_description="Show a curriculum semester lesson",
     operation_id="getSingleCurriculumLesson",
     response_model=CurriculumLessonModel,
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def show_curriculum_lesson(
     unid: str, depid: str, curid: str, cursid: str, curlid: str, request: Request
@@ -302,10 +276,7 @@ async def update_curriculum_lesson(
     response_description="Delete curriculum lesson",
     operation_id="deleteCurriculumLesson",
     response_model=Message,
-    responses={
-        404: {"model": Message},
-        403: {"model": Message},
-    },
+    responses={404: {"model": Message}, 403: {"model": Message},},
 )
 async def delete_curriculum_lesson(
     unid: str,
@@ -333,11 +304,7 @@ async def delete_curriculum_lesson(
                     }
                 }
             },
-            array_filters=[
-                {"i._id": depid},
-                {"j._id": curid},
-                {"k._id": cursid},
-            ],
+            array_filters=[{"i._id": depid}, {"j._id": curid}, {"k._id": cursid},],
         )
 
         if delete_result.modified_count == 1:
