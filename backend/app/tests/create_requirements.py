@@ -55,6 +55,68 @@ def create_professor_and_login(client, admin_token, email, password):
     return professor.json()["_id"], professor_login.json()["access_token"]
 
 
+def create_university(client, token, university_name):
+    """Create university and return university id"""
+
+    university = client.post(
+        "/universities",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"name": university_name},
+    )
+
+    assert university.status_code == 201
+    assert university.json()["message"] == "University created"
+
+    return university.json()["_id"]
+
+
+def create_department(client, token, university_id, department_name):
+    """Create department and return department id"""
+
+    department = client.post(
+        f"/universities/{university_id}/departments",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"name": department_name},
+    )
+
+    assert department.status_code == 201
+    assert department.json()["message"] == "University department created"
+
+    return department.json()["_id"]
+
+
+def create_curriculum(client, token, university_id, department_id, curriculum_name):
+    """Create curriculum and return curriculum id"""
+
+    curriculum = client.post(
+        f"/universities/{university_id}/departments/{department_id}/curriculums",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"name": curriculum_name, "startYear": 2020, "endYear": 2032,},
+    )
+
+    assert curriculum.status_code == 201
+    assert curriculum.json()["message"] == "Department curriculum created"
+
+    return curriculum.json()["_id"]
+
+
+def create_curriculum_semester(
+    client, token, university_id, department_id, curriculum_id, semester
+):
+    """Create curriculum semester and return curriculum semester id"""
+
+    curriculum_semester = client.post(
+        f"/universities/{university_id}/departments/{department_id}/curriculums/{curriculum_id}/semesters",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"semester": semester,},
+    )
+
+    assert curriculum_semester.status_code == 201
+    assert curriculum_semester.json()["message"] == "Curriculum semester created"
+
+    return curriculum_semester.json()["_id"]
+
+
 def create_semester(client, user_id, token):
     """Create semester and return semester id"""
 
