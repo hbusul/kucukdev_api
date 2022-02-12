@@ -117,6 +117,21 @@ def create_curriculum_semester(
     return curriculum_semester.json()["_id"]
 
 
+def create_university_semester(client, token, university_id, semester_name):
+    """Create university semester and return university semester id"""
+
+    university_semester = client.post(
+        f"/universities/{university_id}/semesters",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"name": semester_name,},
+    )
+
+    assert university_semester.status_code == 201
+    assert university_semester.json()["message"] == "University semester created"
+
+    return university_semester.json()["_id"]
+
+
 def create_semester(client, user_id, token):
     """Create semester and return semester id"""
 
