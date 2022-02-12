@@ -2884,7 +2884,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Message"
+                  "$ref": "#/components/schemas/MessageCreate"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageCreate"
                 }
               }
             }
