@@ -13,13 +13,15 @@ var _HTTPValidationError = _interopRequireDefault(require("../model/HTTPValidati
 
 var _Message = _interopRequireDefault(require("../model/Message"));
 
+var _MessageCreate = _interopRequireDefault(require("../model/MessageCreate"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
 * CurriculumLessons service.
@@ -43,7 +45,7 @@ var CurriculumLessonsApi = /*#__PURE__*/function () {
    * Callback function to receive the result of the createCurriculumLesson operation.
    * @callback module:api/CurriculumLessonsApi~createCurriculumLessonCallback
    * @param {String} error Error message, if any.
-   * @param {module:model/CurriculumLessonModel} data The data returned by the service call.
+   * @param {module:model/MessageCreate} data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
 
@@ -56,7 +58,7 @@ var CurriculumLessonsApi = /*#__PURE__*/function () {
    * @param {String} cursid 
    * @param {module:model/CurriculumLessonModel} curriculumLessonModel 
    * @param {module:api/CurriculumLessonsApi~createCurriculumLessonCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link module:model/CurriculumLessonModel}
+   * data is of type: {@link module:model/MessageCreate}
    */
 
 
@@ -101,8 +103,8 @@ var CurriculumLessonsApi = /*#__PURE__*/function () {
       var authNames = ['OAuth2PasswordBearer'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = _CurriculumLessonModel.default;
-      return this.apiClient.callApi('/universities/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons', 'POST', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
+      var returnType = _MessageCreate.default;
+      return this.apiClient.callApi('/universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons', 'POST', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**
      * Callback function to receive the result of the deleteCurriculumLesson operation.
@@ -114,7 +116,7 @@ var CurriculumLessonsApi = /*#__PURE__*/function () {
 
     /**
      * Delete Curriculum Lesson
-     * Delete a university department with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
+     * Delete a lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
      * @param {String} unid 
      * @param {String} depid 
      * @param {String} curid 
@@ -179,7 +181,7 @@ var CurriculumLessonsApi = /*#__PURE__*/function () {
 
     /**
      * Show Curriculum Lesson
-     * Get a single semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
+     * Get a single lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
      * @param {String} unid 
      * @param {String} depid 
      * @param {String} curid 
@@ -290,7 +292,7 @@ var CurriculumLessonsApi = /*#__PURE__*/function () {
       var contentTypes = [];
       var accepts = ['application/json'];
       var returnType = [_CurriculumLessonModel.default];
-      return this.apiClient.callApi('/universities/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons', 'GET', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
+      return this.apiClient.callApi('/universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons', 'GET', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**
      * Callback function to receive the result of the updateCurriculumLesson operation.
@@ -302,7 +304,7 @@ var CurriculumLessonsApi = /*#__PURE__*/function () {
 
     /**
      * Update Curriculum Lesson
-     * Update semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
+     * Update lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
      * @param {String} unid 
      * @param {String} depid 
      * @param {String} curid 

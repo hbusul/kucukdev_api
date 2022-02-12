@@ -15,6 +15,7 @@
 import ApiClient from "../ApiClient";
 import HTTPValidationError from '../model/HTTPValidationError';
 import Message from '../model/Message';
+import MessageCreate from '../model/MessageCreate';
 import UniversityCurriculumModel from '../model/UniversityCurriculumModel';
 
 /**
@@ -40,7 +41,7 @@ export default class CurriculumsApi {
      * Callback function to receive the result of the createUniversityDepartmentCurriculum operation.
      * @callback module:api/CurriculumsApi~createUniversityDepartmentCurriculumCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/UniversityCurriculumModel} data The data returned by the service call.
+     * @param {module:model/MessageCreate} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -51,7 +52,7 @@ export default class CurriculumsApi {
      * @param {String} depid 
      * @param {module:model/UniversityCurriculumModel} universityCurriculumModel 
      * @param {module:api/CurriculumsApi~createUniversityDepartmentCurriculumCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/UniversityCurriculumModel}
+     * data is of type: {@link module:model/MessageCreate}
      */
     createUniversityDepartmentCurriculum(unid, depid, universityCurriculumModel, callback) {
       let postBody = universityCurriculumModel;
@@ -82,7 +83,7 @@ export default class CurriculumsApi {
       let authNames = ['OAuth2PasswordBearer'];
       let contentTypes = ['application/json'];
       let accepts = ['application/json'];
-      let returnType = UniversityCurriculumModel;
+      let returnType = MessageCreate;
       return this.apiClient.callApi(
         '/universities/{unid}/departments/{depid}/curriculums', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,

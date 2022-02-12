@@ -31,7 +31,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
 * Users service.
@@ -52,23 +52,58 @@ var UsersApi = /*#__PURE__*/function () {
     this.apiClient = apiClient || _ApiClient.default.instance;
   }
   /**
-   * Callback function to receive the result of the createUser operation.
-   * @callback module:api/UsersApi~createUserCallback
+   * Callback function to receive the result of the createProfessorUser operation.
+   * @callback module:api/UsersApi~createProfessorUserCallback
    * @param {String} error Error message, if any.
    * @param {module:model/MessageCreate} data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
 
   /**
-   * Create User
-   * Create a user
+   * Create Professor User
+   * Create a professor user
    * @param {module:model/UserModel} userModel 
-   * @param {module:api/UsersApi~createUserCallback} callback The callback function, accepting three arguments: error, data, response
+   * @param {module:api/UsersApi~createProfessorUserCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link module:model/MessageCreate}
    */
 
 
   _createClass(UsersApi, [{
+    key: "createProfessorUser",
+    value: function createProfessorUser(userModel, callback) {
+      var postBody = userModel; // verify the required parameter 'userModel' is set
+
+      if (userModel === undefined || userModel === null) {
+        throw new Error("Missing the required parameter 'userModel' when calling createProfessorUser");
+      }
+
+      var pathParams = {};
+      var queryParams = {};
+      var headerParams = {};
+      var formParams = {};
+      var authNames = ['OAuth2PasswordBearer'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = _MessageCreate.default;
+      return this.apiClient.callApi('/users/professors', 'POST', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
+    }
+    /**
+     * Callback function to receive the result of the createUser operation.
+     * @callback module:api/UsersApi~createUserCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/MessageCreate} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Create User
+     * Create a user
+     * @param {module:model/UserModel} userModel 
+     * @param {module:api/UsersApi~createUserCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/MessageCreate}
+     */
+
+  }, {
     key: "createUser",
     value: function createUser(userModel, callback) {
       var postBody = userModel; // verify the required parameter 'userModel' is set

@@ -48,6 +48,16 @@
   }
 
   describe('UsersApi', function() {
+    describe('createProfessorUser', function() {
+      it('should call createProfessorUser successfully', function(done) {
+        //uncomment below and update the code to test createProfessorUser
+        //instance.createProfessorUser(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe('createUser', function() {
       it('should call createUser successfully', function(done) {
         //uncomment below and update the code to test createUser

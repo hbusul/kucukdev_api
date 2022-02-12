@@ -15,6 +15,7 @@
 import ApiClient from "../ApiClient";
 import HTTPValidationError from '../model/HTTPValidationError';
 import Message from '../model/Message';
+import MessageCreate from '../model/MessageCreate';
 import UniversityAPIModel from '../model/UniversityAPIModel';
 import UniversityModel from '../model/UniversityModel';
 import UniversitySemesterModel from '../model/UniversitySemesterModel';
@@ -44,7 +45,7 @@ export default class UniversitiesApi {
      * Callback function to receive the result of the createUniversity operation.
      * @callback module:api/UniversitiesApi~createUniversityCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/UniversityAPIModel} data The data returned by the service call.
+     * @param {module:model/MessageCreate} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -53,7 +54,7 @@ export default class UniversitiesApi {
      * Create a university
      * @param {module:model/UniversityModel} universityModel 
      * @param {module:api/UniversitiesApi~createUniversityCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/UniversityAPIModel}
+     * data is of type: {@link module:model/MessageCreate}
      */
     createUniversity(universityModel, callback) {
       let postBody = universityModel;
@@ -74,7 +75,7 @@ export default class UniversitiesApi {
       let authNames = ['OAuth2PasswordBearer'];
       let contentTypes = ['application/json'];
       let accepts = ['application/json'];
-      let returnType = UniversityAPIModel;
+      let returnType = MessageCreate;
       return this.apiClient.callApi(
         '/universities', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,
@@ -172,7 +173,7 @@ export default class UniversitiesApi {
      * Callback function to receive the result of the getSingleUniversity operation.
      * @callback module:api/UniversitiesApi~getSingleUniversityCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/UniversityModel} data The data returned by the service call.
+     * @param {module:model/UniversityAPIModel} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -181,7 +182,7 @@ export default class UniversitiesApi {
      * Get a single university with given universityID
      * @param {String} unid 
      * @param {module:api/UniversitiesApi~getSingleUniversityCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/UniversityModel}
+     * data is of type: {@link module:model/UniversityAPIModel}
      */
     getSingleUniversity(unid, callback) {
       let postBody = null;
@@ -203,7 +204,7 @@ export default class UniversitiesApi {
       let authNames = [];
       let contentTypes = [];
       let accepts = ['application/json'];
-      let returnType = UniversityModel;
+      let returnType = UniversityAPIModel;
       return this.apiClient.callApi(
         '/universities/{unid}', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,

@@ -54,12 +54,6 @@
       //expect(instance).to.be.a(Kucukdevapi.UpdateSemesterModel);
     });
 
-    it('should have the property id (base name: "_id")', function() {
-      // uncomment below and update the code to test the property id
-      //var instance = new Kucukdevapi.UpdateSemesterModel();
-      //expect(instance).to.be();
-    });
-
     it('should have the property curSemesterID (base name: "curSemesterID")', function() {
       // uncomment below and update the code to test the property curSemesterID
       //var instance = new Kucukdevapi.UpdateSemesterModel();

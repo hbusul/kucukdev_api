@@ -49,9 +49,6 @@ class UpdatePasswordModel {
         if (data) {
             obj = obj || new UpdatePasswordModel();
 
-            if (data.hasOwnProperty('_id')) {
-                obj['_id'] = ApiClient.convertToType(data['_id'], 'String');
-            }
             if (data.hasOwnProperty('password')) {
                 obj['password'] = ApiClient.convertToType(data['password'], 'String');
             }
@@ -61,11 +58,6 @@ class UpdatePasswordModel {
 
 
 }
-
-/**
- * @member {String} _id
- */
-UpdatePasswordModel.prototype['_id'] = undefined;
 
 /**
  * @member {String} password

@@ -16,7 +16,7 @@ Method | HTTP request | Description
 
 ## createUniversity
 
-> UniversityAPIModel createUniversity(universityModel)
+> MessageCreate createUniversity(universityModel)
 
 Create University
 
@@ -51,7 +51,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**UniversityAPIModel**](UniversityAPIModel.md)
+[**MessageCreate**](MessageCreate.md)
 
 ### Authorization
 
@@ -159,7 +159,7 @@ No authorization required
 
 ## getSingleUniversity
 
-> UniversityModel getSingleUniversity(unid)
+> UniversityAPIModel getSingleUniversity(unid)
 
 Show University
 
@@ -190,7 +190,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**UniversityModel**](UniversityModel.md)
+[**UniversityAPIModel**](UniversityAPIModel.md)
 
 ### Authorization
 

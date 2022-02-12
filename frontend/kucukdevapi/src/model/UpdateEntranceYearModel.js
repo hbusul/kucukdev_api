@@ -49,9 +49,6 @@ class UpdateEntranceYearModel {
         if (data) {
             obj = obj || new UpdateEntranceYearModel();
 
-            if (data.hasOwnProperty('_id')) {
-                obj['_id'] = ApiClient.convertToType(data['_id'], 'String');
-            }
             if (data.hasOwnProperty('entranceYear')) {
                 obj['entranceYear'] = ApiClient.convertToType(data['entranceYear'], 'Number');
             }
@@ -61,11 +58,6 @@ class UpdateEntranceYearModel {
 
 
 }
-
-/**
- * @member {String} _id
- */
-UpdateEntranceYearModel.prototype['_id'] = undefined;
 
 /**
  * @member {Number} entranceYear

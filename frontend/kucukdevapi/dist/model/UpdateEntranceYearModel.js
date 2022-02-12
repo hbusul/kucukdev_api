@@ -13,7 +13,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
  * The UpdateEntranceYearModel model module.
@@ -57,10 +57,6 @@ var UpdateEntranceYearModel = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new UpdateEntranceYearModel();
 
-        if (data.hasOwnProperty('_id')) {
-          obj['_id'] = _ApiClient.default.convertToType(data['_id'], 'String');
-        }
-
         if (data.hasOwnProperty('entranceYear')) {
           obj['entranceYear'] = _ApiClient.default.convertToType(data['entranceYear'], 'Number');
         }
@@ -73,14 +69,9 @@ var UpdateEntranceYearModel = /*#__PURE__*/function () {
   return UpdateEntranceYearModel;
 }();
 /**
- * @member {String} _id
- */
-
-
-UpdateEntranceYearModel.prototype['_id'] = undefined;
-/**
  * @member {Number} entranceYear
  */
+
 
 UpdateEntranceYearModel.prototype['entranceYear'] = undefined;
 var _default = UpdateEntranceYearModel;

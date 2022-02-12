@@ -14,7 +14,7 @@ Method | HTTP request | Description
 
 ## createCurriculumSemester
 
-> CurriculumSemesterModel createCurriculumSemester(unid, depid, curid, curriculumSemesterModel)
+> MessageCreate createCurriculumSemester(unid, depid, curid, curriculumSemesterModel)
 
 Create Curriculum Semester
 
@@ -55,7 +55,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**CurriculumSemesterModel**](CurriculumSemesterModel.md)
+[**MessageCreate**](MessageCreate.md)
 
 ### Authorization
 

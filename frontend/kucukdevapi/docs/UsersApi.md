@@ -4,6 +4,7 @@ All URIs are relative to *http://localhost:8000*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**createProfessorUser**](UsersApi.md#createProfessorUser) | **POST** /users/professors | Create Professor User
 [**createUser**](UsersApi.md#createUser) | **POST** /users | Create User
 [**deleteUser**](UsersApi.md#deleteUser) | **DELETE** /users/{uid} | Delete User
 [**getCurrentUser**](UsersApi.md#getCurrentUser) | **GET** /users | Get Current
@@ -13,6 +14,55 @@ Method | HTTP request | Description
 [**updateEntranceyear**](UsersApi.md#updateEntranceyear) | **PUT** /users/{uid}/entrance-year | Update Entrance Year
 [**updatePassword**](UsersApi.md#updatePassword) | **PUT** /users/{uid}/change-password | Update Password
 
+
+
+## createProfessorUser
+
+> MessageCreate createProfessorUser(userModel)
+
+Create Professor User
+
+Create a professor user
+
+### Example
+
+```javascript
+import Kucukdevapi from 'kucukdevapi';
+let defaultClient = Kucukdevapi.ApiClient.instance;
+// Configure OAuth2 access token for authorization: OAuth2PasswordBearer
+let OAuth2PasswordBearer = defaultClient.authentications['OAuth2PasswordBearer'];
+OAuth2PasswordBearer.accessToken = 'YOUR ACCESS TOKEN';
+
+let apiInstance = new Kucukdevapi.UsersApi();
+let userModel = new Kucukdevapi.UserModel(); // UserModel | 
+apiInstance.createProfessorUser(userModel, (error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **userModel** | [**UserModel**](UserModel.md)|  | 
+
+### Return type
+
+[**MessageCreate**](MessageCreate.md)
+
+### Authorization
+
+[OAuth2PasswordBearer](../README.md#OAuth2PasswordBearer)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
 
 
 ## createUser
