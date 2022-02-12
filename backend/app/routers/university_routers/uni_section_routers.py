@@ -92,11 +92,12 @@ async def update_lesson_section(
                 )
                 .to_list(length=None)
             )
+            is not None
         ):
             return JSONResponse(
                 status_code=status.HTTP_409_CONFLICT,
                 content={
-                    "message": "Section could not be found or there exists another section with given section number"
+                    "message": "University lesson section could not be found or there exists another section with given section number"
                 },
             )
 
@@ -126,12 +127,12 @@ async def update_lesson_section(
         if update_result.modified_count == 1:
             return JSONResponse(
                 status_code=status.HTTP_200_OK,
-                content={"message": "Section updated"},
+                content={"message": "University lesson section updated"},
             )
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Section could not be updated"},
+            content={"message": "University lesson section could not be updated"},
         )
 
     return JSONResponse(
@@ -144,10 +145,7 @@ async def update_lesson_section(
     response_description="Delete a lesson section",
     operation_id="deleteLessonSection",
     response_model=Message,
-    responses={
-        403: {"model": Message},
-        404: {"model": Message},
-    },
+    responses={403: {"model": Message}, 404: {"model": Message},},
 )
 async def delete_lesson_section(
     unid: str,
@@ -161,24 +159,19 @@ async def delete_lesson_section(
 
     if auth_user["userGroup"] == "professor":
         update_result = await request.app.mongodb["universities"].update_one(
-            {
-                "_id": unid,
-                "semesters._id": unisid,
-                "semesters.lessons._id": unilid,
-            },
+            {"_id": unid, "semesters._id": unisid, "semesters.lessons._id": unilid,},
             {"$pull": {"semesters.$[i].lessons.$[j].sections": {"_id": secid}}},
             array_filters=[{"i._id": unisid}, {"j._id": unilid}],
         )
 
         if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"message": "Section deleted"},
+                status_code=status.HTTP_200_OK, content={"message": "University lesson section deleted"},
             )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Section could not be deleted"},
+            content={"message": "University lesson section not found"},
         )
 
     return JSONResponse(
