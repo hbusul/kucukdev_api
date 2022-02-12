@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons",
+    "/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons",
     response_description="Add new curriculum lesson",
     operation_id="createCurriculumLesson",
     response_model=MessageCreate,
@@ -83,7 +83,7 @@ async def create_curriculum_lesson(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Curriculum not found"},
+            content={"message": "Curriculum semester not found"},
         )
 
     return JSONResponse(
@@ -92,7 +92,7 @@ async def create_curriculum_lesson(
 
 
 @router.get(
-    "/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons",
+    "/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons",
     response_description="List all curriculum lessons",
     operation_id="listCurriculumLessons",
     response_model=List[CurriculumLessonModel],
@@ -104,26 +104,29 @@ async def list_curriculum_lessons(
     """list all lessons of a curriculum semester of a department with given universityID, universityDepartmentID, departmentCurriculumID and curriculumSemesterID"""
 
     if (
-        university := await request.app.mongodb["universities"].find_one(
-            {
-                "_id": unid,
-                "departments._id": depid,
-                "departments.curriculums._id": curid,
-                "departments.curriculums.semesters._id": cursid,
-            }
+        university := await request.app.mongodb["universities"]
+        .aggregate(
+            [
+                {
+                    "$match": {
+                        "_id": unid,
+                        "departments._id": depid,
+                        "departments.curriculums._id": curid,
+                    }
+                },
+                {"$unwind": "$departments"},
+                {"$unwind": "$departments.curriculums"},
+                {"$unwind": "$departments.curriculums.semesters"},
+                {"$match": {"departments.curriculums.semesters._id": cursid}},
+            ]
         )
-    ) is not None:
-        for department in university["departments"]:
-            if department["_id"] == depid:
-                for curriculum in department["curriculums"]:
-                    if curriculum["_id"] == curid:
-                        for semester in curriculum["semesters"]:
-                            if semester["_id"] == cursid:
-                                return semester["lessons"]
+        .to_list(length=None)
+    ) :
+        return university[0]["departments"]["curriculums"]["semesters"]["lessons"]
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": "Curriculum lesson not found"},
+        content={"message": "Curriculum semester not found"},
     )
 
 
@@ -137,28 +140,30 @@ async def list_curriculum_lessons(
 async def show_curriculum_lesson(
     unid: str, depid: str, curid: str, cursid: str, curlid: str, request: Request
 ):
-    """Get a single semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
+    """Get a single lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
 
     if (
-        university := await request.app.mongodb["universities"].find_one(
-            {
-                "_id": unid,
-                "departments._id": depid,
-                "departments.curriculums._id": curid,
-                "departments.curriculums.semesters._id": cursid,
-                "departments.curriculums.semesters.lessons._id": curlid,
-            }
+        university := await request.app.mongodb["universities"]
+        .aggregate(
+            [
+                {
+                    "$match": {
+                        "_id": unid,
+                        "departments._id": depid,
+                        "departments.curriculums._id": curid,
+                        "departments.curriculums.semesters._id": cursid,
+                    }
+                },
+                {"$unwind": "$departments"},
+                {"$unwind": "$departments.curriculums"},
+                {"$unwind": "$departments.curriculums.semesters"},
+                {"$unwind": "$departments.curriculums.semesters.lessons"},
+                {"$match": {"departments.curriculums.semesters.lessons._id": curlid}},
+            ]
         )
-    ) is not None:
-        for department in university["departments"]:
-            if department["_id"] == depid:
-                for curriculum in department["curriculums"]:
-                    if curriculum["_id"] == curid:
-                        for semester in curriculum["semesters"]:
-                            if semester["_id"] == cursid:
-                                for lesson in semester["lessons"]:
-                                    if lesson["_id"] == curlid:
-                                        return lesson
+        .to_list(length=None)
+    ) :
+        return university[0]["departments"]["curriculums"]["semesters"]["lessons"]
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -172,9 +177,10 @@ async def show_curriculum_lesson(
     operation_id="updateCurriculumLesson",
     response_model=Message,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         400: {"model": Message},
+        401: {"model": Message},
+        403: {"model": Message},
+        409: {"model": Message},
     },
 )
 async def update_curriculum_lesson(
@@ -187,83 +193,114 @@ async def update_curriculum_lesson(
     curriculum_lesson: CurriculumLessonModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
-    """Update semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
+    """Update lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
 
     if auth_user["userGroup"] == "professor":
-        curriculum_lesson = {
-            k: v for k, v in curriculum_lesson.dict().items() if v is not None
-        }
+        curriculum_lesson = jsonable_encoder(curriculum_lesson)
 
         if (
-            university := await request.app.mongodb["universities"].find_one(
-                {
-                    "_id": unid,
-                    "departments._id": depid,
-                    "departments.curriculums._id": curid,
-                    "departments.curriculums.semesters._id": cursid,
-                    "departments.curriculums.semesters.lessons._id": curlid,
-                }
-            )
-        ) is None:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "Curriculum lesson not found"},
-            )
-        else:
-            for department in university["departments"]:
-                if department["_id"] == depid:
-                    for curriculum in department["curriculums"]:
-                        if curriculum["_id"] == curid:
-                            for semester in curriculum["semesters"]:
-                                if semester["_id"] == cursid:
-                                    for lesson in semester["lessons"]:
-                                        if lesson["name"] == curriculum_lesson["name"]:
-                                            return JSONResponse(
-                                                status_code=status.HTTP_400_BAD_REQUEST,
-                                                content={
-                                                    "message": "Curriculum lesson already exists"
-                                                },
-                                            )
-
-        if len(curriculum_lesson) >= 1:
-            update_result = await request.app.mongodb["universities"].update_many(
-                {
-                    "_id": unid,
-                    "departments._id": depid,
-                    "departments.curriculums._id": curid,
-                    "departments.curriculums.semesters._id": cursid,
-                    "departments.curriculums.semesters.lessons._id": curlid,
-                },
-                {
-                    "$set": {
-                        "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].name": curriculum_lesson[
-                            "name"
-                        ],
-                        "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].code": curriculum_lesson[
-                            "code"
-                        ],
-                        "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].lessonType": curriculum_lesson[
-                            "lessonType"
-                        ],
-                    }
-                },
-                array_filters=[
-                    {"i._id": depid},
-                    {"j._id": curid},
-                    {"k._id": cursid},
-                    {"l._id": curlid},
-                ],
-            )
-
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "Curriculum lesson updated"},
+            await (
+                request.app.mongodb["universities"]
+                .aggregate(
+                    [
+                        {
+                            "$match": {
+                                "_id": unid,
+                                "departments._id": depid,
+                                "departments.curriculums._id": curid,
+                                "departments.curriculums.semesters._id": cursid,
+                            },
+                        },
+                        {"$unwind": "$departments"},
+                        {"$unwind": "$departments.curriculums"},
+                        {"$unwind": "$departments.curriculums.semesters"},
+                        {"$unwind": "$departments.curriculums.semesters.lessons"},
+                        {
+                            "$match": {
+                                "departments.curriculums.semesters.lessons._id": curlid,
+                                "departments.curriculums.semesters.lessons.code": curriculum_lesson[
+                                    "code"
+                                ],
+                            },
+                        },
+                    ]
                 )
+                .to_list(length=None)
+            )
+        ) == [] and (
+            await (
+                request.app.mongodb["universities"]
+                .aggregate(
+                    [
+                        {
+                            "$match": {
+                                "_id": unid,
+                                "departments._id": depid,
+                                "departments.curriculums._id": curid,
+                                "departments.curriculums.semesters._id": cursid,
+                            },
+                        },
+                        {"$unwind": "$departments"},
+                        {"$unwind": "$departments.curriculums"},
+                        {"$unwind": "$departments.curriculums.semesters"},
+                        {"$unwind": "$departments.curriculums.semesters.lessons"},
+                        {
+                            "$match": {
+                                "departments.curriculums.semesters.lessons.code": curriculum_lesson[
+                                    "code"
+                                ],
+                            },
+                        },
+                    ]
+                )
+                .to_list(length=None)
+            )
+        ):
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={
+                    "message": "Lesson could not be found or there exists another lesson with given lesson code"
+                },
+            )
+
+        update_result = await request.app.mongodb["universities"].update_many(
+            {
+                "_id": unid,
+                "departments._id": depid,
+                "departments.curriculums._id": curid,
+                "departments.curriculums.semesters._id": cursid,
+                "departments.curriculums.semesters.lessons._id": curlid,
+            },
+            {
+                "$set": {
+                    "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].name": curriculum_lesson[
+                        "name"
+                    ],
+                    "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].code": curriculum_lesson[
+                        "code"
+                    ],
+                    "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].lessonType": curriculum_lesson[
+                        "lessonType"
+                    ],
+                }
+            },
+            array_filters=[
+                {"i._id": depid},
+                {"j._id": curid},
+                {"k._id": cursid},
+                {"l._id": curlid},
+            ],
+        )
+
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "Curriculum lesson updated"},
+            )
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Curriculum lesson input cannot be empty"},
+            content={"message": "Curriculum lesson could not be updated"},
         )
 
     return JSONResponse(
@@ -287,7 +324,7 @@ async def delete_curriculum_lesson(
     request: Request,
     auth_user: UserModel = Depends(get_current_user),
 ):
-    """Delete a university department with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
+    """Delete a lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
 
     if auth_user["userGroup"] == "professor":
         delete_result = await request.app.mongodb["universities"].update_one(

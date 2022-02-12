@@ -19,6 +19,8 @@ with TestClient(app) as client:
         department_id = None
         curriculum_id = None
         curriculum_semester_id = None
+        curriculum_lesson_id = None
+        second_curriculum_lesson_id = None
 
     test_user = TestUser()
     admin_token = login_admin_user(client, settings)
@@ -59,7 +61,7 @@ with TestClient(app) as client:
         """Test creating a curriculum lesson"""
 
         curriculum_lesson = client.post(
-            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters{test_user.curriculum_semester_id}/lessons",
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons",
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
                 "name": "Test Curriculum Lesson",
@@ -67,10 +69,343 @@ with TestClient(app) as client:
                 "lessonType": "default",
             },
         )
-        print(curriculum_lesson.json())
 
         assert curriculum_lesson.status_code == 201
         assert curriculum_lesson.json()["message"] == "Curriculum lesson created"
+        test_user.curriculum_lesson_id = curriculum_lesson.json()["_id"]
+
+    def test_get_curriculum_lesson():
+        """Test getting a curriculum lesson"""
+
+        curriculum_lesson = client.get(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons/{test_user.curriculum_lesson_id}",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+        )
+
+        assert curriculum_lesson.status_code == 200
+        assert curriculum_lesson.json() == {
+            "_id": test_user.curriculum_lesson_id,
+            "name": "Test Curriculum Lesson",
+            "code": "TEST_CUR_LESSON",
+            "lessonType": "default",
+        }
+
+    def test_get_curriculum_lesson_with_default_user():
+        """Test getting a curriculum lesson with default user"""
+
+        curriculum_lesson = client.get(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons/{test_user.curriculum_lesson_id}",
+            headers={"Authorization": f"Bearer {default_user.token}"},
+        )
+
+        assert curriculum_lesson.status_code == 200
+        assert curriculum_lesson.json() == {
+            "_id": test_user.curriculum_lesson_id,
+            "name": "Test Curriculum Lesson",
+            "code": "TEST_CUR_LESSON",
+            "lessonType": "default",
+        }
+
+    def test_get_curriculum_lesson_with_invalid_lesson_id():
+        """Test getting a curriculum lesson with invalid lesson id"""
+
+        curriculum_lesson = client.get(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons/invalid_lesson_id",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+        )
+
+        assert curriculum_lesson.status_code == 404
+        assert curriculum_lesson.json()["message"] == "Curriculum lesson not found"
+
+    def test_create_same_curriculum_lesson():
+        """Test creating a curriculum lesson with the same name"""
+
+        curriculum_lesson = client.post(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+            json={
+                "name": "Test Curriculum Lesson",
+                "code": "TEST_CUR_LESSON",
+                "lessonType": "default",
+            },
+        )
+
+        assert curriculum_lesson.status_code == 409
+        assert curriculum_lesson.json()["message"] == "Curriculum lesson already exists"
+
+    def test_create_curriculum_lesson_with_invalid_semester_id():
+        """Test creating a curriculum lesson with an invalid semester id"""
+
+        curriculum_semester_id = "non_exists_curriculum_semester_id"
+        curriculum_lesson = client.post(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{curriculum_semester_id}/lessons",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+            json={
+                "name": "Test Curriculum Lesson",
+                "code": "TEST_CUR_LESSON",
+                "lessonType": "default",
+            },
+        )
+
+        assert curriculum_lesson.status_code == 404
+        assert curriculum_lesson.json()["message"] == "Curriculum semester not found"
+
+    def test_create_curriculum_lesson_with_invalid_university_id():
+        """Test creating a curriculum lesson with an invalid university id"""
+
+        university_id = "non_exists_university_id"
+        curriculum_lesson = client.post(
+            f"/universities/{university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+            json={
+                "name": "Test Curriculum Lesson",
+                "code": "TEST_CUR_LESSON",
+                "lessonType": "default",
+            },
+        )
+
+        assert curriculum_lesson.status_code == 404
+        assert curriculum_lesson.json()["message"] == "Curriculum semester not found"
+
+    def test_create_curriculum_lesson_with_default_user():
+        """Test creating a curriculum lesson with a default user"""
+
+        curriculum_lesson = client.post(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons",
+            headers={"Authorization": f"Bearer {default_user.token}"},
+            json={
+                "name": "Test Curriculum Lesson",
+                "code": "TEST_CUR_LESSON",
+                "lessonType": "default",
+            },
+        )
+
+        assert curriculum_lesson.status_code == 403
+        assert curriculum_lesson.json()["message"] == "No right to access"
+
+    def test_list_curriculum_lessons():
+        """Test listing curriculum lessons"""
+
+        curriculum_lessons = client.get(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+        )
+
+        assert curriculum_lessons.status_code == 200
+        assert curriculum_lessons.json() == [
+            {
+                "_id": test_user.curriculum_lesson_id,
+                "name": "Test Curriculum Lesson",
+                "code": "TEST_CUR_LESSON",
+                "lessonType": "default",
+            }
+        ]
+
+    def test_list_curriculum_lessons_with_default_user():
+        """Test listing curriculum lessons with a default user"""
+
+        curriculum_lessons = client.get(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons",
+            headers={"Authorization": f"Bearer {default_user.token}"},
+        )
+
+        assert curriculum_lessons.status_code == 200
+        assert curriculum_lessons.json() == [
+            {
+                "_id": test_user.curriculum_lesson_id,
+                "name": "Test Curriculum Lesson",
+                "code": "TEST_CUR_LESSON",
+                "lessonType": "default",
+            }
+        ]
+
+    def test_list_curriculum_lessons_with_invalid_semester_id():
+        """Test listing curriculum lessons with an invalid semester id"""
+
+        curriculum_semester_id = "non_exists_curriculum_semester_id"
+        curriculum_lessons = client.get(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{curriculum_semester_id}/lessons",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+        )
+
+        assert curriculum_lessons.status_code == 404
+        assert curriculum_lessons.json()["message"] == "Curriculum semester not found"
+
+    def test_list_curriculum_lessons_with_invalid_university_id():
+        """Test listing curriculum lessons with an invalid university id"""
+
+        university_id = "non_exists_university_id"
+        curriculum_lessons = client.get(
+            f"/universities/{university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+        )
+
+        assert curriculum_lessons.status_code == 404
+        assert curriculum_lessons.json()["message"] == "Curriculum semester not found"
+
+    def test_update_curriculum_lesson():
+        """Test updating a curriculum lesson"""
+
+        curriculum_lesson = client.put(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons/{test_user.curriculum_lesson_id}",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+            json={
+                "name": "Test Curriculum Lesson Updated",
+                "code": "TEST_CUR_LESSON",
+                "lessonType": "default",
+            },
+        )
+
+        assert curriculum_lesson.status_code == 200
+        assert curriculum_lesson.json()["message"] == "Curriculum lesson updated"
+
+    def test_create_second_curriculum_lesson():
+        """Test creating a second curriculum lesson"""
+
+        curriculum_lesson = client.post(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+            json={
+                "name": "Test Curriculum Lesson 2",
+                "code": "TEST_CUR_LESSON_2",
+                "lessonType": "default",
+            },
+        )
+
+        assert curriculum_lesson.status_code == 201
+        assert curriculum_lesson.json()["message"] == "Curriculum lesson created"
+        test_user.second_curriculum_lesson_id = curriculum_lesson.json()["_id"]
+
+    def test_list_curriculum_lessons_with_two_lessons():
+        """Test listing curriculum lessons with two lessons"""
+
+        curriculum_lessons = client.get(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+        )
+
+        assert curriculum_lessons.status_code == 200
+        assert curriculum_lessons.json() == [
+            {
+                "_id": test_user.curriculum_lesson_id,
+                "name": "Test Curriculum Lesson Updated",
+                "code": "TEST_CUR_LESSON",
+                "lessonType": "default",
+            },
+            {
+                "_id": test_user.second_curriculum_lesson_id,
+                "name": "Test Curriculum Lesson 2",
+                "code": "TEST_CUR_LESSON_2",
+                "lessonType": "default",
+            },
+        ]
+
+    def test_update_curriculum_lesson_with_invalid_lesson_id():
+        """Test updating a curriculum lesson with an invalid lesson id"""
+
+        curriculum_lesson_id = "non_exists_curriculum_lesson_id"
+        curriculum_lesson = client.put(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons/{curriculum_lesson_id}",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+            json={
+                "name": "Test Curriculum Lesson Updated 3",
+                "code": "TEST_CUR_LESSON_3",
+                "lessonType": "default",
+            },
+        )
+
+        assert curriculum_lesson.status_code == 400
+        assert (
+            curriculum_lesson.json()["message"]
+            == "Curriculum lesson could not be updated"
+        )
+
+    def test_update_curriculum_lesson_with_exists_lesson_code():
+        """Test updating a curriculum lesson with an exists lesson code"""
+
+        curriculum_lesson = client.put(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons/{test_user.curriculum_lesson_id}",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+            json={
+                "name": "Test Curriculum Lesson Updated 4",
+                "code": "TEST_CUR_LESSON_2",
+                "lessonType": "default",
+            },
+        )
+
+        assert curriculum_lesson.status_code == 409
+        assert (
+            curriculum_lesson.json()["message"]
+            == "Lesson could not be found or there exists another lesson with given lesson code"
+        )
+
+    def test_udpate_curriculum_lesson_with_same_lesson_context():
+        """Test updating a curriculum lesson with the same lesson context"""
+
+        curriculum_lesson = client.put(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons/{test_user.curriculum_lesson_id}",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+            json={
+                "name": "Test Curriculum Lesson Updated",
+                "code": "TEST_CUR_LESSON",
+                "lessonType": "default",
+            },
+        )
+
+        assert curriculum_lesson.status_code == 400
+        assert (
+            curriculum_lesson.json()["message"]
+            == "Curriculum lesson could not be updated"
+        )
+
+    def test_update_curriculum_lesson_with_default_user():
+        """Test updating a curriculum lesson with the default user"""
+
+        curriculum_lesson = client.put(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons/{test_user.curriculum_lesson_id}",
+            headers={"Authorization": f"Bearer {default_user.token}"},
+            json={
+                "name": "Test Curriculum Lesson Updated",
+                "code": "TEST_CUR_LESSON_4",
+                "lessonType": "default",
+            },
+        )
+
+        assert curriculum_lesson.status_code == 403
+        assert curriculum_lesson.json()["message"] == "No right to access"
+
+    def test_delete_curriculum_lesson():
+        """Test deleting a curriculum lesson"""
+
+        curriculum_lesson = client.delete(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons/{test_user.curriculum_lesson_id}",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+        )
+
+        assert curriculum_lesson.status_code == 200
+        assert curriculum_lesson.json()["message"] == "Curriculum lesson deleted"
+
+    def test_delete_same_curriculum_lesson():
+        """Test deleting a curriculum lesson"""
+
+        curriculum_lesson = client.delete(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons/{test_user.curriculum_lesson_id}",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+        )
+
+        assert curriculum_lesson.status_code == 404
+        assert curriculum_lesson.json()["message"] == "Curriculum lesson not found"
+
+    def test_delete_same_curriculum_lesson_with_default_user():
+        """Test deleting a curriculum lesson with the default user"""
+
+        curriculum_lesson = client.delete(
+            f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}/lessons/{test_user.curriculum_lesson_id}",
+            headers={"Authorization": f"Bearer {default_user.token}"},
+        )
+
+        assert curriculum_lesson.status_code == 403
+        assert curriculum_lesson.json()["message"] == "No right to access"
 
     def test_delete_used_university():
         """Test deleting a university that has been used"""
