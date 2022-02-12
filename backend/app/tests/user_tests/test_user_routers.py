@@ -8,7 +8,6 @@ with TestClient(app) as client:
         user_id = None
         token = None
         semester_id = None
-        lesson_id = None
 
     test_user = TestUser()
 
@@ -42,7 +41,6 @@ with TestClient(app) as client:
         assert test_user.user_id is not None
         assert test_user.token is not None
         assert test_user.semester_id is not None
-        # assert test_user.lesson_id is not None
 
     def test_show_user():
         """Test showing user"""

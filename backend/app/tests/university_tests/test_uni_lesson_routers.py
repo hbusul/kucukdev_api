@@ -20,25 +20,27 @@ with TestClient(app) as client:
         second_section_id = None
 
     test_user = TestUser()
-    admin_token = login_admin_user(client, settings)
-    test_user.user_id, test_user.token = create_professor_and_login(
-        client, admin_token, "professor_uni_lesson_routers@test.com", "test"
-    )
-    test_user.university_id = create_university(
-        client, test_user.token, "Test University for Uni Lesson Routers"
-    )
-
-    test_user.semester_id = create_university_semester(
-        client,
-        test_user.token,
-        test_user.university_id,
-        "Test University Semester for Uni Lesson Routers",
-    )
-
     default_user = TestUser()
-    default_user.user_id, default_user.token = create_user_and_login(
-        client, "default_user_uni_lesson@test.com", "test"
-    )
+
+    def test_prepare_test_data():
+        admin_token = login_admin_user(client, settings)
+        test_user.user_id, test_user.token = create_professor_and_login(
+            client, admin_token, "professor_uni_lesson_routers@test.com", "test"
+        )
+        test_user.university_id = create_university(
+            client, test_user.token, "Test University for Uni Lesson Routers"
+        )
+
+        test_user.semester_id = create_university_semester(
+            client,
+            test_user.token,
+            test_user.university_id,
+            "Test University Semester for Uni Lesson Routers",
+        )
+
+        default_user.user_id, default_user.token = create_user_and_login(
+            client, "default_user_uni_lesson@test.com", "test"
+        )
 
     def test_create_university_lesson():
         """Test creating university lesson"""

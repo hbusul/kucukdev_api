@@ -12,10 +12,13 @@ with TestClient(app) as client:
 
     test_user = TestUser()
 
-    test_user.user_id, test_user.token = create_user_and_login(
-        client, "lesson_routers@test.com", "test"
-    )
-    test_user.semester_id = create_semester(client, test_user.user_id, test_user.token)
+    def test_prepare_test_data():
+        test_user.user_id, test_user.token = create_user_and_login(
+            client, "lesson_routers@test.com", "test"
+        )
+        test_user.semester_id = create_semester(
+            client, test_user.user_id, test_user.token
+        )
 
     def test_create_lesson():
         """Test creating lesson"""

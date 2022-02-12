@@ -23,39 +23,41 @@ with TestClient(app) as client:
         second_curriculum_lesson_id = None
 
     test_user = TestUser()
-    admin_token = login_admin_user(client, settings)
-    test_user.user_id, test_user.token = create_professor_and_login(
-        client, admin_token, "professor_uni_cur_lesson_routers@test.com", "test"
-    )
-    test_user.university_id = create_university(
-        client, test_user.token, "Test University for Uni Cur Lesson Routers"
-    )
-    test_user.department_id = create_department(
-        client,
-        test_user.token,
-        test_user.university_id,
-        "Test Department for Uni Cur Lesson Routers",
-    )
-    test_user.curriculum_id = create_curriculum(
-        client,
-        test_user.token,
-        test_user.university_id,
-        test_user.department_id,
-        "Test Curriculum for Uni Cur Lesson Routers",
-    )
-    test_user.curriculum_semester_id = create_curriculum_semester(
-        client,
-        test_user.token,
-        test_user.university_id,
-        test_user.department_id,
-        test_user.curriculum_id,
-        1,
-    )
-
     default_user = TestUser()
-    default_user.user_id, default_user.token = create_user_and_login(
-        client, "default_user_uni_cur@test.com", "test"
-    )
+
+    def test_prepare_test_data():
+        admin_token = login_admin_user(client, settings)
+        test_user.user_id, test_user.token = create_professor_and_login(
+            client, admin_token, "professor_uni_cur_lesson_routers@test.com", "test"
+        )
+        test_user.university_id = create_university(
+            client, test_user.token, "Test University for Uni Cur Lesson Routers"
+        )
+        test_user.department_id = create_department(
+            client,
+            test_user.token,
+            test_user.university_id,
+            "Test Department for Uni Cur Lesson Routers",
+        )
+        test_user.curriculum_id = create_curriculum(
+            client,
+            test_user.token,
+            test_user.university_id,
+            test_user.department_id,
+            "Test Curriculum for Uni Cur Lesson Routers",
+        )
+        test_user.curriculum_semester_id = create_curriculum_semester(
+            client,
+            test_user.token,
+            test_user.university_id,
+            test_user.department_id,
+            test_user.curriculum_id,
+            1,
+        )
+
+        default_user.user_id, default_user.token = create_user_and_login(
+            client, "default_user_uni_cur@test.com", "test"
+        )
 
     def test_create_curriculum_lesson():
         """Test creating a curriculum lesson"""

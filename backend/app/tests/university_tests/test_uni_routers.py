@@ -17,15 +17,17 @@ with TestClient(app) as client:
         second_semester_id = None
 
     test_user = TestUser()
-    admin_token = login_admin_user(client, settings)
-    test_user.user_id, test_user.token = create_professor_and_login(
-        client, admin_token, "professor_uni_routers@test.com", "test"
-    )
-
     default_user = TestUser()
-    default_user.user_id, default_user.token = create_user_and_login(
-        client, "default_user@test.com", "test"
-    )
+
+    def test_prepare_test_data():
+        admin_token = login_admin_user(client, settings)
+        test_user.user_id, test_user.token = create_professor_and_login(
+            client, admin_token, "professor_uni_routers@test.com", "test"
+        )
+
+        default_user.user_id, default_user.token = create_user_and_login(
+            client, "default_user@test.com", "test"
+        )
 
     def test_create_university():
         """Test creating university"""
