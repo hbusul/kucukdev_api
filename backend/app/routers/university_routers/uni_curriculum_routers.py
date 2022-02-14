@@ -97,7 +97,7 @@ async def list_department_curriculums(unid: str, depid: str, request: Request):
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": "University department not found"},
+        content={"message": "University or department not found"},
     )
 
 
@@ -260,3 +260,4 @@ async def delete_department_curriculum(
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
     )
+

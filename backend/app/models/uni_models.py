@@ -149,7 +149,7 @@ class CurriculumSemesterModel(BaseModel):
 
 class UniversityCurriculumModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
+    name: str = Field(..., min_length=1)
     startYear: int = Field(...)
     endYear: int = Field(...)
     semesters: List[CurriculumSemesterModel] = []
