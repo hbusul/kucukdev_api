@@ -1,5 +1,6 @@
 from typing import Optional, List
 from pydantic import BaseModel, Field
+from datetime import datetime
 from bson import ObjectId
 
 from .PyObjectId import PyObjectId
@@ -117,7 +118,37 @@ class UniversitySemesterModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {"example": {"name": "20-21 Spring",}}
+        schema_extra = {
+            "example": {
+                "name": "20-21 Spring",
+            }
+        }
+
+
+class UniversitySemesterAPIModel(BaseModel):
+    id: Optional[str] = Field(alias="_id")
+    name: Optional[str]
+    startDate: Optional[datetime]
+    endDate: Optional[datetime]
+    startHour: Optional[str]
+    dLesson: Optional[int]
+    dBreak: Optional[int]
+    slotCount: Optional[int]
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "_id": "61ddea901311ecaed99afb7c",
+                "name": "2020-21 Spring",
+                "startDate": "2022-02-18T00:00:00Z",
+                "endDate": "2022-06-18T00:00:00Z",
+                "startHour": "8.10",
+                "dLesson": 50,
+                "dBreak": 10,
+                "slotCount": 12,
+            }
+        }
 
 
 class CurriculumLessonModel(BaseModel):
@@ -144,7 +175,11 @@ class CurriculumSemesterModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {"example": {"semester": 1,}}
+        schema_extra = {
+            "example": {
+                "semester": 1,
+            }
+        }
 
 
 class UniversityCurriculumModel(BaseModel):
@@ -172,7 +207,11 @@ class UniversityDepartmentModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {"example": {"name": "COMP",}}
+        schema_extra = {
+            "example": {
+                "name": "COMP",
+            }
+        }
 
 
 class UniversityModel(BaseModel):
@@ -185,7 +224,11 @@ class UniversityModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {"example": {"name": "AGU",}}
+        schema_extra = {
+            "example": {
+                "name": "AGU",
+            }
+        }
 
 
 class UniversityAPIModel(BaseModel):
@@ -210,5 +253,8 @@ class UpdateUniversityNameModel(BaseModel):
     name: str = Field(...)
 
     class Config:
-        schema_extra = {"example": {"name": "AGU",}}
-
+        schema_extra = {
+            "example": {
+                "name": "AGU",
+            }
+        }
