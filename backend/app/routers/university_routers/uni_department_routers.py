@@ -109,16 +109,14 @@ async def show_university_department(unid: str, depid: str, request: Request):
 
     if (
         university := await request.app.mongodb["universities"].find_one(
-            {"_id": unid, "departments._id": depid}
+            {"_id": unid, "departments._id": depid}, {"departments.$": 1}
         )
     ) is not None:
-        for department in university["departments"]:
-            if department["_id"] == depid:
-                return department
+        return university["departments"][0]
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": "University department not found"},
+        content={"message": "University or department not found"},
     )
 
 
@@ -154,7 +152,7 @@ async def update_university_department(
         ) is None:
             return JSONResponse(
                 status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "University department not found"},
+                content={"message": "University or department not found"},
             )
         else:
             for department in existing_university["departments"]:
@@ -164,22 +162,16 @@ async def update_university_department(
                         content={"message": "University department already exists"},
                     )
 
-        if len(university_department) >= 1:
-            update_result = await request.app.mongodb["universities"].update_many(
-                {"_id": unid, "departments._id": depid},
-                {"$set": {"departments.$.name": university_department["name"]}},
-            )
-
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "University department updated"},
-                )
-
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid input"},
+        update_result = await request.app.mongodb["universities"].update_many(
+            {"_id": unid, "departments._id": depid},
+            {"$set": {"departments.$.name": university_department["name"]}},
         )
+
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "University department updated"},
+            )
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -214,7 +206,7 @@ async def delete_university_department(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "University department not found"},
+            content={"message": "University or department not found"},
         )
 
     return JSONResponse(

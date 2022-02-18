@@ -165,7 +165,7 @@ class UniversityCurriculumModel(BaseModel):
 
 class UniversityDepartmentModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
+    name: str = Field(..., min_length=2 ,max_length=100,)  
     curriculums: List[UniversityCurriculumModel] = []
 
     class Config:

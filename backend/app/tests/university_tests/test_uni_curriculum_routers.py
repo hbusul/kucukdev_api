@@ -27,7 +27,7 @@ with TestClient(app) as client:
             client, admin_token, "professor_uni_curriculum_routers@test.com", "test"
         )
         test_user.university_id = create_university(
-            client, test_user.token, "Test University for Uni Lesson Routers"
+            client, test_user.token, "Test University for Uni Curriculum Routers"
         )
         test_user.department_id = create_department(
             client,
