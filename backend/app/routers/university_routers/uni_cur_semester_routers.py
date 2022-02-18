@@ -65,7 +65,10 @@ async def create_curriculum_semester(
                     "departments.$[i].curriculums.$[j].semesters": curriculum_semester
                 }
             },
-            array_filters=[{"i._id": depid}, {"j._id": curid},],
+            array_filters=[
+                {"i._id": depid},
+                {"j._id": curid},
+            ],
         )
 
         if update_result.modified_count == 1:
@@ -81,7 +84,7 @@ async def create_curriculum_semester(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "University or departmen or curriculum not found"},
+            content={"message": "University or department or curriculum not found"},
         )
 
     return JSONResponse(
@@ -94,7 +97,9 @@ async def create_curriculum_semester(
     response_description="List all curriculum semesters",
     operation_id="listCurriculumSemesters",
     response_model=List[CurriculumSemesterModel],
-    responses={404: {"model": Message},},
+    responses={
+        404: {"model": Message},
+    },
 )
 async def list_curriculum_semesters(
     unid: str, depid: str, curid: str, request: Request
@@ -127,7 +132,9 @@ async def list_curriculum_semesters(
     response_description="Show a university curriculum semester",
     operation_id="getSingleCurriculumSemester",
     response_model=CurriculumSemesterModel,
-    responses={404: {"model": Message},},
+    responses={
+        404: {"model": Message},
+    },
 )
 async def show_curriculum_semester(
     unid: str, depid: str, curid: str, cursid: str, request: Request
@@ -255,7 +262,10 @@ async def update_curriculum_semester(
     response_description="Delete curriculum semester",
     operation_id="deleteCurriculumSemester",
     response_model=Message,
-    responses={404: {"model": Message}, 403: {"model": Message},},
+    responses={
+        404: {"model": Message},
+        403: {"model": Message},
+    },
 )
 async def delete_curriculum_semester(
     unid: str,
@@ -275,7 +285,10 @@ async def delete_curriculum_semester(
                 "departments.curriculums._id": curid,
             },
             {"$pull": {"departments.$[i].curriculums.$[j].semesters": {"_id": cursid}}},
-            array_filters=[{"i._id": depid}, {"j._id": curid},],
+            array_filters=[
+                {"i._id": depid},
+                {"j._id": curid},
+            ],
         )
 
         if delete_result.modified_count == 1:
