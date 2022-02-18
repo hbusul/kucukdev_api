@@ -332,13 +332,13 @@ with TestClient(app) as client:
         assert semester.status_code == 403
         assert semester.json() == {"message": "No right to access"}
 
-    # def test_delete_used_university():
-    #     """Test deleting a university that has been used"""
+    def test_delete_used_university():
+        """Test deleting a university that has been used"""
 
-    #     university = client.delete(
-    #         f"/universities/{test_user.university_id}",
-    #         headers={"Authorization": f"Bearer {test_user.token}"},
-    #     )
+        university = client.delete(
+            f"/universities/{test_user.university_id}",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+        )
 
-    #     assert university.status_code == 200
-    #     assert university.json()["message"] == "University deleted"
+        assert university.status_code == 200
+        assert university.json()["message"] == "University deleted"
