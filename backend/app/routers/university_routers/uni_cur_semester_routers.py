@@ -65,10 +65,7 @@ async def create_curriculum_semester(
                     "departments.$[i].curriculums.$[j].semesters": curriculum_semester
                 }
             },
-            array_filters=[
-                {"i._id": depid},
-                {"j._id": curid},
-            ],
+            array_filters=[{"i._id": depid}, {"j._id": curid},],
         )
 
         if update_result.modified_count == 1:
@@ -97,9 +94,7 @@ async def create_curriculum_semester(
     response_description="List all curriculum semesters",
     operation_id="listCurriculumSemesters",
     response_model=List[CurriculumSemesterModel],
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def list_curriculum_semesters(
     unid: str, depid: str, curid: str, request: Request
@@ -132,9 +127,7 @@ async def list_curriculum_semesters(
     response_description="Show a university curriculum semester",
     operation_id="getSingleCurriculumSemester",
     response_model=CurriculumSemesterModel,
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def show_curriculum_semester(
     unid: str, depid: str, curid: str, cursid: str, request: Request
@@ -142,22 +135,17 @@ async def show_curriculum_semester(
     """Get a single semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID and curriculumSemesterID"""
 
     if (
-        university := await request.app.mongodb["universities"].find_one(
+        result := await request.app.mongodb["universities"].find_one(
             {
                 "_id": unid,
                 "departments._id": depid,
                 "departments.curriculums._id": curid,
                 "departments.curriculums.semesters._id": cursid,
-            }
+            },
+            {"departments.curriculums.semesters.$": 1, "_id": 0},
         )
     ) is not None:
-        for department in university["departments"]:
-            if department["_id"] == depid:
-                for curriculum in department["curriculums"]:
-                    if curriculum["_id"] == curid:
-                        for semester in curriculum["semesters"]:
-                            if semester["_id"] == cursid:
-                                return semester
+        return result["departments"][0]["curriculums"][0]["semesters"][0]
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -193,13 +181,14 @@ async def update_curriculum_semester(
         }
 
         if (
-            university := await request.app.mongodb["universities"].find_one(
+            result := await request.app.mongodb["universities"].find_one(
                 {
                     "_id": unid,
                     "departments._id": depid,
                     "departments.curriculums._id": curid,
                     "departments.curriculums.semesters._id": cursid,
-                }
+                },
+                {"departments.curriculums": 1, "_id": 0},
             )
         ) is None:
             return JSONResponse(
@@ -207,21 +196,13 @@ async def update_curriculum_semester(
                 content={"message": "Curriculum semester not found"},
             )
         else:
-            for department in university["departments"]:
-                if department["_id"] == depid:
-                    for curriculum in department["curriculums"]:
-                        if curriculum["_id"] == curid:
-                            for semester in curriculum["semesters"]:
-                                if (
-                                    semester["semester"]
-                                    == curriculum_semester["semester"]
-                                ):
-                                    return JSONResponse(
-                                        status_code=status.HTTP_400_BAD_REQUEST,
-                                        content={
-                                            "message": "Curriculum semester already exists"
-                                        },
-                                    )
+            semester_list = result["departments"][0]["curriculums"][0]["semesters"]
+            for semester in semester_list:
+                if semester["semester"] == curriculum_semester["semester"]:
+                    return JSONResponse(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        content={"message": "Curriculum semester already exists"},
+                    )
 
         if len(curriculum_semester) >= 1:
             update_result = await request.app.mongodb["universities"].update_many(
@@ -262,10 +243,7 @@ async def update_curriculum_semester(
     response_description="Delete curriculum semester",
     operation_id="deleteCurriculumSemester",
     response_model=Message,
-    responses={
-        404: {"model": Message},
-        403: {"model": Message},
-    },
+    responses={404: {"model": Message}, 403: {"model": Message},},
 )
 async def delete_curriculum_semester(
     unid: str,
@@ -285,10 +263,7 @@ async def delete_curriculum_semester(
                 "departments.curriculums._id": curid,
             },
             {"$pull": {"departments.$[i].curriculums.$[j].semesters": {"_id": cursid}}},
-            array_filters=[
-                {"i._id": depid},
-                {"j._id": curid},
-            ],
+            array_filters=[{"i._id": depid}, {"j._id": curid},],
         )
 
         if delete_result.modified_count == 1:
