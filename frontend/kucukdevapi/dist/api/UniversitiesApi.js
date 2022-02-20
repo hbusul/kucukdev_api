@@ -11,6 +11,8 @@ var _HTTPValidationError = _interopRequireDefault(require("../model/HTTPValidati
 
 var _Message = _interopRequireDefault(require("../model/Message"));
 
+var _MessageCreate = _interopRequireDefault(require("../model/MessageCreate"));
+
 var _UniversityAPIModel = _interopRequireDefault(require("../model/UniversityAPIModel"));
 
 var _UniversityModel = _interopRequireDefault(require("../model/UniversityModel"));
@@ -27,7 +29,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
 * Universities service.
@@ -51,7 +53,7 @@ var UniversitiesApi = /*#__PURE__*/function () {
    * Callback function to receive the result of the createUniversity operation.
    * @callback module:api/UniversitiesApi~createUniversityCallback
    * @param {String} error Error message, if any.
-   * @param {module:model/UniversityAPIModel} data The data returned by the service call.
+   * @param {module:model/MessageCreate} data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
 
@@ -60,7 +62,7 @@ var UniversitiesApi = /*#__PURE__*/function () {
    * Create a university
    * @param {module:model/UniversityModel} universityModel 
    * @param {module:api/UniversitiesApi~createUniversityCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link module:model/UniversityAPIModel}
+   * data is of type: {@link module:model/MessageCreate}
    */
 
 
@@ -80,7 +82,7 @@ var UniversitiesApi = /*#__PURE__*/function () {
       var authNames = ['OAuth2PasswordBearer'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = _UniversityAPIModel.default;
+      var returnType = _MessageCreate.default;
       return this.apiClient.callApi('/universities', 'POST', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**
@@ -161,7 +163,7 @@ var UniversitiesApi = /*#__PURE__*/function () {
      * Callback function to receive the result of the getSingleUniversity operation.
      * @callback module:api/UniversitiesApi~getSingleUniversityCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/UniversityModel} data The data returned by the service call.
+     * @param {module:model/UniversityAPIModel} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -170,7 +172,7 @@ var UniversitiesApi = /*#__PURE__*/function () {
      * Get a single university with given universityID
      * @param {String} unid 
      * @param {module:api/UniversitiesApi~getSingleUniversityCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/UniversityModel}
+     * data is of type: {@link module:model/UniversityAPIModel}
      */
 
   }, {
@@ -191,7 +193,7 @@ var UniversitiesApi = /*#__PURE__*/function () {
       var authNames = [];
       var contentTypes = [];
       var accepts = ['application/json'];
-      var returnType = _UniversityModel.default;
+      var returnType = _UniversityAPIModel.default;
       return this.apiClient.callApi('/universities/{unid}', 'GET', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**

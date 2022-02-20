@@ -14,7 +14,7 @@ Method | HTTP request | Description
 
 ## createUniversityDepartment
 
-> UniversityDepartmentModel createUniversityDepartment(unid, universityDepartmentModel)
+> MessageCreate createUniversityDepartment(unid, universityDepartmentModel)
 
 Create University Department
 
@@ -51,7 +51,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**UniversityDepartmentModel**](UniversityDepartmentModel.md)
+[**MessageCreate**](MessageCreate.md)
 
 ### Authorization
 

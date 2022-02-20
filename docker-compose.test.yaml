@@ -10,6 +10,8 @@ services:
     environment:
       DB_URL: "mongodb://root:example@mongo/"
       DB_NAME: farmstack
+    env_file:
+      - backend/.env
     networks:
       - app-network
 
@@ -21,7 +23,10 @@ services:
     networks:
       - app-network
     volumes:
-      - mongo-data:/data/db
+      - mongo-data-test:/data/db
+    command: mongod --quiet --logpath /dev/null # to ignore the log outputs from the MongoDB container
+    ports:
+      - "27017:27017"
 
 networks:
   app-network:
@@ -29,4 +34,4 @@ networks:
     internal: false
 
 volumes:
-  mongo-data:
+  mongo-data-test:

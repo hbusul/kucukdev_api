@@ -1,5 +1,6 @@
 from typing import Optional, List
 from pydantic import BaseModel, Field
+from datetime import datetime
 from bson import ObjectId
 
 from .PyObjectId import PyObjectId
@@ -124,6 +125,32 @@ class UniversitySemesterModel(BaseModel):
         }
 
 
+class UniversitySemesterAPIModel(BaseModel):
+    id: Optional[str] = Field(alias="_id")
+    name: Optional[str]
+    startDate: Optional[datetime]
+    endDate: Optional[datetime]
+    startHour: Optional[str]
+    dLesson: Optional[int]
+    dBreak: Optional[int]
+    slotCount: Optional[int]
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "_id": "61ddea901311ecaed99afb7c",
+                "name": "2020-21 Spring",
+                "startDate": "2022-02-18T00:00:00Z",
+                "endDate": "2022-06-18T00:00:00Z",
+                "startHour": "8.10",
+                "dLesson": 50,
+                "dBreak": 10,
+                "slotCount": 12,
+            }
+        }
+
+
 class CurriculumLessonModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
@@ -157,7 +184,7 @@ class CurriculumSemesterModel(BaseModel):
 
 class UniversityCurriculumModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
+    name: str = Field(..., min_length=1)
     startYear: int = Field(...)
     endYear: int = Field(...)
     semesters: List[CurriculumSemesterModel] = []
@@ -173,7 +200,7 @@ class UniversityCurriculumModel(BaseModel):
 
 class UniversityDepartmentModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
+    name: str = Field(..., min_length=2 ,max_length=100,)  
     curriculums: List[UniversityCurriculumModel] = []
 
     class Config:
@@ -223,13 +250,9 @@ class UniversityAPIModel(BaseModel):
 
 
 class UpdateUniversityNameModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
 
     class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "name": "AGU",

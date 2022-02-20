@@ -18,6 +18,7 @@ import LessonAPIModel from '../model/LessonAPIModel';
 import LessonAbsenceModel from '../model/LessonAbsenceModel';
 import LessonModel from '../model/LessonModel';
 import Message from '../model/Message';
+import MessageCreate from '../model/MessageCreate';
 import UpdateLessonModel from '../model/UpdateLessonModel';
 
 /**
@@ -103,7 +104,7 @@ export default class LessonsApi {
      * Callback function to receive the result of the createLesson operation.
      * @callback module:api/LessonsApi~createLessonCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/Message} data The data returned by the service call.
+     * @param {module:model/MessageCreate} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -114,7 +115,7 @@ export default class LessonsApi {
      * @param {String} sid 
      * @param {module:model/LessonModel} lessonModel 
      * @param {module:api/LessonsApi~createLessonCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/Message}
+     * data is of type: {@link module:model/MessageCreate}
      */
     createLesson(uid, sid, lessonModel, callback) {
       let postBody = lessonModel;
@@ -145,7 +146,7 @@ export default class LessonsApi {
       let authNames = ['OAuth2PasswordBearer'];
       let contentTypes = ['application/json'];
       let accepts = ['application/json'];
-      let returnType = Message;
+      let returnType = MessageCreate;
       return this.apiClient.callApi(
         '/users/{uid}/semesters/{sid}/lessons', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,

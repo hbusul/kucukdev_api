@@ -27,9 +27,7 @@ class LessonAbsenceModel(BaseModel):
             AbsenceModel: lambda x: [x.week, x.day, x.hour, x.isLab],
         }
         schema_extra = {
-            "example": {
-                "absence": {"week": 0, "day": 2, "hour": 7, "isLab": 0},
-            }
+            "example": {"absence": {"week": 0, "day": 2, "hour": 7, "isLab": 0},}
         }
 
 
@@ -199,12 +197,7 @@ class UserModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "email": "hello@agu.edu.tr",
-                "password": "hello1234",
-            }
-        }
+        schema_extra = {"example": {"email": "hello@agu.edu.tr", "password": "123456"}}
 
 
 class UserAPIModel(BaseModel):
@@ -230,62 +223,41 @@ class UserAPIModel(BaseModel):
 
 
 class UpdatePasswordModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     password: str = Field(...)
 
     class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "password": "123456",
-            }
-        }
+        schema_extra = {"example": {"password": "123456",}}
 
 
 class UpdateSemesterModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     curSemesterID: str = Field(...)
 
     class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "curSemesterID": "61ddea901311ecaed99afb7f",
-            }
-        }
+        schema_extra = {"example": {"curSemesterID": "61ddea901311ecaed99afb7f"}}
 
 
 class UpdateEntranceYearModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     entranceYear: int = Field(...)
 
     class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "entranceYear": 2018,
-            }
-        }
+        schema_extra = {"example": {"entranceYear": 2018,}}
 
 
 class UpdateUniversityModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     curUniversityID: str = Field(...)
 
     class Config:
+        schema_extra = {"example": {"curUniversityID": "61ddea901311ecaed99afb7g"}}
+
+
+class MessageCreate(BaseModel):
+    id: str = Field(alias="_id")
+    message: str
+
+    class Config:
         allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
         schema_extra = {
-            "example": {
-                "curUniversityID": "61ddea901311ecaed99afb7g",
-            }
+            "example": {"_id": "61ddea901311ecaed99afb7c", "message": "string"}
         }
 
 

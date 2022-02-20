@@ -114,7 +114,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserAPIModel"
+                  "$ref": "#/components/schemas/MessageCreate"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageCreate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
                 }
               }
             }
@@ -638,6 +658,83 @@
         ]
       }
     },
+    "/users/professors": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Create Professor User",
+        "description": "Create a professor user",
+        "operationId": "createProfessorUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Add new professor user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageCreate"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageCreate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/users/{uid}/semesters": {
       "get": {
         "tags": [
@@ -672,8 +769,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -692,8 +789,8 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -753,27 +850,23 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Response Create Semester Users  Uid  Semesters Post",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SemesterAPIModel"
-                  }
+                  "$ref": "#/components/schemas/MessageCreate"
                 }
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "201": {
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Message"
+                  "$ref": "#/components/schemas/MessageCreate"
                 }
               }
             }
           },
-          "403": {
-            "description": "Forbidden",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -792,8 +885,18 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -859,8 +962,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -879,8 +982,8 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -954,8 +1057,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -974,8 +1077,8 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1039,18 +1142,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -1069,8 +1162,18 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1140,8 +1243,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -1160,8 +1263,8 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1230,7 +1333,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Message"
+                  "$ref": "#/components/schemas/MessageCreate"
                 }
               }
             }
@@ -1240,13 +1343,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Message"
+                  "$ref": "#/components/schemas/MessageCreate"
                 }
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -1265,8 +1368,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1341,8 +1444,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -1361,8 +1464,8 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1445,8 +1548,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -1465,8 +1568,8 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1539,8 +1642,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -1559,8 +1662,8 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1645,8 +1748,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "201": {
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
@@ -1655,8 +1758,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -1675,8 +1778,18 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1875,7 +1988,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UniversityAPIModel"
+                  "$ref": "#/components/schemas/MessageCreate"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageCreate"
                 }
               }
             }
@@ -1892,6 +2015,16 @@
           },
           "403": {
             "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
@@ -1943,7 +2076,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UniversityModel"
+                  "$ref": "#/components/schemas/UniversityAPIModel"
                 }
               }
             }
@@ -2751,7 +2884,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Message"
+                  "$ref": "#/components/schemas/MessageCreate"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageCreate"
                 }
               }
             }
@@ -3433,13 +3576,23 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UniversityDepartmentModel"
+                  "$ref": "#/components/schemas/MessageCreate"
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageCreate"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -3460,6 +3613,16 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
@@ -3826,13 +3989,23 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UniversityCurriculumModel"
+                  "$ref": "#/components/schemas/MessageCreate"
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageCreate"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -3853,6 +4026,16 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
@@ -4264,13 +4447,23 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CurriculumSemesterModel"
+                  "$ref": "#/components/schemas/MessageCreate"
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageCreate"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -4291,6 +4484,16 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
@@ -4603,7 +4806,7 @@
         ]
       }
     },
-    "/universities/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons": {
+    "/universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons": {
       "get": {
         "tags": [
           "curriculum lessons"
@@ -4655,7 +4858,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Response List Curriculum Lessons Universities  Unid  Departments  Depid  Curriculums  Curid  Semesters Cursid  Lessons Get",
+                  "title": "Response List Curriculum Lessons Universities  Unid  Departments  Depid  Curriculums  Curid  Semesters  Cursid  Lessons Get",
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/CurriculumLessonModel"
@@ -4747,13 +4950,23 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CurriculumLessonModel"
+                  "$ref": "#/components/schemas/MessageCreate"
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageCreate"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -4774,6 +4987,16 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
@@ -4806,7 +5029,7 @@
           "curriculum lessons"
         ],
         "summary": "Show Curriculum Lesson",
-        "description": "Get a single semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID",
+        "description": "Get a single lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID",
         "operationId": "getSingleCurriculumLesson",
         "parameters": [
           {
@@ -4893,7 +5116,7 @@
           "curriculum lessons"
         ],
         "summary": "Update Curriculum Lesson",
-        "description": "Update semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID",
+        "description": "Update lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID",
         "operationId": "updateCurriculumLesson",
         "parameters": [
           {
@@ -4963,8 +5186,18 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -4983,8 +5216,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
@@ -5015,7 +5248,7 @@
           "curriculum lessons"
         ],
         "summary": "Delete Curriculum Lesson",
-        "description": "Delete a university department with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID",
+        "description": "Delete a lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID",
         "operationId": "deleteCurriculumLesson",
         "parameters": [
           {
@@ -5520,6 +5753,28 @@
           }
         }
       },
+      "MessageCreate": {
+        "title": "MessageCreate",
+        "required": [
+          "_id",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "_id": {
+            "title": " Id",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "example": {
+          "_id": "61ddea901311ecaed99afb7c",
+          "message": "string"
+        }
+      },
       "SemesterAPIModel": {
         "title": "SemesterAPIModel",
         "type": "object",
@@ -6018,10 +6273,6 @@
         ],
         "type": "object",
         "properties": {
-          "_id": {
-            "title": " Id",
-            "type": "string"
-          },
           "entranceYear": {
             "title": "Entranceyear",
             "type": "integer"
@@ -6087,10 +6338,6 @@
         ],
         "type": "object",
         "properties": {
-          "_id": {
-            "title": " Id",
-            "type": "string"
-          },
           "password": {
             "title": "Password",
             "type": "string"
@@ -6107,10 +6354,6 @@
         ],
         "type": "object",
         "properties": {
-          "_id": {
-            "title": " Id",
-            "type": "string"
-          },
           "curSemesterID": {
             "title": "Cursemesterid",
             "type": "string"
@@ -6127,10 +6370,6 @@
         ],
         "type": "object",
         "properties": {
-          "_id": {
-            "title": " Id",
-            "type": "string"
-          },
           "curUniversityID": {
             "title": "Curuniversityid",
             "type": "string"
@@ -6147,10 +6386,6 @@
         ],
         "type": "object",
         "properties": {
-          "_id": {
-            "title": " Id",
-            "type": "string"
-          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -6289,7 +6524,7 @@
         },
         "example": {
           "email": "hello@agu.edu.tr",
-          "password": "hello1234"
+          "password": "123456"
         }
       },
       "UserSemesterModel": {

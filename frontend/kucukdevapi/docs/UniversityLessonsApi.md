@@ -15,7 +15,7 @@ Method | HTTP request | Description
 
 ## createUniversityLesson
 
-> Message createUniversityLesson(unid, unisid, universityLessonModel)
+> MessageCreate createUniversityLesson(unid, unisid, universityLessonModel)
 
 Create University Lesson
 
@@ -54,7 +54,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Message**](Message.md)
+[**MessageCreate**](MessageCreate.md)
 
 ### Authorization
 

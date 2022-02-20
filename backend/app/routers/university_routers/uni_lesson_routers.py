@@ -11,7 +11,7 @@ from ...models.uni_models import (
     UniversityLessonModel,
     UniversitySectionModel,
 )
-from ...models.user_models import Message, UserModel
+from ...models.user_models import Message, MessageCreate, UserModel
 
 router = APIRouter()
 
@@ -20,8 +20,9 @@ router = APIRouter()
     "/{unid}/semesters/{unisid}/lessons",
     response_description="Add new university lesson",
     operation_id="createUniversityLesson",
-    response_model=Message,
+    response_model=MessageCreate,
     responses={
+        201: {"model": MessageCreate},
         403: {"model": Message},
         404: {"model": Message},
         409: {"model": Message},
@@ -83,7 +84,7 @@ async def create_university_lesson(
             ):
                 return JSONResponse(
                     status_code=status.HTTP_409_CONFLICT,
-                    content={"message": "Section already exists"},
+                    content={"message": "University lesson section already exists"},
                 )
 
             update_result = await request.app.mongodb["universities"].update_one(
@@ -101,13 +102,18 @@ async def create_university_lesson(
 
             if update_result.modified_count == 1:
                 return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "Section created"},
+                    status_code=status.HTTP_201_CREATED,
+                    content=jsonable_encoder(
+                        MessageCreate(
+                            id=section["_id"],
+                            message="University lesson section created",
+                        )
+                    ),
                 )
 
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Section could not be created"},
+                content={"message": "University lesson section could not be created"},
             )
 
         new_lesson = UniversityLessonAPIModel(
@@ -133,21 +139,22 @@ async def create_university_lesson(
                     "semesters.lessons.code": new_lesson["code"],
                 },
                 {"$push": {"semesters.$[i].lessons.$[j].sections": section}},
-                array_filters=[
-                    {"i._id": unisid},
-                    {"j.code": new_lesson["code"]},
-                ],
+                array_filters=[{"i._id": unisid}, {"j.code": new_lesson["code"]},],
             )
 
             if update_result.modified_count == 1:
                 return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "Lesson created"},
+                    status_code=status.HTTP_201_CREATED,
+                    content=jsonable_encoder(
+                        MessageCreate(
+                            id=new_lesson["_id"], message="University lesson created",
+                        )
+                    ),
                 )
 
             return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"message": "Lesson could not be created"},
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "University lesson could not be created"},
             )
 
         return JSONResponse(
@@ -165,9 +172,7 @@ async def create_university_lesson(
     response_description="Get a single lessons with code",
     operation_id="getSingleLessonWithCode",
     response_model=UniversityLessonAPIModel,
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def show_lesson_with_code(unid: str, code: str, request: Request):
     """Get a single lesson of a university semester with given universityID and Lesson Code"""
@@ -177,19 +182,10 @@ async def show_lesson_with_code(unid: str, code: str, request: Request):
             request.app.mongodb["universities"]
             .aggregate(
                 [
-                    {
-                        "$match": {
-                            "_id": unid,
-                            "semesters.lessons.code": code,
-                        },
-                    },
+                    {"$match": {"_id": unid, "semesters.lessons.code": code,},},
                     {"$unwind": "$semesters"},
                     {"$unwind": "$semesters.lessons"},
-                    {
-                        "$match": {
-                            "semesters.lessons.code": code,
-                        },
-                    },
+                    {"$match": {"semesters.lessons.code": code,},},
                 ]
             )
             .to_list(length=None)
@@ -208,9 +204,7 @@ async def show_lesson_with_code(unid: str, code: str, request: Request):
     response_description="List all lessons of a university semester",
     operation_id="listUniversitySemesterLessons",
     response_model=List[UniversityLessonAPIModel],
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def list_university_lessons(unid: str, unisid: str, request: Request):
     """list all lessons for a semesters of a university with given universityID and universitySemesterID"""
@@ -220,18 +214,9 @@ async def list_university_lessons(unid: str, unisid: str, request: Request):
             request.app.mongodb["universities"]
             .aggregate(
                 [
-                    {
-                        "$match": {
-                            "_id": unid,
-                            "semesters._id": unisid,
-                        },
-                    },
+                    {"$match": {"_id": unid, "semesters._id": unisid,},},
                     {"$unwind": "$semesters"},
-                    {
-                        "$match": {
-                            "semesters._id": unisid,
-                        },
-                    },
+                    {"$match": {"semesters._id": unisid,},},
                 ]
             )
             .to_list(length=None)
@@ -250,9 +235,7 @@ async def list_university_lessons(unid: str, unisid: str, request: Request):
     response_description="Get a single lessons of a university semester",
     operation_id="getSingleUniversitySemesterLesson",
     response_model=UniversityLessonAPIModel,
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def show_university_lesson(unid: str, unisid: str, unilid: str, request: Request):
     """Get a single lesson of a university semester with given universityID, universitySemesterID and universityLessonID"""
@@ -271,11 +254,7 @@ async def show_university_lesson(unid: str, unisid: str, unilid: str, request: R
                     },
                     {"$unwind": "$semesters"},
                     {"$unwind": "$semesters.lessons"},
-                    {
-                        "$match": {
-                            "semesters.lessons._id": unilid,
-                        },
-                    },
+                    {"$match": {"semesters.lessons._id": unilid,},},
                 ]
             )
             .to_list(length=None)
@@ -285,7 +264,7 @@ async def show_university_lesson(unid: str, unisid: str, unilid: str, request: R
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": "University semester not found"},
+        content={"message": "University lesson not found"},
     )
 
 
@@ -315,38 +294,43 @@ async def update_university_lesson(
         university_lesson = json.loads(university_lesson.replace("\\", ""))
 
         if (
-            await (
-                request.app.mongodb["universities"]
-                .aggregate(
-                    [
-                        {
-                            "$match": {
-                                "_id": unid,
-                                "semesters._id": unisid,
-                                "semesters.lessons._id": unilid,
+            (
+                await (
+                    request.app.mongodb["universities"]
+                    .aggregate(
+                        [
+                            {
+                                "$match": {
+                                    "_id": unid,
+                                    "semesters._id": unisid,
+                                    "semesters.lessons._id": unilid,
+                                },
                             },
-                        },
-                        {"$unwind": "$semesters"},
-                        {"$unwind": "$semesters.lessons"},
-                        {
-                            "$match": {
-                                "semesters.lessons._id": unilid,
-                                "semesters.lessons.code": university_lesson["code"],
+                            {"$unwind": "$semesters"},
+                            {"$unwind": "$semesters.lessons"},
+                            {
+                                "$match": {
+                                    "semesters.lessons._id": unilid,
+                                    "semesters.lessons.code": university_lesson["code"],
+                                },
                             },
-                        },
-                    ]
+                        ]
+                    )
+                    .to_list(length=None)
                 )
-                .to_list(length=None)
             )
-        ) == [] and (
-            await request.app.mongodb["universities"].find_one(
-                {
-                    "_id": unid,
-                    "semesters._id": unisid,
-                    "semesters.lessons.code": university_lesson["code"],
-                }
+            == []
+            and (
+                await request.app.mongodb["universities"].find_one(
+                    {
+                        "_id": unid,
+                        "semesters._id": unisid,
+                        "semesters.lessons.code": university_lesson["code"],
+                    }
+                )
             )
-        ) is not None:
+            is not None
+        ):
             return JSONResponse(
                 status_code=status.HTTP_409_CONFLICT,
                 content={
@@ -355,11 +339,7 @@ async def update_university_lesson(
             )
 
         update_result = await request.app.mongodb["universities"].update_one(
-            {
-                "_id": unid,
-                "semesters._id": unisid,
-                "semesters.lessons._id": unilid,
-            },
+            {"_id": unid, "semesters._id": unisid, "semesters.lessons._id": unilid,},
             {
                 "$set": {
                     "semesters.$[i].lessons.$[j].name": university_lesson["name"],
@@ -380,7 +360,7 @@ async def update_university_lesson(
             )
 
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content={"message": "University lesson could not be updated"},
         )
 

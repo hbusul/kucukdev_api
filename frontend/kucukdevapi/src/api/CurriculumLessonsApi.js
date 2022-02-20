@@ -16,6 +16,7 @@ import ApiClient from "../ApiClient";
 import CurriculumLessonModel from '../model/CurriculumLessonModel';
 import HTTPValidationError from '../model/HTTPValidationError';
 import Message from '../model/Message';
+import MessageCreate from '../model/MessageCreate';
 
 /**
 * CurriculumLessons service.
@@ -40,7 +41,7 @@ export default class CurriculumLessonsApi {
      * Callback function to receive the result of the createCurriculumLesson operation.
      * @callback module:api/CurriculumLessonsApi~createCurriculumLessonCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/CurriculumLessonModel} data The data returned by the service call.
+     * @param {module:model/MessageCreate} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -53,7 +54,7 @@ export default class CurriculumLessonsApi {
      * @param {String} cursid 
      * @param {module:model/CurriculumLessonModel} curriculumLessonModel 
      * @param {module:api/CurriculumLessonsApi~createCurriculumLessonCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/CurriculumLessonModel}
+     * data is of type: {@link module:model/MessageCreate}
      */
     createCurriculumLesson(unid, depid, curid, cursid, curriculumLessonModel, callback) {
       let postBody = curriculumLessonModel;
@@ -94,9 +95,9 @@ export default class CurriculumLessonsApi {
       let authNames = ['OAuth2PasswordBearer'];
       let contentTypes = ['application/json'];
       let accepts = ['application/json'];
-      let returnType = CurriculumLessonModel;
+      let returnType = MessageCreate;
       return this.apiClient.callApi(
-        '/universities/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons', 'POST',
+        '/universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -112,7 +113,7 @@ export default class CurriculumLessonsApi {
 
     /**
      * Delete Curriculum Lesson
-     * Delete a university department with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
+     * Delete a lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
      * @param {String} unid 
      * @param {String} depid 
      * @param {String} curid 
@@ -179,7 +180,7 @@ export default class CurriculumLessonsApi {
 
     /**
      * Show Curriculum Lesson
-     * Get a single semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
+     * Get a single lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
      * @param {String} unid 
      * @param {String} depid 
      * @param {String} curid 
@@ -291,7 +292,7 @@ export default class CurriculumLessonsApi {
       let accepts = ['application/json'];
       let returnType = [CurriculumLessonModel];
       return this.apiClient.callApi(
-        '/universities/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons', 'GET',
+        '/universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -307,7 +308,7 @@ export default class CurriculumLessonsApi {
 
     /**
      * Update Curriculum Lesson
-     * Update semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
+     * Update lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
      * @param {String} unid 
      * @param {String} depid 
      * @param {String} curid 

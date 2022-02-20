@@ -1,16 +1,19 @@
-from fastapi import APIRouter, Body, Request, status, Depends
-from fastapi.responses import JSONResponse
-from typing import List
 import json
+from typing import List
+
+from fastapi import APIRouter, Body, Depends, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.user_models import (
     LessonAbsenceModel,
-    UserModel,
-    LessonModel,
-    UpdateLessonModel,
     LessonAPIModel,
+    LessonModel,
     Message,
+    MessageCreate,
+    UpdateLessonModel,
+    UserModel,
 )
 
 router = APIRouter()
@@ -20,12 +23,12 @@ router = APIRouter()
     "/{uid}/semesters/{sid}/lessons",
     response_description="Add new lesson into a semester",
     operation_id="createLesson",
-    response_model=Message,
+    response_model=MessageCreate,
     responses={
-        201: {"model": Message},
-        404: {"model": Message},
+        201: {"model": MessageCreate},
+        401: {"model": Message},
         403: {"model": Message},
-        400: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def create_lesson(
@@ -49,7 +52,9 @@ async def create_lesson(
         if update_result.modified_count == 1:
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
-                content={"message": "Lesson created"},
+                content=jsonable_encoder(
+                    MessageCreate(id=lesson["_id"], message="Lesson created")
+                ),
             )
 
         return JSONResponse(
@@ -68,9 +73,9 @@ async def create_lesson(
     operation_id="listLessonsOfSemester",
     response_model=List[LessonAPIModel],
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def list_lessons(
@@ -99,7 +104,7 @@ async def list_lessons(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Lessons not found"},
+            content={"message": "Semester not found"},
         )
 
     return JSONResponse(
@@ -113,9 +118,9 @@ async def list_lessons(
     operation_id="getSingleLesson",
     response_model=LessonAPIModel,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def show_lesson(
@@ -165,9 +170,9 @@ async def show_lesson(
     operation_id="updateLesson",
     response_model=Message,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def update_lesson(
@@ -209,7 +214,7 @@ async def update_lesson(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Lesson could not be updated"},
+            content={"message": "Lesson not found"},
         )
 
     return JSONResponse(
@@ -223,9 +228,9 @@ async def update_lesson(
     operation_id="deleteLesson",
     response_model=Message,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def delete_lesson(
@@ -251,7 +256,7 @@ async def delete_lesson(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Lesson could not be deleted"},
+            content={"message": "Lesson not found"},
         )
 
     return JSONResponse(
@@ -265,10 +270,11 @@ async def delete_lesson(
     operation_id="createAbsence",
     response_model=Message,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
-        401: {"model": Message},
+        201: {"model": Message},
         400: {"model": Message},
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def create_absence(
@@ -316,7 +322,7 @@ async def create_absence(
 
         if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_200_OK,
+                status_code=status.HTTP_201_CREATED,
                 content={"message": "Absence created"},
             )
 

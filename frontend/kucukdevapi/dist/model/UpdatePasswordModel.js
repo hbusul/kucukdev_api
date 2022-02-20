@@ -13,7 +13,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
  * The UpdatePasswordModel model module.
@@ -57,10 +57,6 @@ var UpdatePasswordModel = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new UpdatePasswordModel();
 
-        if (data.hasOwnProperty('_id')) {
-          obj['_id'] = _ApiClient.default.convertToType(data['_id'], 'String');
-        }
-
         if (data.hasOwnProperty('password')) {
           obj['password'] = _ApiClient.default.convertToType(data['password'], 'String');
         }
@@ -73,14 +69,9 @@ var UpdatePasswordModel = /*#__PURE__*/function () {
   return UpdatePasswordModel;
 }();
 /**
- * @member {String} _id
- */
-
-
-UpdatePasswordModel.prototype['_id'] = undefined;
-/**
  * @member {String} password
  */
+
 
 UpdatePasswordModel.prototype['password'] = undefined;
 var _default = UpdatePasswordModel;

@@ -54,12 +54,6 @@
       //expect(instance).to.be.a(Kucukdevapi.UpdateUniversityModel);
     });
 
-    it('should have the property id (base name: "_id")', function() {
-      // uncomment below and update the code to test the property id
-      //var instance = new Kucukdevapi.UpdateUniversityModel();
-      //expect(instance).to.be();
-    });
-
     it('should have the property curUniversityID (base name: "curUniversityID")', function() {
       // uncomment below and update the code to test the property curUniversityID
       //var instance = new Kucukdevapi.UpdateUniversityModel();

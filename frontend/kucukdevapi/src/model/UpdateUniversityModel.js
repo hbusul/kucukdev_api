@@ -49,9 +49,6 @@ class UpdateUniversityModel {
         if (data) {
             obj = obj || new UpdateUniversityModel();
 
-            if (data.hasOwnProperty('_id')) {
-                obj['_id'] = ApiClient.convertToType(data['_id'], 'String');
-            }
             if (data.hasOwnProperty('curUniversityID')) {
                 obj['curUniversityID'] = ApiClient.convertToType(data['curUniversityID'], 'String');
             }
@@ -61,11 +58,6 @@ class UpdateUniversityModel {
 
 
 }
-
-/**
- * @member {String} _id
- */
-UpdateUniversityModel.prototype['_id'] = undefined;
 
 /**
  * @member {String} curUniversityID

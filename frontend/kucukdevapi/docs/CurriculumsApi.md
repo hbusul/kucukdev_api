@@ -14,7 +14,7 @@ Method | HTTP request | Description
 
 ## createUniversityDepartmentCurriculum
 
-> UniversityCurriculumModel createUniversityDepartmentCurriculum(unid, depid, universityCurriculumModel)
+> MessageCreate createUniversityDepartmentCurriculum(unid, depid, universityCurriculumModel)
 
 Create Department Curriculum
 
@@ -53,7 +53,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**UniversityCurriculumModel**](UniversityCurriculumModel.md)
+[**MessageCreate**](MessageCreate.md)
 
 ### Authorization
 

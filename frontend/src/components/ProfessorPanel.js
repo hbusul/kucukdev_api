@@ -795,6 +795,9 @@ const ProfessorPanel = ({ history }) => {
                         console.log(
                             "API called successfully. Returned data: " + data
                         )
+                        if (semesters.length === 0) {
+                            selectedUniversity.curSemesterID = data["_id"]
+                        }
                         onSelectUniversity(selectedUniversity, true)
                     }
                 }
@@ -891,7 +894,7 @@ const ProfessorPanel = ({ history }) => {
         if (key === "updateLesson") {
             let unilid = selectedLesCur._id
             let apiInstance = new Kucukdevapi.UniversityLessonsApi()
-            let universityAPILessonModel = new Kucukdevapi.UniversityAPILessonModel(
+            let universityLessonAPIModel = new Kucukdevapi.UniversityLessonAPIModel(
                 name,
                 code,
                 ects,
@@ -901,7 +904,7 @@ const ProfessorPanel = ({ history }) => {
                 unid,
                 unisid,
                 unilid,
-                universityAPILessonModel,
+                universityLessonAPIModel,
                 (error, data, response) => {
                     if (error) {
                         console.error(error)

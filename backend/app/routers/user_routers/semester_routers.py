@@ -1,16 +1,19 @@
-from fastapi import APIRouter, Body, Request, status, Depends, Response
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 from typing import List
 
+from app.routers.user_routers.user_routers import update_current_semester
+from fastapi import APIRouter, Body, Depends, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.user_models import (
+    Message,
+    MessageCreate,
+    SemesterAPIModel,
+    UpdateSemesterModel,
+    UpdateUserSemesterModel,
     UserModel,
     UserSemesterModel,
-    SemesterAPIModel,
-    UpdateUserSemesterModel,
-    Message,
 )
 
 router = APIRouter()
@@ -20,12 +23,13 @@ router = APIRouter()
     "/{uid}/semesters",
     response_description="Add new semester",
     operation_id="createSemester",
-    response_model=List[SemesterAPIModel],
+    response_model=MessageCreate,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
-        401: {"model": Message},
+        201: {"model": MessageCreate},
         400: {"model": Message},
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def create_semester(
@@ -57,23 +61,20 @@ async def create_semester(
         )
 
         if update_result.modified_count == 1:
-            if (
-                created_semester := await request.app.mongodb["users"].find_one(
-                    {"_id": uid}
+            if len(auth_user["semesters"]) == 0:
+                await update_current_semester(
+                    uid,
+                    request,
+                    UpdateSemesterModel(curSemesterID=semester["_id"]),
+                    auth_user,
                 )
-            ) is not None:
-                semesters = []
-                for semester in created_semester["semesters"]:
-                    semester.pop("lessons")
-                    semesters.append(semester)
 
-                if len(semesters) == 1:
-                    update_result = await request.app.mongodb["users"].update_one(
-                        {"_id": uid},
-                        {"$set": {"curSemesterID": semesters[0]["_id"]}},
-                    )
-
-                return semesters
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=jsonable_encoder(
+                    MessageCreate(id=semester["_id"], message="Semester created")
+                ),
+            )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -91,9 +92,9 @@ async def create_semester(
     operation_id="listSemestersOfUser",
     response_model=List[SemesterAPIModel],
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def list_semesters(
@@ -121,9 +122,9 @@ async def list_semesters(
     operation_id="getSingleSemester",
     response_model=SemesterAPIModel,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def show_semester(
@@ -155,9 +156,9 @@ async def show_semester(
     operation_id="updateSemester",
     response_model=Message,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
         401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def update_semester(
@@ -229,10 +230,10 @@ async def update_semester(
     operation_id="deleteSemester",
     response_model=Message,
     responses={
-        404: {"model": Message},
-        403: {"model": Message},
-        401: {"model": Message},
         400: {"model": Message},
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
     },
 )
 async def delete_semester(
@@ -244,14 +245,10 @@ async def delete_semester(
     """Delete a semester with given userID and semesterID"""
 
     if auth_user["_id"] == uid:
-        find_user = await request.app.mongodb["users"].find_one(
-            {"_id": uid, "semesters._id": sid}
-        )
-
         if auth_user["curSemesterID"] == sid:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Current semester cannot be deleted"},
+                content={"message": "Cannot delete current semester"},
             )
 
         update_result = await request.app.mongodb["users"].update_one(

@@ -128,10 +128,10 @@ All URIs are relative to *http://localhost:8000*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*Kucukdevapi.CurriculumLessonsApi* | [**createCurriculumLesson**](docs/CurriculumLessonsApi.md#createCurriculumLesson) | **POST** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons | Create Curriculum Lesson
+*Kucukdevapi.CurriculumLessonsApi* | [**createCurriculumLesson**](docs/CurriculumLessonsApi.md#createCurriculumLesson) | **POST** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons | Create Curriculum Lesson
 *Kucukdevapi.CurriculumLessonsApi* | [**deleteCurriculumLesson**](docs/CurriculumLessonsApi.md#deleteCurriculumLesson) | **DELETE** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons/{curlid} | Delete Curriculum Lesson
 *Kucukdevapi.CurriculumLessonsApi* | [**getSingleCurriculumLesson**](docs/CurriculumLessonsApi.md#getSingleCurriculumLesson) | **GET** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons/{curlid} | Show Curriculum Lesson
-*Kucukdevapi.CurriculumLessonsApi* | [**listCurriculumLessons**](docs/CurriculumLessonsApi.md#listCurriculumLessons) | **GET** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons | List Curriculum Lessons
+*Kucukdevapi.CurriculumLessonsApi* | [**listCurriculumLessons**](docs/CurriculumLessonsApi.md#listCurriculumLessons) | **GET** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons | List Curriculum Lessons
 *Kucukdevapi.CurriculumLessonsApi* | [**updateCurriculumLesson**](docs/CurriculumLessonsApi.md#updateCurriculumLesson) | **PUT** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons/{curlid} | Update Curriculum Lesson
 *Kucukdevapi.CurriculumSemestersApi* | [**createCurriculumSemester**](docs/CurriculumSemestersApi.md#createCurriculumSemester) | **POST** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters | Create Curriculum Semester
 *Kucukdevapi.CurriculumSemestersApi* | [**deleteCurriculumSemester**](docs/CurriculumSemestersApi.md#deleteCurriculumSemester) | **DELETE** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid} | Delete Curriculum Semester
@@ -182,6 +182,7 @@ Class | Method | HTTP request | Description
 *Kucukdevapi.UniversitySemestersApi* | [**getSingleUniversitySemesters**](docs/UniversitySemestersApi.md#getSingleUniversitySemesters) | **GET** /universities/{unid}/semesters/{unisid} | Show University Semester
 *Kucukdevapi.UniversitySemestersApi* | [**listUniversitySemesters**](docs/UniversitySemestersApi.md#listUniversitySemesters) | **GET** /universities/{unid}/semesters | List University Semesters
 *Kucukdevapi.UniversitySemestersApi* | [**updateUniversitySemester**](docs/UniversitySemestersApi.md#updateUniversitySemester) | **PUT** /universities/{unid}/semesters/{unisid} | Update University Semester
+*Kucukdevapi.UsersApi* | [**createProfessorUser**](docs/UsersApi.md#createProfessorUser) | **POST** /users/professors | Create Professor User
 *Kucukdevapi.UsersApi* | [**createUser**](docs/UsersApi.md#createUser) | **POST** /users | Create User
 *Kucukdevapi.UsersApi* | [**deleteUser**](docs/UsersApi.md#deleteUser) | **DELETE** /users/{uid} | Delete User
 *Kucukdevapi.UsersApi* | [**getCurrentUser**](docs/UsersApi.md#getCurrentUser) | **GET** /users | Get Current
@@ -202,6 +203,7 @@ Class | Method | HTTP request | Description
  - [Kucukdevapi.LessonAbsenceModel](docs/LessonAbsenceModel.md)
  - [Kucukdevapi.LessonModel](docs/LessonModel.md)
  - [Kucukdevapi.Message](docs/Message.md)
+ - [Kucukdevapi.MessageCreate](docs/MessageCreate.md)
  - [Kucukdevapi.SemesterAPIModel](docs/SemesterAPIModel.md)
  - [Kucukdevapi.SlotModel](docs/SlotModel.md)
  - [Kucukdevapi.Token](docs/Token.md)

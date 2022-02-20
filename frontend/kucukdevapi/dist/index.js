@@ -3,16 +3,16 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-Object.defineProperty(exports, "ApiClient", {
-  enumerable: true,
-  get: function get() {
-    return _ApiClient.default;
-  }
-});
 Object.defineProperty(exports, "AbsenceModel", {
   enumerable: true,
   get: function get() {
     return _AbsenceModel.default;
+  }
+});
+Object.defineProperty(exports, "ApiClient", {
+  enumerable: true,
+  get: function get() {
+    return _ApiClient.default;
   }
 });
 Object.defineProperty(exports, "CurriculumLessonModel", {
@@ -21,10 +21,34 @@ Object.defineProperty(exports, "CurriculumLessonModel", {
     return _CurriculumLessonModel.default;
   }
 });
+Object.defineProperty(exports, "CurriculumLessonsApi", {
+  enumerable: true,
+  get: function get() {
+    return _CurriculumLessonsApi.default;
+  }
+});
 Object.defineProperty(exports, "CurriculumSemesterModel", {
   enumerable: true,
   get: function get() {
     return _CurriculumSemesterModel.default;
+  }
+});
+Object.defineProperty(exports, "CurriculumSemestersApi", {
+  enumerable: true,
+  get: function get() {
+    return _CurriculumSemestersApi.default;
+  }
+});
+Object.defineProperty(exports, "CurriculumsApi", {
+  enumerable: true,
+  get: function get() {
+    return _CurriculumsApi.default;
+  }
+});
+Object.defineProperty(exports, "DepartmentsApi", {
+  enumerable: true,
+  get: function get() {
+    return _DepartmentsApi.default;
   }
 });
 Object.defineProperty(exports, "HTTPValidationError", {
@@ -51,16 +75,40 @@ Object.defineProperty(exports, "LessonModel", {
     return _LessonModel.default;
   }
 });
+Object.defineProperty(exports, "LessonsApi", {
+  enumerable: true,
+  get: function get() {
+    return _LessonsApi.default;
+  }
+});
 Object.defineProperty(exports, "Message", {
   enumerable: true,
   get: function get() {
     return _Message.default;
   }
 });
+Object.defineProperty(exports, "MessageCreate", {
+  enumerable: true,
+  get: function get() {
+    return _MessageCreate.default;
+  }
+});
+Object.defineProperty(exports, "SchedulerApi", {
+  enumerable: true,
+  get: function get() {
+    return _SchedulerApi.default;
+  }
+});
 Object.defineProperty(exports, "SemesterAPIModel", {
   enumerable: true,
   get: function get() {
     return _SemesterAPIModel.default;
+  }
+});
+Object.defineProperty(exports, "SemestersApi", {
+  enumerable: true,
+  get: function get() {
+    return _SemestersApi.default;
   }
 });
 Object.defineProperty(exports, "SlotModel", {
@@ -73,6 +121,18 @@ Object.defineProperty(exports, "Token", {
   enumerable: true,
   get: function get() {
     return _Token.default;
+  }
+});
+Object.defineProperty(exports, "TokenApi", {
+  enumerable: true,
+  get: function get() {
+    return _TokenApi.default;
+  }
+});
+Object.defineProperty(exports, "UniversitiesApi", {
+  enumerable: true,
+  get: function get() {
+    return _UniversitiesApi.default;
   }
 });
 Object.defineProperty(exports, "UniversityAPIModel", {
@@ -105,6 +165,12 @@ Object.defineProperty(exports, "UniversityLessonModel", {
     return _UniversityLessonModel.default;
   }
 });
+Object.defineProperty(exports, "UniversityLessonsApi", {
+  enumerable: true,
+  get: function get() {
+    return _UniversityLessonsApi.default;
+  }
+});
 Object.defineProperty(exports, "UniversityModel", {
   enumerable: true,
   get: function get() {
@@ -123,10 +189,22 @@ Object.defineProperty(exports, "UniversitySectionModel", {
     return _UniversitySectionModel.default;
   }
 });
+Object.defineProperty(exports, "UniversitySectionsApi", {
+  enumerable: true,
+  get: function get() {
+    return _UniversitySectionsApi.default;
+  }
+});
 Object.defineProperty(exports, "UniversitySemesterModel", {
   enumerable: true,
   get: function get() {
     return _UniversitySemesterModel.default;
+  }
+});
+Object.defineProperty(exports, "UniversitySemestersApi", {
+  enumerable: true,
+  get: function get() {
+    return _UniversitySemestersApi.default;
   }
 });
 Object.defineProperty(exports, "UniversitySlotModel", {
@@ -195,88 +273,16 @@ Object.defineProperty(exports, "UserSemesterModel", {
     return _UserSemesterModel.default;
   }
 });
-Object.defineProperty(exports, "ValidationError", {
-  enumerable: true,
-  get: function get() {
-    return _ValidationError.default;
-  }
-});
-Object.defineProperty(exports, "CurriculumLessonsApi", {
-  enumerable: true,
-  get: function get() {
-    return _CurriculumLessonsApi.default;
-  }
-});
-Object.defineProperty(exports, "CurriculumSemestersApi", {
-  enumerable: true,
-  get: function get() {
-    return _CurriculumSemestersApi.default;
-  }
-});
-Object.defineProperty(exports, "CurriculumsApi", {
-  enumerable: true,
-  get: function get() {
-    return _CurriculumsApi.default;
-  }
-});
-Object.defineProperty(exports, "DepartmentsApi", {
-  enumerable: true,
-  get: function get() {
-    return _DepartmentsApi.default;
-  }
-});
-Object.defineProperty(exports, "LessonsApi", {
-  enumerable: true,
-  get: function get() {
-    return _LessonsApi.default;
-  }
-});
-Object.defineProperty(exports, "SchedulerApi", {
-  enumerable: true,
-  get: function get() {
-    return _SchedulerApi.default;
-  }
-});
-Object.defineProperty(exports, "SemestersApi", {
-  enumerable: true,
-  get: function get() {
-    return _SemestersApi.default;
-  }
-});
-Object.defineProperty(exports, "TokenApi", {
-  enumerable: true,
-  get: function get() {
-    return _TokenApi.default;
-  }
-});
-Object.defineProperty(exports, "UniversitiesApi", {
-  enumerable: true,
-  get: function get() {
-    return _UniversitiesApi.default;
-  }
-});
-Object.defineProperty(exports, "UniversityLessonsApi", {
-  enumerable: true,
-  get: function get() {
-    return _UniversityLessonsApi.default;
-  }
-});
-Object.defineProperty(exports, "UniversitySectionsApi", {
-  enumerable: true,
-  get: function get() {
-    return _UniversitySectionsApi.default;
-  }
-});
-Object.defineProperty(exports, "UniversitySemestersApi", {
-  enumerable: true,
-  get: function get() {
-    return _UniversitySemestersApi.default;
-  }
-});
 Object.defineProperty(exports, "UsersApi", {
   enumerable: true,
   get: function get() {
     return _UsersApi.default;
+  }
+});
+Object.defineProperty(exports, "ValidationError", {
+  enumerable: true,
+  get: function get() {
+    return _ValidationError.default;
   }
 });
 
@@ -297,6 +303,8 @@ var _LessonAbsenceModel = _interopRequireDefault(require("./model/LessonAbsenceM
 var _LessonModel = _interopRequireDefault(require("./model/LessonModel"));
 
 var _Message = _interopRequireDefault(require("./model/Message"));
+
+var _MessageCreate = _interopRequireDefault(require("./model/MessageCreate"));
 
 var _SemesterAPIModel = _interopRequireDefault(require("./model/SemesterAPIModel"));
 

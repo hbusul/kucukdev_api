@@ -4,17 +4,17 @@ All URIs are relative to *http://localhost:8000*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**createCurriculumLesson**](CurriculumLessonsApi.md#createCurriculumLesson) | **POST** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons | Create Curriculum Lesson
+[**createCurriculumLesson**](CurriculumLessonsApi.md#createCurriculumLesson) | **POST** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons | Create Curriculum Lesson
 [**deleteCurriculumLesson**](CurriculumLessonsApi.md#deleteCurriculumLesson) | **DELETE** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons/{curlid} | Delete Curriculum Lesson
 [**getSingleCurriculumLesson**](CurriculumLessonsApi.md#getSingleCurriculumLesson) | **GET** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons/{curlid} | Show Curriculum Lesson
-[**listCurriculumLessons**](CurriculumLessonsApi.md#listCurriculumLessons) | **GET** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters{cursid}/lessons | List Curriculum Lessons
+[**listCurriculumLessons**](CurriculumLessonsApi.md#listCurriculumLessons) | **GET** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons | List Curriculum Lessons
 [**updateCurriculumLesson**](CurriculumLessonsApi.md#updateCurriculumLesson) | **PUT** /universities/{unid}/departments/{depid}/curriculums/{curid}/semesters/{cursid}/lessons/{curlid} | Update Curriculum Lesson
 
 
 
 ## createCurriculumLesson
 
-> CurriculumLessonModel createCurriculumLesson(unid, depid, curid, cursid, curriculumLessonModel)
+> MessageCreate createCurriculumLesson(unid, depid, curid, cursid, curriculumLessonModel)
 
 Create Curriculum Lesson
 
@@ -57,7 +57,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**CurriculumLessonModel**](CurriculumLessonModel.md)
+[**MessageCreate**](MessageCreate.md)
 
 ### Authorization
 
@@ -75,7 +75,7 @@ Name | Type | Description  | Notes
 
 Delete Curriculum Lesson
 
-Delete a university department with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
+Delete a lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
 
 ### Example
 
@@ -132,7 +132,7 @@ Name | Type | Description  | Notes
 
 Show Curriculum Lesson
 
-Get a single semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
+Get a single lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
 
 ### Example
 
@@ -236,7 +236,7 @@ No authorization required
 
 Update Curriculum Lesson
 
-Update semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
+Update lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID
 
 ### Example
 

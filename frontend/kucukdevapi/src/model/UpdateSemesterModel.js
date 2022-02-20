@@ -49,9 +49,6 @@ class UpdateSemesterModel {
         if (data) {
             obj = obj || new UpdateSemesterModel();
 
-            if (data.hasOwnProperty('_id')) {
-                obj['_id'] = ApiClient.convertToType(data['_id'], 'String');
-            }
             if (data.hasOwnProperty('curSemesterID')) {
                 obj['curSemesterID'] = ApiClient.convertToType(data['curSemesterID'], 'String');
             }
@@ -61,11 +58,6 @@ class UpdateSemesterModel {
 
 
 }
-
-/**
- * @member {String} _id
- */
-UpdateSemesterModel.prototype['_id'] = undefined;
 
 /**
  * @member {String} curSemesterID

@@ -15,6 +15,7 @@
 import ApiClient from "../ApiClient";
 import HTTPValidationError from '../model/HTTPValidationError';
 import Message from '../model/Message';
+import MessageCreate from '../model/MessageCreate';
 import UniversityDepartmentModel from '../model/UniversityDepartmentModel';
 
 /**
@@ -40,7 +41,7 @@ export default class DepartmentsApi {
      * Callback function to receive the result of the createUniversityDepartment operation.
      * @callback module:api/DepartmentsApi~createUniversityDepartmentCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/UniversityDepartmentModel} data The data returned by the service call.
+     * @param {module:model/MessageCreate} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -50,7 +51,7 @@ export default class DepartmentsApi {
      * @param {String} unid 
      * @param {module:model/UniversityDepartmentModel} universityDepartmentModel 
      * @param {module:api/DepartmentsApi~createUniversityDepartmentCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/UniversityDepartmentModel}
+     * data is of type: {@link module:model/MessageCreate}
      */
     createUniversityDepartment(unid, universityDepartmentModel, callback) {
       let postBody = universityDepartmentModel;
@@ -76,7 +77,7 @@ export default class DepartmentsApi {
       let authNames = ['OAuth2PasswordBearer'];
       let contentTypes = ['application/json'];
       let accepts = ['application/json'];
-      let returnType = UniversityDepartmentModel;
+      let returnType = MessageCreate;
       return this.apiClient.callApi(
         '/universities/{unid}/departments', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,

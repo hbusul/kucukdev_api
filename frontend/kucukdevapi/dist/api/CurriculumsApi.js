@@ -11,6 +11,8 @@ var _HTTPValidationError = _interopRequireDefault(require("../model/HTTPValidati
 
 var _Message = _interopRequireDefault(require("../model/Message"));
 
+var _MessageCreate = _interopRequireDefault(require("../model/MessageCreate"));
+
 var _UniversityCurriculumModel = _interopRequireDefault(require("../model/UniversityCurriculumModel"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -19,7 +21,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
 * Curriculums service.
@@ -43,7 +45,7 @@ var CurriculumsApi = /*#__PURE__*/function () {
    * Callback function to receive the result of the createUniversityDepartmentCurriculum operation.
    * @callback module:api/CurriculumsApi~createUniversityDepartmentCurriculumCallback
    * @param {String} error Error message, if any.
-   * @param {module:model/UniversityCurriculumModel} data The data returned by the service call.
+   * @param {module:model/MessageCreate} data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
 
@@ -54,7 +56,7 @@ var CurriculumsApi = /*#__PURE__*/function () {
    * @param {String} depid 
    * @param {module:model/UniversityCurriculumModel} universityCurriculumModel 
    * @param {module:api/CurriculumsApi~createUniversityDepartmentCurriculumCallback} callback The callback function, accepting three arguments: error, data, response
-   * data is of type: {@link module:model/UniversityCurriculumModel}
+   * data is of type: {@link module:model/MessageCreate}
    */
 
 
@@ -87,7 +89,7 @@ var CurriculumsApi = /*#__PURE__*/function () {
       var authNames = ['OAuth2PasswordBearer'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = _UniversityCurriculumModel.default;
+      var returnType = _MessageCreate.default;
       return this.apiClient.callApi('/universities/{unid}/departments/{depid}/curriculums', 'POST', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
     }
     /**

@@ -1,18 +1,15 @@
-from fastapi import (
-    APIRouter,
-    Body,
-    Request,
-    status,
-    Response,
-    Depends,
-)
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 from typing import List
+
+from app.routers.university_routers.uni_routers import (
+    update_university_current_semester,
+)
+from fastapi import APIRouter, Body, Depends, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.uni_models import UniversitySemesterModel
-from ...models.user_models import UserModel, Message
+from ...models.user_models import Message, MessageCreate, UpdateSemesterModel, UserModel
 
 router = APIRouter()
 
@@ -36,37 +33,51 @@ async def create_university_semester(
 ):
     """Create semester for a university with given universityID"""
 
-    if auth_user["userGroup"] != "professor":
-        return JSONResponse(
-            status_code=status.HTTP_403_FORBIDDEN,
-            content={"message": "No right to access"},
+    if auth_user["userGroup"] == "professor":
+        university_semester = jsonable_encoder(university_semester)
+
+        if await request.app.mongodb["universities"].find_one(
+            {"_id": unid, "semesters.name": university_semester["name"]}
+        ):
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"message": "University semester already exists"},
+            )
+
+        new_semester = await request.app.mongodb["universities"].update_one(
+            {"_id": unid}, {"$push": {"semesters": university_semester}}
         )
 
-    university_semester = jsonable_encoder(university_semester)
+        if new_semester.modified_count == 1:
+            if (await request.app.mongodb["universities"].find_one({"_id": unid}))[
+                "curSemesterID"
+            ] == "null":
+                await update_university_current_semester(
+                    unid,
+                    request,
+                    UpdateSemesterModel(curSemesterID=university_semester["_id"]),
+                    auth_user,
+                )
 
-    university = await request.app.mongodb["universities"].find_one({"_id": unid})
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=jsonable_encoder(
+                    MessageCreate(
+                        id=university_semester["_id"],
+                        message="University semester created",
+                    )
+                ),
+            )
 
-    if not university:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"message": "University not found"},
         )
 
-    if university_semester["name"] in [x["name"] for x in university["semesters"]]:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "University semester already exists"},
-        )
-
-    await request.app.mongodb["universities"].update_one(
-        {"_id": unid}, {"$push": {"semesters": university_semester}}
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN,
+        content={"message": "No right to access"},
     )
-
-    university = await request.app.mongodb["universities"].find_one({"_id": unid})
-    university_semester = [
-        x for x in university["semesters"] if x["name"] == university_semester["name"]
-    ][0]
-    return university_semester
 
 
 @router.get(
@@ -96,7 +107,7 @@ async def list_university_semesters(unid: str, request: Request):
     "/{unid}/semesters/{unisid}",
     response_description="List a university semeseters",
     operation_id="getSingleUniversitySemesters",
-    response_model=List[UniversitySemesterModel],
+    response_model=UniversitySemesterModel,
     responses={
         404: {"model": Message},
     },
@@ -212,6 +223,16 @@ async def delete_university_semester(
     """Delete a university semester with given universityID and universitySemesterID"""
 
     if auth_user["userGroup"] == "professor":
+        if (
+            await request.app.mongodb["universities"].find_one(
+                {"_id": unid, "curSemesterID": unisid}
+            )
+        ) is not None:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Cannot delete current semester"},
+            )
+
         delete_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid}, {"$pull": {"semesters": {"_id": unisid}}}
         )

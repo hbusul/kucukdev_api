@@ -15,6 +15,7 @@
 import ApiClient from "../ApiClient";
 import HTTPValidationError from '../model/HTTPValidationError';
 import Message from '../model/Message';
+import MessageCreate from '../model/MessageCreate';
 import UpdateEntranceYearModel from '../model/UpdateEntranceYearModel';
 import UpdatePasswordModel from '../model/UpdatePasswordModel';
 import UpdateSemesterModel from '../model/UpdateSemesterModel';
@@ -42,10 +43,52 @@ export default class UsersApi {
 
 
     /**
+     * Callback function to receive the result of the createProfessorUser operation.
+     * @callback module:api/UsersApi~createProfessorUserCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/MessageCreate} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Create Professor User
+     * Create a professor user
+     * @param {module:model/UserModel} userModel 
+     * @param {module:api/UsersApi~createProfessorUserCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/MessageCreate}
+     */
+    createProfessorUser(userModel, callback) {
+      let postBody = userModel;
+      // verify the required parameter 'userModel' is set
+      if (userModel === undefined || userModel === null) {
+        throw new Error("Missing the required parameter 'userModel' when calling createProfessorUser");
+      }
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = ['OAuth2PasswordBearer'];
+      let contentTypes = ['application/json'];
+      let accepts = ['application/json'];
+      let returnType = MessageCreate;
+      return this.apiClient.callApi(
+        '/users/professors', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the createUser operation.
      * @callback module:api/UsersApi~createUserCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/UserAPIModel} data The data returned by the service call.
+     * @param {module:model/MessageCreate} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -54,7 +97,7 @@ export default class UsersApi {
      * Create a user
      * @param {module:model/UserModel} userModel 
      * @param {module:api/UsersApi~createUserCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/UserAPIModel}
+     * data is of type: {@link module:model/MessageCreate}
      */
     createUser(userModel, callback) {
       let postBody = userModel;
@@ -75,7 +118,7 @@ export default class UsersApi {
       let authNames = [];
       let contentTypes = ['application/json'];
       let accepts = ['application/json'];
-      let returnType = UserAPIModel;
+      let returnType = MessageCreate;
       return this.apiClient.callApi(
         '/users', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,

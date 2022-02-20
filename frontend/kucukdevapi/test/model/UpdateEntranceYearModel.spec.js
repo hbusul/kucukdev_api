@@ -54,12 +54,6 @@
       //expect(instance).to.be.a(Kucukdevapi.UpdateEntranceYearModel);
     });
 
-    it('should have the property id (base name: "_id")', function() {
-      // uncomment below and update the code to test the property id
-      //var instance = new Kucukdevapi.UpdateEntranceYearModel();
-      //expect(instance).to.be();
-    });
-
     it('should have the property entranceYear (base name: "entranceYear")', function() {
       // uncomment below and update the code to test the property entranceYear
       //var instance = new Kucukdevapi.UpdateEntranceYearModel();

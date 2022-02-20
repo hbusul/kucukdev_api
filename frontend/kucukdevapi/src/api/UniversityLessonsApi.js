@@ -15,6 +15,7 @@
 import ApiClient from "../ApiClient";
 import HTTPValidationError from '../model/HTTPValidationError';
 import Message from '../model/Message';
+import MessageCreate from '../model/MessageCreate';
 import UniversityLessonAPIModel from '../model/UniversityLessonAPIModel';
 import UniversityLessonModel from '../model/UniversityLessonModel';
 
@@ -41,7 +42,7 @@ export default class UniversityLessonsApi {
      * Callback function to receive the result of the createUniversityLesson operation.
      * @callback module:api/UniversityLessonsApi~createUniversityLessonCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/Message} data The data returned by the service call.
+     * @param {module:model/MessageCreate} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -52,7 +53,7 @@ export default class UniversityLessonsApi {
      * @param {String} unisid 
      * @param {module:model/UniversityLessonModel} universityLessonModel 
      * @param {module:api/UniversityLessonsApi~createUniversityLessonCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/Message}
+     * data is of type: {@link module:model/MessageCreate}
      */
     createUniversityLesson(unid, unisid, universityLessonModel, callback) {
       let postBody = universityLessonModel;
@@ -83,7 +84,7 @@ export default class UniversityLessonsApi {
       let authNames = ['OAuth2PasswordBearer'];
       let contentTypes = ['application/json'];
       let accepts = ['application/json'];
-      let returnType = Message;
+      let returnType = MessageCreate;
       return this.apiClient.callApi(
         '/universities/{unid}/semesters/{unisid}/lessons', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,

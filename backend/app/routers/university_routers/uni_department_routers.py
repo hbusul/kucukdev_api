@@ -12,7 +12,7 @@ from typing import List
 
 from ...dependencies import get_current_user
 from ...models.uni_models import UniversityDepartmentModel
-from ...models.user_models import UserModel, Message
+from ...models.user_models import MessageCreate, UserModel, Message
 
 router = APIRouter()
 
@@ -21,11 +21,13 @@ router = APIRouter()
     "/{unid}/departments",
     response_description="Add new university department",
     operation_id="createUniversityDepartment",
-    response_model=UniversityDepartmentModel,
+    response_model=MessageCreate,
     responses={
-        400: {"model": Message},
+        201: {"model": MessageCreate},
+        401: {"model": Message},
         403: {"model": Message},
         404: {"model": Message},
+        409: {"model": Message},
     },
 )
 async def create_university_department(
@@ -40,33 +42,29 @@ async def create_university_department(
         university_department = jsonable_encoder(university_department)
 
         if (
-            created_university := await request.app.mongodb["universities"].find_one(
-                {"_id": unid}
+            await request.app.mongodb["universities"].find_one(
+                {"_id": unid, "departments.name": university_department["name"]}
             )
         ) is not None:
-            for department in created_university["departments"]:
-                if department["name"] == university_department["name"]:
-                    return JSONResponse(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        content={"message": "University department already exists"},
-                    )
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"message": "University department already exists"},
+            )
 
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid}, {"$push": {"departments": university_department}}
         )
 
         if update_result.modified_count == 1:
-            if (
-                created_university := await request.app.mongodb[
-                    "universities"
-                ].find_one({"_id": unid})
-            ) is not None:
-                dep = [
-                    x
-                    for x in created_university["departments"]
-                    if x["name"] == university_department["name"]
-                ][0]
-                return dep
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=jsonable_encoder(
+                    MessageCreate(
+                        id=university_department["_id"],
+                        message="University department created",
+                    )
+                ),
+            )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -83,9 +81,7 @@ async def create_university_department(
     response_description="List all university departments",
     operation_id="listUniversityDepartments",
     response_model=List[UniversityDepartmentModel],
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def list_university_departments(unid: str, request: Request):
     """list all departments of a university with given universityID"""
@@ -106,25 +102,21 @@ async def list_university_departments(unid: str, request: Request):
     response_description="Show a university department",
     operation_id="getSingleUniversityDepartment",
     response_model=UniversityDepartmentModel,
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def show_university_department(unid: str, depid: str, request: Request):
     """Get a single semester of a university with given universityID and universityDepartmentID"""
 
     if (
         university := await request.app.mongodb["universities"].find_one(
-            {"_id": unid, "departments._id": depid}
+            {"_id": unid, "departments._id": depid}, {"departments.$": 1}
         )
     ) is not None:
-        for department in university["departments"]:
-            if department["_id"] == depid:
-                return department
+        return university["departments"][0]
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": "University department not found"},
+        content={"message": "University or department not found"},
     )
 
 
@@ -160,7 +152,7 @@ async def update_university_department(
         ) is None:
             return JSONResponse(
                 status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "University department not found"},
+                content={"message": "University or department not found"},
             )
         else:
             for department in existing_university["departments"]:
@@ -170,22 +162,16 @@ async def update_university_department(
                         content={"message": "University department already exists"},
                     )
 
-        if len(university_department) >= 1:
-            update_result = await request.app.mongodb["universities"].update_many(
-                {"_id": unid, "departments._id": depid},
-                {"$set": {"departments.$.name": university_department["name"]}},
-            )
-
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "University department updated"},
-                )
-
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid input"},
+        update_result = await request.app.mongodb["universities"].update_many(
+            {"_id": unid, "departments._id": depid},
+            {"$set": {"departments.$.name": university_department["name"]}},
         )
+
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "University department updated"},
+            )
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -197,10 +183,7 @@ async def update_university_department(
     response_description="Delete university department",
     operation_id="deleteUniversityDepartment",
     response_model=Message,
-    responses={
-        404: {"model": Message},
-        403: {"model": Message},
-    },
+    responses={404: {"model": Message}, 403: {"model": Message},},
 )
 async def delete_university_department(
     unid: str,
@@ -223,7 +206,7 @@ async def delete_university_department(
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "University department not found"},
+            content={"message": "University or department not found"},
         )
 
     return JSONResponse(
