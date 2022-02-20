@@ -23,9 +23,7 @@ router = APIRouter()
     response_description="Create schedules for given lessons",
     operation_id="createSchedule",
     response_model=List[Dict[str, int]],
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def create_schedule(unid: str, lesson_codes: List[str], request: Request):
     """Create schedules for given lessons"""
@@ -52,6 +50,7 @@ async def create_schedule(unid: str, lesson_codes: List[str], request: Request):
         x for x in current_semester["lessons"] if x["code"] in lesson_codes
     ]
 
+    # TODO: We can make here more readable
     selected_lesson_simple = {
         i: {
             j: [[int(z) for z in k.split(",")[:2]] for k in y["slots"]]

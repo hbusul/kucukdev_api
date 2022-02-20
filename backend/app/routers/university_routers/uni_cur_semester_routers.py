@@ -196,13 +196,15 @@ async def update_curriculum_semester(
                 content={"message": "Curriculum semester not found"},
             )
         else:
-            semester_list = result["departments"][0]["curriculums"][0]["semesters"]
-            for semester in semester_list:
-                if semester["semester"] == curriculum_semester["semester"]:
-                    return JSONResponse(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        content={"message": "Curriculum semester already exists"},
-                    )
+            semester_name_list = [
+                semester["semester"]
+                for semester in result["departments"][0]["curriculums"][0]["semesters"]
+            ]
+            if curriculum_semester["semester"] in semester_name_list:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Curriculum semester already exists"},
+                )
 
         if len(curriculum_semester) >= 1:
             update_result = await request.app.mongodb["universities"].update_many(

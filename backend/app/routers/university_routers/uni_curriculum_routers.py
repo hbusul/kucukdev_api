@@ -114,19 +114,16 @@ async def show_department_curriculum(
     """Get a single semester of a university with given universityID, universityDepartmentID and departmentCurriculumID"""
 
     if (
-        university := await request.app.mongodb["universities"].find_one(
+        result := await request.app.mongodb["universities"].find_one(
             {
                 "_id": unid,
                 "departments._id": depid,
                 "departments.curriculums._id": curid,
-            }
+            },
+            {"departments.curriculums.$": 1,},  # first element of curriculums
         )
     ) is not None:
-        for department in university["departments"]:
-            if department["_id"] == depid:
-                for curriculum in department["curriculums"]:
-                    if curriculum["_id"] == curid:
-                        return curriculum
+        return result["departments"][0]["curriculums"][0]
 
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -161,12 +158,15 @@ async def update_department_curriculum(
         }
 
         if (
-            university := await request.app.mongodb["universities"].find_one(
+            result := await request.app.mongodb["universities"].find_one(
                 {
                     "_id": unid,
                     "departments._id": depid,
                     "departments.curriculums._id": curid,
-                }
+                },
+                {
+                    "departments.curriculums": 1,
+                },  # first element of the departments array
             )
         ) is None:
             return JSONResponse(
@@ -174,16 +174,17 @@ async def update_department_curriculum(
                 content={"message": "University department curriculum not found"},
             )
         else:
-            for department in university["departments"]:
-                if department["_id"] == depid:
-                    for curriculum in department["curriculums"]:
-                        if curriculum["name"] == department_curriculum["name"]:
-                            return JSONResponse(
-                                status_code=status.HTTP_400_BAD_REQUEST,
-                                content={
-                                    "message": "University department curriculum already exists"
-                                },
-                            )
+            curriculum_name_list = [
+                curriculum_list["name"]
+                for curriculum_list in result["departments"][0]["curriculums"]
+            ]
+            if department_curriculum["name"] in curriculum_name_list:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={
+                        "message": "University department curriculum already exists"
+                    },
+                )
 
         if len(department_curriculum) >= 1:
             update_result = await request.app.mongodb["universities"].update_many(
