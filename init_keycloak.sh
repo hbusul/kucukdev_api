@@ -6,8 +6,8 @@ set -e
 [ "${KEYCLOAK_ADMIN_PASSWORD}" = "" ] && { echo "KEYCLOAK_ADMIN_PASSWORD is not specified"; exit 1; }
 
 ./"$HOME"/bin/kcadm.sh config credentials --server "${KEYCLOAK_URL}" --realm master --user "${KEYCLOAK_ADMIN}" --password "${KEYCLOAK_ADMIN_PASSWORD}" --client admin-cli
-./"$HOME"/bin/kcadm.sh create realms -s realm=kucukdev -s enabled=true
+./"$HOME"/bin/kcadm.sh create realms -f /tmp/realm-export.json
 
 
 echo "hello world"
-sleep 9000
+sleep inf
