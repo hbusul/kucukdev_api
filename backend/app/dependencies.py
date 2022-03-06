@@ -1,7 +1,9 @@
+import json
 import secrets
 from datetime import datetime, timedelta
 from typing import Optional
 
+import requests
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -17,7 +19,7 @@ settings = Settings()
 
 router = APIRouter()
 
-ALGORITHM = "HS256"
+ALGORITHM = "RS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -117,14 +119,25 @@ async def get_current_user(request: Request, token: str = Depends(oauth2_scheme)
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
+        jwk_set = json.loads(requests.get('http://auth_server:8080/realms/kucukdev/protocol/openid-connect/certs').text)
+        payload = jwt.decode(token, jwk_set, algorithms=[ALGORITHM], audience='account')
+        sub: str = payload.get("sub")
+        if sub is None:
             raise credentials_exception
-        token_data = TokenData(email=email)
-    except JWTError:
+    except JWTError as e:
         raise credentials_exception
-    user = await request.app.mongodb["users"].find_one({"email": token_data.email})
+    user = await request.app.mongodb["users"].find_one({"_id": sub})
+
     if user is None:
-        raise credentials_exception
+        user = {
+            "_id": sub,
+            "semesters": [],
+            "userGroup": "default",
+            "curSemesterID": "null",
+            "curUniversityID": "null",
+            "entranceYear": 0
+        }
+
+        await request.app.mongodb["users"].insert_one(user)
+
     return user
