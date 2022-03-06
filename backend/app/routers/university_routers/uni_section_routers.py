@@ -1,13 +1,95 @@
 import json
 
 from fastapi import APIRouter, Body, Depends, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.uni_models import UniversitySectionModel
-from ...models.user_models import Message, UserModel
+from ...models.user_models import Message, MessageCreate, UserModel
 
 router = APIRouter()
+
+
+@router.post(
+    "/{unid}/semesters/{unisid}/lessons/{unilid}/sections",
+    response_description="Add a lesson section",
+    operation_id="addLessonSection",
+    response_model=Message,
+    responses={
+        201: {"model": MessageCreate},
+        403: {"model": Message},
+        404: {"model": Message},
+        409: {"model": Message},
+    },
+)
+async def create_lesson_section(
+    unid: str,
+    unisid: str,
+    unilid: str,
+    request: Request,
+    new_section: UniversitySectionModel = Body(...),
+    auth_user: UserModel = Depends(get_current_user),
+):
+    """Create a university section"""
+
+    if auth_user["user_group"] == "professor":
+        new_section = jsonable_encoder(new_section)
+
+        if await (
+            request.app.mongodb["universities"]
+            .aggregate(
+                [
+                    {
+                        "$match": {
+                            "_id": unid,
+                            "semesters._id": unisid,
+                            "semesters.lessons._id": unilid,
+                        },
+                    },
+                    {"$unwind": "$semesters"},
+                    {"$unwind": "$semesters.lessons"},
+                    {
+                        "$match": {
+                            "semesters.lessons._id": unilid,
+                            "semesters.lessons.sections.number": new_section["number"],
+                        },
+                    },
+                ]
+            )
+            .to_list(length=None)
+        ):
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"message": "University lesson section already exists"},
+            )
+
+        update_result = await request.app.mongodb["universities"].update_one(
+            {"_id": unid, "semesters._id": unisid, "semesters.lessons._id": unilid,},
+            {"$push": {"semesters.$[i].lessons.$[j].sections": new_section}},
+            array_filters=[{"i._id": unisid}, {"j._id": unilid},],
+        )
+
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=jsonable_encoder(
+                    MessageCreate(
+                        id=new_section["_id"],
+                        message="University lesson section created",
+                    )
+                ),
+            )
+
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": "University lesson section could not be created"},
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN,
+        content={"message": "No right to access"},
+    )
 
 
 @router.put(
@@ -35,7 +117,7 @@ async def update_lesson_section(
     new_section = new_section.json(by_alias=True, models_as_dict=False)
     new_section = json.loads(new_section.replace("\\", ""))
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
 
         if (
             await (
@@ -56,8 +138,8 @@ async def update_lesson_section(
                             "$match": {
                                 "semesters.lessons._id": unilid,
                                 "semesters.lessons.sections._id": secid,
-                                "semesters.lessons.sections.section": new_section[
-                                    "section"
+                                "semesters.lessons.sections.number": new_section[
+                                    "number"
                                 ],
                             },
                         },
@@ -83,8 +165,8 @@ async def update_lesson_section(
                         {
                             "$match": {
                                 "semesters.lessons._id": unilid,
-                                "semesters.lessons.sections.section": new_section[
-                                    "section"
+                                "semesters.lessons.sections.number": new_section[
+                                    "number"
                                 ],
                             },
                         },
@@ -92,7 +174,6 @@ async def update_lesson_section(
                 )
                 .to_list(length=None)
             )
-            is not None
         ):
             return JSONResponse(
                 status_code=status.HTTP_409_CONFLICT,
@@ -110,8 +191,8 @@ async def update_lesson_section(
             },
             {
                 "$set": {
-                    "semesters.$[i].lessons.$[j].sections.$[k].section": new_section[
-                        "section"
+                    "semesters.$[i].lessons.$[j].sections.$[k].number": new_section[
+                        "number"
                     ],
                     "semesters.$[i].lessons.$[j].sections.$[k].instructor": new_section[
                         "instructor"
@@ -157,7 +238,7 @@ async def delete_lesson_section(
 ):
     """Delete a lesson section with given universityID, universitySemesterID, universityLessonID and sectionID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid, "semesters._id": unisid, "semesters.lessons._id": unilid,},
             {"$pull": {"semesters.$[i].lessons.$[j].sections": {"_id": secid}}},
@@ -166,7 +247,8 @@ async def delete_lesson_section(
 
         if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_200_OK, content={"message": "University lesson section deleted"},
+                status_code=status.HTTP_200_OK,
+                content={"message": "University lesson section deleted"},
             )
 
         return JSONResponse(

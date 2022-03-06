@@ -208,7 +208,8 @@ async def update_current_semester(
         if len(semester) >= 1:
 
             update_result = await request.app.mongodb["users"].update_one(
-                {"_id": uid}, {"$set": {"curSemesterID": semester["curSemesterID"]}}
+                {"_id": uid},
+                {"$set": {"current_semester_id": semester["current_semester_id"]}},
             )
 
             if update_result.matched_count == 1:
@@ -259,7 +260,11 @@ async def update_current_university(
 
             update_result = await request.app.mongodb["users"].update_one(
                 {"_id": uid},
-                {"$set": {"curUniversityID": university["curUniversityID"]}},
+                {
+                    "$set": {
+                        "current_university_id": university["current_university_id"]
+                    }
+                },
             )
 
             if update_result.modified_count == 1:
@@ -297,19 +302,20 @@ async def update_current_university(
 async def update_entrance_year(
     uid: str,
     request: Request,
-    entranceYear: UpdateEntranceYearModel = Body(...),
+    entrance_year: UpdateEntranceYearModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update entrance year of a user with given userID"""
 
     if auth_user["_id"] == uid:
 
-        entranceYear = {k: v for k, v in entranceYear.dict().items() if v is not None}
+        entrance_year = {k: v for k, v in entrance_year.dict().items() if v is not None}
 
-        if len(entranceYear) >= 1:
+        if len(entrance_year) >= 1:
 
             update_result = await request.app.mongodb["users"].update_one(
-                {"_id": uid}, {"$set": {"entranceYear": entranceYear["entranceYear"]}},
+                {"_id": uid},
+                {"$set": {"entrance_year": entrance_year["entrance_year"]}},
             )
 
             if update_result.modified_count == 1:
@@ -351,13 +357,13 @@ async def create_professor_user(
 ):
     """Create a professor user"""
 
-    if auth_user["userGroup"] == "admin":
+    if auth_user["user_group"] == "admin":
 
         user = jsonable_encoder(user)
-        user["userGroup"] = "professor"
-        user["curSemesterID"] = "null"
-        user["curUniversityID"] = "null"
-        user["entranceYear"] = 0
+        user["user_group"] = "professor"
+        user["current_semester_id"] = "null"
+        user["current_university_id"] = "null"
+        user["entrance_year"] = 0
 
         if (
             await request.app.mongodb["users"].find_one({"email": user["email"]})

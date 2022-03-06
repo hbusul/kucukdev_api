@@ -9,7 +9,6 @@ from ...dependencies import get_current_user
 from ...models.uni_models import (
     UniversityLessonAPIModel,
     UniversityLessonModel,
-    UniversitySectionModel,
 )
 from ...models.user_models import Message, MessageCreate, UserModel
 
@@ -37,124 +36,23 @@ async def create_university_lesson(
 ):
     """Create a lesson for a semester of a university with given universityID and universitySemesterID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         university_lesson = jsonable_encoder(university_lesson)
-
-        section = UniversitySectionModel(
-            section=university_lesson["section"],
-            instructor=university_lesson["instructor"],
-            slots=university_lesson["slots"],
-        )
-        section = section.json(by_alias=True, models_as_dict=False)
-        section = json.loads(section.replace("\\", ""))
-
-        if (
-            await request.app.mongodb["universities"].find_one(
-                {
-                    "_id": unid,
-                    "semesters._id": unisid,
-                    "semesters.lessons.code": university_lesson["code"],
-                }
-            )
-        ) is not None:
-            if await (
-                request.app.mongodb["universities"]
-                .aggregate(
-                    [
-                        {
-                            "$match": {
-                                "_id": unid,
-                                "semesters._id": unisid,
-                                "semesters.lessons.code": university_lesson["code"],
-                            },
-                        },
-                        {"$unwind": "$semesters"},
-                        {"$unwind": "$semesters.lessons"},
-                        {
-                            "$match": {
-                                "semesters.lessons.code": university_lesson["code"],
-                                "semesters.lessons.sections.section": university_lesson[
-                                    "section"
-                                ],
-                            },
-                        },
-                    ]
-                )
-                .to_list(length=None)
-            ):
-                return JSONResponse(
-                    status_code=status.HTTP_409_CONFLICT,
-                    content={"message": "University lesson section already exists"},
-                )
-
-            update_result = await request.app.mongodb["universities"].update_one(
-                {
-                    "_id": unid,
-                    "semesters._id": unisid,
-                    "semesters.lessons.code": university_lesson["code"],
-                },
-                {"$push": {"semesters.$[i].lessons.$[j].sections": section}},
-                array_filters=[
-                    {"i._id": unisid},
-                    {"j.code": university_lesson["code"]},
-                ],
-            )
-
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_201_CREATED,
-                    content=jsonable_encoder(
-                        MessageCreate(
-                            id=section["_id"],
-                            message="University lesson section created",
-                        )
-                    ),
-                )
-
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "University lesson section could not be created"},
-            )
-
-        new_lesson = UniversityLessonAPIModel(
-            name=university_lesson["name"],
-            code=university_lesson["code"],
-            ects=university_lesson["ects"],
-            absenceLimit=university_lesson["absenceLimit"],
-            sections=[],
-        )
-        new_lesson = new_lesson.json(by_alias=True, models_as_dict=False)
-        new_lesson = json.loads(new_lesson.replace("\\", ""))
 
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid, "semesters._id": unisid},
-            {"$push": {"semesters.$.lessons": new_lesson}},
+            {"$push": {"semesters.$.lessons": university_lesson}},
         )
 
         if update_result.modified_count == 1:
-            update_result = await request.app.mongodb["universities"].update_one(
-                {
-                    "_id": unid,
-                    "semesters._id": unisid,
-                    "semesters.lessons.code": new_lesson["code"],
-                },
-                {"$push": {"semesters.$[i].lessons.$[j].sections": section}},
-                array_filters=[{"i._id": unisid}, {"j.code": new_lesson["code"]},],
-            )
-
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_201_CREATED,
-                    content=jsonable_encoder(
-                        MessageCreate(
-                            id=new_lesson["_id"], message="University lesson created",
-                        )
-                    ),
-                )
-
             return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "University lesson could not be created"},
+                status_code=status.HTTP_201_CREATED,
+                content=jsonable_encoder(
+                    MessageCreate(
+                        id=university_lesson["_id"],
+                        message="University lesson created",
+                    )
+                ),
             )
 
         return JSONResponse(
@@ -284,12 +182,12 @@ async def update_university_lesson(
     unisid: str,
     unilid: str,
     request: Request,
-    university_lesson: UniversityLessonAPIModel = Body(...),
+    university_lesson: UniversityLessonModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update lesson of a university semester with given universityID, universitySemesterID and universityLessonID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         university_lesson = university_lesson.json(by_alias=True, models_as_dict=False)
         university_lesson = json.loads(university_lesson.replace("\\", ""))
 
@@ -345,8 +243,8 @@ async def update_university_lesson(
                     "semesters.$[i].lessons.$[j].name": university_lesson["name"],
                     "semesters.$[i].lessons.$[j].code": university_lesson["code"],
                     "semesters.$[i].lessons.$[j].ects": university_lesson["ects"],
-                    "semesters.$[i].lessons.$[j].absenceLimit": university_lesson[
-                        "absenceLimit"
+                    "semesters.$[i].lessons.$[j].absence_limit": university_lesson[
+                        "absence_limit"
                     ],
                 }
             },
@@ -389,7 +287,7 @@ async def delete_university_lesson(
 ):
     """Delete a university lesson with given universityID, universitySemesterID and universityLessonID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid, "semesters._id": unisid},
             {"$pull": {"semesters.$.lessons": {"_id": unilid}}},

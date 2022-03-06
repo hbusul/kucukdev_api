@@ -35,9 +35,9 @@ async def create_university(
 ):
     """Create a university"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         university = jsonable_encoder(university)
-        university["curSemesterID"] = "null"
+        university["current_semester_id"] = "null"
 
         if await request.app.mongodb["universities"].find_one(
             {"name": university["name"]}
@@ -131,7 +131,7 @@ async def update_university_name(
 ):
     """Update name of a university with given universityID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         university_name = jsonable_encoder(university_name)
 
         if (
@@ -184,12 +184,12 @@ async def update_university_current_semester(
 ):
     """Update current semester of a university with given universityID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         current_semester = jsonable_encoder(current_semester)
 
         if (
             await request.app.mongodb["universities"].find_one(
-                {"_id": unid, "semesters._id": current_semester["curSemesterID"]}
+                {"_id": unid, "semesters._id": current_semester["current_semester_id"]}
             )
         ) is None:
             return JSONResponse(
@@ -199,7 +199,7 @@ async def update_university_current_semester(
 
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid},
-            {"$set": {"curSemesterID": current_semester["curSemesterID"]}},
+            {"$set": {"current_semester_id": current_semester["current_semester_id"]}},
         )
 
         if update_result.modified_count == 1:
@@ -237,7 +237,7 @@ async def show_university_current_semester(unid: str, request: Request):
                     {"$unwind": "$semesters"},
                     {
                         "$match": {
-                            "$expr": {"$eq": ["$semesters._id", "$curSemesterID"]}
+                            "$expr": {"$eq": ["$semesters._id", "$current_semester_id"]}
                         }
                     },
                 ]
@@ -265,7 +265,7 @@ async def delete_university(
 ):
     """Delete a university with given universityID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         delete_result = await request.app.mongodb["universities"].delete_one(
             {"_id": unid}
         )

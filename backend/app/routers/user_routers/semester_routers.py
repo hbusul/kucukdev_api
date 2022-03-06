@@ -65,7 +65,7 @@ async def create_semester(
                 await update_current_semester(
                     uid,
                     request,
-                    UpdateSemesterModel(curSemesterID=semester["_id"]),
+                    UpdateSemesterModel(current_semester_id=semester["_id"]),
                     auth_user,
                 )
 
@@ -98,8 +98,7 @@ async def create_semester(
     },
 )
 async def list_semesters(
-    uid: str,
-    auth_user: UserModel = Depends(get_current_user),
+    uid: str, auth_user: UserModel = Depends(get_current_user),
 ):
     """list all semesters of a user with given userID"""
 
@@ -245,7 +244,7 @@ async def delete_semester(
     """Delete a semester with given userID and semesterID"""
 
     if auth_user["_id"] == uid:
-        if auth_user["curSemesterID"] == sid:
+        if auth_user["current_semester_id"] == sid:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"message": "Cannot delete current semester"},
@@ -257,8 +256,7 @@ async def delete_semester(
 
         if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"message": "Semester deleted"},
+                status_code=status.HTTP_200_OK, content={"message": "Semester deleted"},
             )
 
         return JSONResponse(

@@ -34,7 +34,7 @@ async def create_curriculum_semester(
 ):
     """Create semester for a curriculum with given universityID, universityDepartmentID and departmentCurriculumID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         curriculum_semester = jsonable_encoder(curriculum_semester)
 
         if (
@@ -175,7 +175,7 @@ async def update_curriculum_semester(
 ):
     """Update semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID and curriculumSemesterID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         curriculum_semester = {
             k: v for k, v in curriculum_semester.dict().items() if v is not None
         }
@@ -257,7 +257,7 @@ async def delete_curriculum_semester(
 ):
     """Delete a university department with given universityID, universityDepartmentID, departmentCurriculumID and curriculumSemesterID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         delete_result = await request.app.mongodb["universities"].update_one(
             {
                 "_id": unid,

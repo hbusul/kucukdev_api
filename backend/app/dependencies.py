@@ -30,10 +30,10 @@ async def create_admin_user(request: Request):
             email=settings.ADMIN_USERNAME, password=bcrypt.hash(settings.ADMIN_PASSWORD)
         )
         user = jsonable_encoder(user)
-        user["userGroup"] = "admin"
-        user["curSemesterID"] = "null"
-        user["curUniversityID"] = "null"
-        user["entranceYear"] = 0
+        user["user_group"] = "admin"
+        user["current_semester_id"] = "null"
+        user["current_university_id"] = "null"
+        user["entrance_year"] = 0
         res = await request["users"].insert_one(user)
         if res.inserted_id is None:
             raise HTTPException(status_code=500, detail="Could not create admin user")

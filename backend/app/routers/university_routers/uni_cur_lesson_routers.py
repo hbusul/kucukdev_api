@@ -35,7 +35,7 @@ async def create_curriculum_lesson(
 ):
     """Create lesson for a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID and curriculumSemesterID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         curriculum_lesson = jsonable_encoder(curriculum_lesson)
 
         if (
@@ -195,7 +195,7 @@ async def update_curriculum_lesson(
 ):
     """Update lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         curriculum_lesson = jsonable_encoder(curriculum_lesson)
 
         if (
@@ -326,7 +326,7 @@ async def delete_curriculum_lesson(
 ):
     """Delete a lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         delete_result = await request.app.mongodb["universities"].update_one(
             {
                 "_id": unid,

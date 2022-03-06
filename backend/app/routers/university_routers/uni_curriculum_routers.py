@@ -33,7 +33,7 @@ async def create_department_curriculum(
 ):
     """Create department for a university with given universityID and universityDepartmentID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         department_curriculum = jsonable_encoder(department_curriculum)
 
         if (
@@ -152,7 +152,7 @@ async def update_department_curriculum(
 ):
     """Update department of a university with given universityID, universityDepartmentID and departmentCurriculumID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         department_curriculum = {
             k: v for k, v in department_curriculum.dict().items() if v is not None
         }
@@ -241,7 +241,7 @@ async def delete_department_curriculum(
 ):
     """Delete a university department with given universityID, universityDepartmentID and departmentCurriculumID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         delete_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid, "departments._id": depid,},
             {"$pull": {"departments.$.curriculums": {"_id": curid}}},
