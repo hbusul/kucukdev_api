@@ -14,8 +14,8 @@ class UniversitySlotModel(BaseModel):
 
 class UniversitySectionModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    section: str = Field(...)
-    instructor: str = Field(...)
+    section: int = Field(..., ge=0)
+    instructor: str = Field(..., min_length=1, max_length=127)
     slots: List[UniversitySlotModel] = Field(...)
 
     class Config:
@@ -27,8 +27,8 @@ class UniversitySectionModel(BaseModel):
         }
         schema_extra = {
             "example": {
-                "section": "01",
-                "instructor": "JACK JOE",
+                "section": 1,
+                "instructor": "Jack Joe",
                 "slots": [
                     {"day": 2, "hour": 7, "isLab": 0},
                     {"day": 2, "hour": 8, "isLab": 0},
@@ -39,7 +39,7 @@ class UniversitySectionModel(BaseModel):
 
 class UniversitySectionAPIModel(BaseModel):
     id: Optional[str] = Field(alias="_id")
-    section: Optional[str]
+    section: Optional[int]
     instructor: Optional[str]
     slots: Optional[List[List[int]]]
 
@@ -47,8 +47,8 @@ class UniversitySectionAPIModel(BaseModel):
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "section": "01",
-                "instructor": "JACK JOE",
+                "section": 1,
+                "instructor": "Jack Joe",
                 "slots": [[2, 7, 0], [2, 8, 0]],
             }
         }
@@ -56,12 +56,12 @@ class UniversitySectionAPIModel(BaseModel):
 
 class UniversityLessonModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
-    code: str = Field(...)
+    name: str = Field(..., min_length=1, max_length=127)
+    code: str = Field(..., min_length=1, max_length=10)
     ects: float = Field(..., ge=0)
-    absenceLimit: int = Field(..., ge=0)
-    section: str = Field(...)
-    instructor: str = Field(...)
+    absence_limit: int = Field(..., ge=0)
+    section: int = Field(..., ge=0)
+    instructor: str = Field(..., min_length=1, max_length=127)
     slots: List[UniversitySlotModel] = Field(...)
 
     class Config:
@@ -76,9 +76,9 @@ class UniversityLessonModel(BaseModel):
                 "name": "ART OF COMPUTING",
                 "code": "COMP101",
                 "ects": 6,
-                "absenceLimit": 8,
-                "section": "01",
-                "instructor": "JACK JOE",
+                "absence_limit": 8,
+                "section": 1,
+                "instructor": "Jack Joe",
                 "slots": [
                     {"day": 2, "hour": 7, "isLab": 0},
                     {"day": 2, "hour": 8, "isLab": 0},
@@ -92,7 +92,7 @@ class UniversityLessonAPIModel(BaseModel):
     name: str = Field(...)
     code: str = Field(...)
     ects: float = Field(..., ge=0)
-    absenceLimit: int = Field(..., ge=0)
+    absence_limit: int = Field(..., ge=0)
     sections: List[UniversitySectionAPIModel] = []
 
     class Config:
@@ -104,7 +104,7 @@ class UniversityLessonAPIModel(BaseModel):
                 "name": "ART OF COMPUTING",
                 "code": "COMP101",
                 "ects": 6,
-                "absenceLimit": 0,
+                "absence_limit": 0,
             }
         }
 
@@ -125,50 +125,24 @@ class UniversitySemesterModel(BaseModel):
         }
 
 
-class UniversitySemesterAPIModel(BaseModel):
-    id: Optional[str] = Field(alias="_id")
-    name: Optional[str]
-    startDate: Optional[datetime]
-    endDate: Optional[datetime]
-    startHour: Optional[str]
-    dLesson: Optional[int]
-    dBreak: Optional[int]
-    slotCount: Optional[int]
-
-    class Config:
-        allow_population_by_field_name = True
-        schema_extra = {
-            "example": {
-                "_id": "61ddea901311ecaed99afb7c",
-                "name": "2020-21 Spring",
-                "startDate": "2022-02-18T00:00:00Z",
-                "endDate": "2022-06-18T00:00:00Z",
-                "startHour": "8.10",
-                "dLesson": 50,
-                "dBreak": 10,
-                "slotCount": 12,
-            }
-        }
-
-
 class CurriculumLessonModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
-    code: str = Field(...)
-    lessonType: str = Field(...)
+    name: str = Field(..., min_length=1, max_length=100)
+    code: str = Field(..., min_length=1, max_length=100)
+    lesson_type: str = Field(..., min_length=1, max_length=30)
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
-            "example": {"name": "PHYSICS I", "code": "PHYS101", "lessonType": "science"}
+            "example": {"name": "PHYSICS I", "code": "PHYS101", "lesson_type": "science"}
         }
 
 
 class CurriculumSemesterModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    semester: int = Field(..., gt=0, lt=9)
+    semester: int = Field(..., gt=0, lt=20)
     lessons: List[CurriculumLessonModel] = []
 
     class Config:
@@ -185,8 +159,8 @@ class CurriculumSemesterModel(BaseModel):
 class UniversityCurriculumModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(..., min_length=1)
-    startYear: int = Field(...)
-    endYear: int = Field(...)
+    start_year: int = Field(...)
+    end_year: int = Field(...)
     semesters: List[CurriculumSemesterModel] = []
 
     class Config:
@@ -194,13 +168,13 @@ class UniversityCurriculumModel(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
-            "example": {"name": "2016 Later", "startYear": 2016, "endYear": 2100}
+            "example": {"name": "2016 Later", "start_year": 2016, "end_year": 2100}
         }
 
 
 class UniversityDepartmentModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(..., min_length=2 ,max_length=100,)  
+    name: str = Field(..., min_length=2 ,max_length=100)  
     curriculums: List[UniversityCurriculumModel] = []
 
     class Config:
@@ -216,7 +190,15 @@ class UniversityDepartmentModel(BaseModel):
 
 class UniversityModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
+    name: str = Field(..., min_length=2, max_length=100)
+    domain: str = Field(..., min_length=5, max_length=100),
+    country: str = Field(..., min_length=2, max_length=100),
+    city: str = Field(..., min_length=2, max_length=100),
+    address: str = Field(..., min_length=2, max_length=100),
+    zip_code: str = Field(..., min_length=2, max_length=100),
+    description: str = Field(..., max_length=255),
+    logo: str = Field(..., max_length=255),
+    cover_photo: str = Field(..., max_length=255),
     departments: List[UniversityDepartmentModel] = []
     semesters: List[UniversitySemesterModel] = []
 
@@ -226,7 +208,15 @@ class UniversityModel(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "name": "AGU",
+                "name": "Test University",
+                "domain": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
             }
         }
 
@@ -234,7 +224,15 @@ class UniversityModel(BaseModel):
 class UniversityAPIModel(BaseModel):
     id: Optional[str] = Field(alias="_id")
     name: Optional[str]
-    curSemesterID: Optional[str]
+    domain: Optional[str]  
+    country: Optional[str] 
+    city: Optional[str] 
+    address: Optional[str] 
+    zip_code: Optional[str]
+    description: Optional[str] 
+    logo: Optional[str] 
+    cover_photo: Optional[str] 
+    cur_semester_id: Optional[str]
 
     class Config:
         allow_population_by_field_name = True
@@ -243,8 +241,16 @@ class UniversityAPIModel(BaseModel):
         schema_extra = {
             "example": {
                 "_id": "61fc266ae3d749b1d65c17c6",
-                "name": "AGU",
-                "curSemesterID": "61fc266ae3d749b1d65c17c7",
+                "name": "Test University",
+                "domain": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+                "cur_semester_id": "61fc266ae3d749b1d65c17c7",
             }
         }
 

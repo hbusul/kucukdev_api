@@ -33,10 +33,11 @@ async def create_user(request: Request, user: UserModel = Body(...)):
     """Create a user"""
 
     user = jsonable_encoder(user)
-    user["userGroup"] = "default"
-    user["curSemesterID"] = "null"
-    user["curUniversityID"] = "null"
-    user["entranceYear"] = 0
+    user["user_group"] = "default"
+    user["current_semester_id"] = "null"
+    user["current_university_id"] = "null"
+    user["entrance_year"] = 0
+    user["current_gpa"] = 0.0
 
     if (await request.app.mongodb["users"].find_one({"email": user["email"]})) is None:
         user["password"] = bcrypt.hash(user["password"])
