@@ -62,7 +62,14 @@ async def create_slot(
 
         update_result = await request.app.mongodb["users"].update_one(
             {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid,},
-            {"$push": {"semesters.$[i].lessons.$[j].slots": slot}},
+            {
+                "$push": {
+                    "semesters.$[i].lessons.$[j].slots": {
+                        "$each": [slot],
+                        "$sort": {"day": 1, "hour": 1},
+                    }
+                }
+            },
             array_filters=[{"i._id": sid}, {"j._id": lid},],
         )
 
@@ -170,6 +177,18 @@ async def update_slot(
         )
 
         if update_result.modified_count == 1:
+            await request.app.mongodb["users"].update_one(
+                {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid,},
+                {
+                    "$push": {
+                        "semesters.$[i].lessons.$[j].slots": {
+                            "$each": [],
+                            "$sort": {"day": 1, "hour": 1},
+                        },
+                    },
+                },
+                array_filters=[{"i._id": sid}, {"j._id": lid}],
+            )
             return JSONResponse(
                 status_code=status.HTTP_200_OK, content={"message": "Slot updated"},
             )

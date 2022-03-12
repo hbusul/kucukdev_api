@@ -65,6 +65,22 @@ async def create_lesson(
         )
 
         if update_result.modified_count == 1:
+            await request.app.mongodb["users"].update_one(
+                {
+                    "_id": uid,
+                    "semesters._id": sid,
+                    "semesters.lessons._id": lesson["_id"],
+                },
+                {
+                    "$push": {
+                        "semesters.$[i].lessons.$[j].slots": {
+                            "$each": [],
+                            "$sort": {"day": 1, "hour": 1},
+                        },
+                    },
+                },
+                array_filters=[{"i._id": sid}, {"j._id": lesson["_id"]}],
+            )
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
                 content=jsonable_encoder(
