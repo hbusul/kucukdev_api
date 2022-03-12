@@ -275,8 +275,11 @@ async def create_absence(
             {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid,},
             {
                 "$push": {
-                    "semesters.$[i].lessons.$[j].slots.$[k].absences": absence["week"]
-                }
+                    "semesters.$[i].lessons.$[j].slots.$[k].absences": {
+                        "$each": [absence["week"]],
+                        "$sort": 1,
+                    },
+                },
             },
             array_filters=[{"i._id": sid}, {"j._id": lid}, {"k._id": slid}],
         )
