@@ -1,7 +1,7 @@
 version: "3.3"
 services:
 
-  backend:
+  backend_test:
     build: 
       context: ./backend
       dockerfile: Dockerfile.test
@@ -10,8 +10,11 @@ services:
     environment:
       DB_URL: "mongodb://root:example@mongo/"
       DB_NAME: farmstack
-    env_file:
-      - backend/.env
+      AUTH_JWT_ALGORITHM: HS256
+      AUTH_API_MANAGE_USERS: "True"
+      AUTH_SECRET_KEY: someverylongsecretkeyhereyes
+      ADMIN_USERNAME: admin@kucukdev.org
+      ADMIN_PASSWORD: thisisonlyfordevelopment
     networks:
       - app-network
 

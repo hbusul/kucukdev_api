@@ -3,7 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from passlib.hash import bcrypt
 
-from ...dependencies import get_current_user
+from ...dependencies import get_current_user, settings
 from ...models.user_models import (
     Message,
     MessageCreate,
@@ -17,48 +17,195 @@ from ...models.user_models import (
 
 router = APIRouter()
 
+if settings.AUTH_API_MANAGE_USERS:
 
-@router.post(
-    "",
-    response_description="Add new user",
-    operation_id="createUser",
-    response_model=MessageCreate,
-    responses={
-        201: {"model": MessageCreate},
-        400: {"model": Message},
-        409: {"model": Message},
-    },
-)
-async def create_user(request: Request, user: UserModel = Body(...)):
-    """Create a user"""
+    @router.post(
+        "",
+        response_description="Add new user",
+        operation_id="createUser",
+        response_model=MessageCreate,
+        responses={
+            201: {"model": MessageCreate},
+            400: {"model": Message},
+            409: {"model": Message},
+        },
+    )
+    async def create_user(request: Request, user: UserModel = Body(...)):
+        """Create a user"""
 
-    user = jsonable_encoder(user)
-    user["userGroup"] = "default"
-    user["curSemesterID"] = "null"
-    user["curUniversityID"] = "null"
-    user["entranceYear"] = 0
+        user = jsonable_encoder(user)
+        user["userGroup"] = "default"
+        user["curSemesterID"] = "null"
+        user["curUniversityID"] = "null"
+        user["entranceYear"] = 0
 
-    if (await request.app.mongodb["users"].find_one({"email": user["email"]})) is None:
-        user["password"] = bcrypt.hash(user["password"])
-        new_user = await request.app.mongodb["users"].insert_one(user)
+        if (
+            await request.app.mongodb["users"].find_one({"email": user["email"]})
+        ) is None:
+            user["password"] = bcrypt.hash(user["password"])
+            new_user = await request.app.mongodb["users"].insert_one(user)
 
-        if new_user.inserted_id is not None:
+            if new_user.inserted_id is not None:
+                return JSONResponse(
+                    status_code=status.HTTP_201_CREATED,
+                    content=jsonable_encoder(
+                        MessageCreate(id=user["_id"], message="User created")
+                    ),
+                )
+
             return JSONResponse(
-                status_code=status.HTTP_201_CREATED,
-                content=jsonable_encoder(
-                    MessageCreate(id=user["_id"], message="User created")
-                ),
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "User not created"},
             )
 
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "User not created"},
+            status_code=status.HTTP_409_CONFLICT,
+            content={"message": "Given email already exists"},
         )
 
-    return JSONResponse(
-        status_code=status.HTTP_409_CONFLICT,
-        content={"message": "Given email already exists"},
+    @router.put(
+        "/{uid}/change-password",
+        response_description="Update password of a user",
+        operation_id="updatePassword",
+        response_model=Message,
+        responses={
+            401: {"model": Message},
+            403: {"model": Message},
+            404: {"model": Message},
+        },
     )
+    async def update_password(
+        uid: str,
+        request: Request,
+        password: UpdatePasswordModel = Body(...),
+        auth_user: UserModel = Depends(get_current_user),
+    ):
+        """Update password of a user with given userID"""
+
+        if auth_user["_id"] == uid:
+
+            password = {k: v for k, v in password.dict().items() if v is not None}
+
+            if len(password) >= 1:
+
+                password["password"] = bcrypt.hash(password["password"])
+                update_result = await request.app.mongodb["users"].update_one(
+                    {"_id": uid}, {"$set": {"password": password["password"]}}
+                )
+
+                if update_result.modified_count == 1:
+                    return JSONResponse(
+                        status_code=status.HTTP_200_OK,
+                        content={"message": "Password updated"},
+                    )
+
+                return JSONResponse(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    content={"message": "Password couldn't be updated"},
+                )
+
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"message": "Invalid input"},
+            )
+
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content={"message": "No right to access"},
+        )
+
+    @router.delete(
+        "/{uid}",
+        response_description="Delete user",
+        operation_id="deleteUser",
+        response_model=UserAPIModel,
+        responses={
+            401: {"model": Message},
+            403: {"model": Message},
+            404: {"model": Message},
+        },
+    )
+    async def delete_user(
+        uid: str,
+        request: Request,
+        auth_user: UserModel = Depends(get_current_user),
+    ):
+        """Delete a user with given userID"""
+
+        if auth_user["_id"] == uid:
+
+            delete_result = await request.app.mongodb["users"].delete_one({"_id": uid})
+
+            if delete_result.deleted_count == 1:
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content={"message": "User deleted"},
+                )
+
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "User not found"},
+            )
+
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content={"message": "No right to access"},
+        )
+
+    @router.post(
+        "/professors",
+        response_description="Add new professor user",
+        operation_id="createProfessorUser",
+        response_model=MessageCreate,
+        responses={
+            201: {"model": MessageCreate},
+            400: {"model": Message},
+            409: {"model": Message},
+        },
+    )
+    async def create_professor_user(
+        request: Request,
+        user: UserModel = Body(...),
+        auth_user: UserModel = Depends(get_current_user),
+    ):
+        """Create a professor user"""
+
+        if auth_user["userGroup"] == "admin":
+
+            user = jsonable_encoder(user)
+            user["userGroup"] = "professor"
+            user["curSemesterID"] = "null"
+            user["curUniversityID"] = "null"
+            user["entranceYear"] = 0
+
+            if (
+                await request.app.mongodb["users"].find_one({"email": user["email"]})
+            ) is None:
+                user["password"] = bcrypt.hash(user["password"])
+                new_user = await request.app.mongodb["users"].insert_one(user)
+
+                if new_user.inserted_id is not None:
+                    return JSONResponse(
+                        status_code=status.HTTP_201_CREATED,
+                        content=jsonable_encoder(
+                            MessageCreate(id=user["_id"], message="Professor created")
+                        ),
+                    )
+
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"message": "Professor not created"},
+                )
+
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"message": "Given email already exists"},
+            )
+
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content={"message": "No right to access"},
+        )
 
 
 @router.get(
@@ -80,101 +227,21 @@ async def get_current(auth_user: UserModel = Depends(get_current_user)):
     responses={403: {"model": Message}, 401: {"model": Message}},
 )
 async def show_user(
-    uid: str, request: Request, auth_user: UserModel = Depends(get_current_user),
+    uid: str,
+    request: Request,
+    auth_user: UserModel = Depends(get_current_user),
 ):
     """Get a single user with given userID"""
 
     if auth_user["_id"] == uid:
         if (
-            user := await request.app.mongodb["users"].find_one({"_id": uid,})
+            user := await request.app.mongodb["users"].find_one(
+                {
+                    "_id": uid,
+                }
+            )
         ) is not None:
             return auth_user
-
-    return JSONResponse(
-        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
-    )
-
-
-@router.put(
-    "/{uid}/change-password",
-    response_description="Update password of a user",
-    operation_id="updatePassword",
-    response_model=Message,
-    responses={
-        401: {"model": Message},
-        403: {"model": Message},
-        404: {"model": Message},
-    },
-)
-async def update_password(
-    uid: str,
-    request: Request,
-    password: UpdatePasswordModel = Body(...),
-    auth_user: UserModel = Depends(get_current_user),
-):
-    """Update password of a user with given userID"""
-
-    if auth_user["_id"] == uid:
-
-        password = {k: v for k, v in password.dict().items() if v is not None}
-
-        if len(password) >= 1:
-
-            password["password"] = bcrypt.hash(password["password"])
-            update_result = await request.app.mongodb["users"].update_one(
-                {"_id": uid}, {"$set": {"password": password["password"]}}
-            )
-
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "Password updated"},
-                )
-
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "Password couldn't be updated"},
-            )
-
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid input"},
-        )
-
-    return JSONResponse(
-        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
-    )
-
-
-@router.delete(
-    "/{uid}",
-    response_description="Delete user",
-    operation_id="deleteUser",
-    response_model=UserAPIModel,
-    responses={
-        401: {"model": Message},
-        403: {"model": Message},
-        404: {"model": Message},
-    },
-)
-async def delete_user(
-    uid: str, request: Request, auth_user: UserModel = Depends(get_current_user),
-):
-    """Delete a user with given userID"""
-
-    if auth_user["_id"] == uid:
-
-        delete_result = await request.app.mongodb["users"].delete_one({"_id": uid})
-
-        if delete_result.deleted_count == 1:
-            return JSONResponse(
-                status_code=status.HTTP_200_OK, content={"message": "User deleted"},
-            )
-
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "User not found"},
-        )
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -308,7 +375,8 @@ async def update_entrance_year(
         if len(entranceYear) >= 1:
 
             update_result = await request.app.mongodb["users"].update_one(
-                {"_id": uid}, {"$set": {"entranceYear": entranceYear["entranceYear"]}},
+                {"_id": uid},
+                {"$set": {"entranceYear": entranceYear["entranceYear"]}},
             )
 
             if update_result.modified_count == 1:
@@ -325,61 +393,6 @@ async def update_entrance_year(
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"message": "Invalid entrance year"},
-        )
-
-    return JSONResponse(
-        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
-    )
-
-
-@router.post(
-    "/professors",
-    response_description="Add new professor user",
-    operation_id="createProfessorUser",
-    response_model=MessageCreate,
-    responses={
-        201: {"model": MessageCreate},
-        400: {"model": Message},
-        409: {"model": Message},
-    },
-)
-async def create_professor_user(
-    request: Request,
-    user: UserModel = Body(...),
-    auth_user: UserModel = Depends(get_current_user),
-):
-    """Create a professor user"""
-
-    if auth_user["userGroup"] == "admin":
-
-        user = jsonable_encoder(user)
-        user["userGroup"] = "professor"
-        user["curSemesterID"] = "null"
-        user["curUniversityID"] = "null"
-        user["entranceYear"] = 0
-
-        if (
-            await request.app.mongodb["users"].find_one({"email": user["email"]})
-        ) is None:
-            user["password"] = bcrypt.hash(user["password"])
-            new_user = await request.app.mongodb["users"].insert_one(user)
-
-            if new_user.inserted_id is not None:
-                return JSONResponse(
-                    status_code=status.HTTP_201_CREATED,
-                    content=jsonable_encoder(
-                        MessageCreate(id=user["_id"], message="Professor created")
-                    ),
-                )
-
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Professor not created"},
-            )
-
-        return JSONResponse(
-            status_code=status.HTTP_409_CONFLICT,
-            content={"message": "Given email already exists"},
         )
 
     return JSONResponse(

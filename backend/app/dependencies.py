@@ -19,8 +19,22 @@ settings = Settings()
 
 router = APIRouter()
 
-ALGORITHM = "RS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+class LazyURLBasedJWK:
+    def __init__(self, URL, key=None):
+        self.URL = URL
+        self.key = key
+
+    def get_key(self):
+        if self.key is None:
+            self.key = json.loads(requests.get(self.URL).text)
+        return self.key
+
+
+if settings.AUTH_JWT_ALGORITHM == "RS256":
+    JWK_SET = LazyURLBasedJWK(settings.AUTH_JWK_URL) if settings.AUTH_JWK_URL else None
+else:
+    JWK_SET = LazyURLBasedJWK(None, settings.AUTH_SECRET_KEY)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -47,9 +61,9 @@ async def control_secret_key(request: Request):
         {}, {"$setOnInsert": {"secret_key": secret_key}}, upsert=True
     )
     if res.upserted_id is not None:
-        settings.SECRET_KEY = secret_key
+        settings.AUTH_SECRET_KEY = secret_key
     else:
-        settings.SECRET_KEY = (await request["key"].find_one())["secret_key"]
+        settings.AUTH_SECRET_KEY = (await request["key"].find_one())["secret_key"]
 
 
 class Token(BaseModel):
@@ -77,26 +91,18 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user["email"]}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-
 async def authenticate_user(request: Request, username: str, password: str):
     user = await request.app.mongodb["users"].find_one({"email": username})
     if not user:
         return False
-    if not verify_password(password, user["password"]):
+    if not pwd_context.verify(password, user["password"]):
         return False
     return user
 
@@ -106,38 +112,60 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+        expire = datetime.utcnow() + timedelta(
+            minutes=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES
+        )
+    to_encode.update({"exp": expire, "aud": "account"})
+    encoded_jwt = jwt.encode(
+        to_encode, settings.AUTH_SECRET_KEY, algorithm=settings.AUTH_JWT_ALGORITHM
+    )
     return encoded_jwt
 
 
-async def get_current_user(request: Request, token: str = Depends(oauth2_scheme)):
+async def get_current_user(
+    request: Request,
+    token: str = Depends(oauth2_scheme),  # jwt token
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        jwk_set = json.loads(requests.get('http://auth_server:8080/realms/kucukdev/protocol/openid-connect/certs').text)
-        payload = jwt.decode(token, jwk_set, algorithms=[ALGORITHM], audience='account')
+        payload = jwt.decode(
+            token,
+            key=JWK_SET.get_key(),
+            algorithms=[settings.AUTH_JWT_ALGORITHM],
+            audience=settings.AUTH_AUDIENCE,
+        )
         sub: str = payload.get("sub")
         if sub is None:
             raise credentials_exception
     except JWTError as e:
         raise credentials_exception
-    user = await request.app.mongodb["users"].find_one({"_id": sub})
 
-    if user is None:
-        user = {
-            "_id": sub,
-            "semesters": [],
-            "userGroup": "default",
-            "curSemesterID": "null",
-            "curUniversityID": "null",
-            "entranceYear": 0
-        }
+    if settings.AUTH_API_MANAGE_USERS:
+        # when API is managing the users, not finding the user means that user got deleted after authenticated
+        user = await request.app.mongodb["users"].find_one({"email": sub})
+        if user is None:
+            raise credentials_exception
+    else:
+        # when API is not managing the users, not finding the user means that it's users first login
+        email = payload.get("email")
+        user = await request.app.mongodb["users"].find_one({"email": email})
 
-        await request.app.mongodb["users"].insert_one(user)
+        if user is None:
+            user = UserModel(email=email, password="nothere")
+            user = jsonable_encoder(user)
+            user.update({
+                "email": email,
+                "semesters": [],
+                "userGroup": "default",
+                "curSemesterID": "null",
+                "curUniversityID": "null",
+                "entranceYear": 0,
+            })
+
+            await request.app.mongodb["users"].insert_one(user)
 
     return user
