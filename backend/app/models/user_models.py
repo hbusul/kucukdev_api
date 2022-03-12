@@ -7,33 +7,47 @@ from pydantic import BaseModel, EmailStr, Field
 from .PyObjectId import PyObjectId
 
 
+class AbsenceModel(BaseModel):
+    week: int = Field(..., ge=1)
+
+    class Config:
+        schema_extra = {"example": {"week": 1}}
+
+
 class SlotModel(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     room: str = Field(max_length=100)
     day: int = Field(..., ge=0, le=4)
     hour: int = Field(..., ge=0, le=15)
     is_lab: int = Field(..., ge=0, le=1)
+    absences: List[int] = []
 
     class Config:
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
         schema_extra = {"example": {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0}}
 
 
-class AbsenceModel(BaseModel):
-    week: int = Field(..., ge=0)
-    day: int = Field(..., ge=0, le=4)
-    hour: int = Field(..., ge=0, le=15)
-    is_lab: int = Field(..., ge=0, le=1)
-
-
-class LessonAbsenceModel(BaseModel):
-    absence: AbsenceModel = Field(...)
+class SlotAPIModel(BaseModel):
+    id: Optional[str] = Field(alias="_id")
+    room: Optional[str]
+    day: Optional[int]
+    hour: Optional[int]
+    is_lab: Optional[int]
+    absences: Optional[List[int]]
 
     class Config:
-        json_encoders = {
-            AbsenceModel: lambda x: [x.week, x.day, x.hour, x.is_lab],
-        }
+        allow_population_by_field_name = True
         schema_extra = {
-            "example": {"absence": {"week": 0, "day": 2, "hour": 7, "is_lab": 0},}
+            "example": {
+                "_id": "61ddea901311ecaed99afb7c",
+                "room": "F0D01",
+                "day": 2,
+                "hour": 7,
+                "is_lab": 0,
+                "absences": [1, 2],
+            }
         }
 
 
@@ -46,7 +60,6 @@ class LessonModel(BaseModel):
     grade: float = Field(ge=0, le=10)
     absence_limit: int = Field(..., ge=0)
     slots: List[SlotModel] = Field()
-    absences: List[AbsenceModel] = []
 
     class Config:
         allow_population_by_field_name = True
@@ -76,8 +89,7 @@ class LessonAPIModel(BaseModel):
     ects: Optional[int]
     grade: Optional[float]
     absence_limit: Optional[int]
-    slots: Optional[List[SlotModel]]
-    absences: Optional[List[List[int]]]
+    slots: Optional[List[SlotAPIModel]]
 
     class Config:
         allow_population_by_field_name = True
@@ -91,10 +103,21 @@ class LessonAPIModel(BaseModel):
                 "grade": 3.67,
                 "absence_limit": 21,
                 "slots": [
-                    {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0,},
-                    {"room": "F0D01", "day": 2, "hour": 8, "is_lab": 0,},
+                    {
+                        "room": "F0D01",
+                        "day": 2,
+                        "hour": 7,
+                        "is_lab": 0,
+                        "absences": [1],
+                    },
+                    {
+                        "room": "F0D01",
+                        "day": 2,
+                        "hour": 8,
+                        "is_lab": 0,
+                        "absences": [2],
+                    },
                 ],
-                "absences": [[0, 2, 7, 0], [0, 2, 8, 0]],
             }
         }
 
@@ -106,7 +129,6 @@ class UpdateLessonModel(BaseModel):
     ects: int = Field(..., ge=0)
     grade: float = Field(ge=0, le=10)
     absence_limit: int = Field(..., ge=0)
-    slots: List[SlotModel] = Field(...)
 
     class Config:
         schema_extra = {
@@ -117,10 +139,6 @@ class UpdateLessonModel(BaseModel):
                 "ects": 5,
                 "grade": 3.67,
                 "absence_limit": 21,
-                "slots": [
-                    {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0},
-                    {"room": "F0D01", "day": 2, "hour": 8, "is_lab": 0},
-                ],
             }
         }
 

@@ -1,4 +1,3 @@
-import json
 from typing import List
 
 from fastapi import APIRouter, Body, Depends, Request, status
@@ -7,7 +6,6 @@ from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
 from ...models.user_models import (
-    LessonAbsenceModel,
     LessonAPIModel,
     LessonModel,
     Message,
@@ -29,6 +27,7 @@ router = APIRouter()
         401: {"model": Message},
         403: {"model": Message},
         404: {"model": Message},
+        409: {"model": Message},
     },
 )
 async def create_lesson(
@@ -185,6 +184,7 @@ async def show_lesson(
         401: {"model": Message},
         403: {"model": Message},
         404: {"model": Message},
+        409: {"model": Message},
     },
 )
 async def update_lesson(
@@ -235,7 +235,7 @@ async def update_lesson(
                 },
             )
 
-        update_result = await request.app.mongodb["users"].update_many(
+        update_result = await request.app.mongodb["users"].update_one(
             {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid,},
             {
                 "$set": {
@@ -247,7 +247,6 @@ async def update_lesson(
                     "semesters.$[i].lessons.$[j].absence_limit": lesson[
                         "absence_limit"
                     ],
-                    "semesters.$[i].lessons.$[j].slots": lesson["slots"],
                 }
             },
             array_filters=[{"i._id": sid}, {"j._id": lid}],
@@ -302,117 +301,6 @@ async def delete_lesson(
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"message": "Lesson not found"},
-        )
-
-    return JSONResponse(
-        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
-    )
-
-
-@router.post(
-    "/{uid}/semesters/{sid}/lessons/{lid}/absences",
-    response_description="Add absence into a lesson",
-    operation_id="createAbsence",
-    response_model=Message,
-    responses={
-        201: {"model": Message},
-        400: {"model": Message},
-        401: {"model": Message},
-        403: {"model": Message},
-        404: {"model": Message},
-    },
-)
-async def create_absence(
-    uid: str,
-    sid: str,
-    lid: str,
-    request: Request,
-    absence: LessonAbsenceModel = Body(...),
-    auth_user: UserModel = Depends(get_current_user),
-):
-    """Create an absence for a lesson with given userID, semesterID and lessonID"""
-
-    absence = absence.json(models_as_dict=False)
-    absence = json.loads(absence.replace("\\", ""))
-
-    if auth_user["_id"] == uid:
-        if (
-            await request.app.mongodb["users"].find_one(
-                {
-                    "_id": uid,
-                    "semesters._id": sid,
-                    "semesters.lessons._id": lid,
-                    "semesters.lessons.absences": absence["absence"],
-                }
-            )
-        ) is not None:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"message": "Absence already exists"},
-            )
-
-        update_result = await request.app.mongodb["users"].update_one(
-            {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid,},
-            {"$push": {"semesters.$[i].lessons.$[j].absences": absence["absence"],}},
-            array_filters=[{"i._id": sid}, {"j._id": lid}],
-        )
-
-        if update_result.modified_count == 1:
-            return JSONResponse(
-                status_code=status.HTTP_201_CREATED,
-                content={"message": "Absence created"},
-            )
-
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Absence could not be created"},
-        )
-
-    return JSONResponse(
-        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
-    )
-
-
-@router.delete(
-    "/{uid}/semesters/{sid}/lessons/{lid}/absences",
-    response_description="Delete absence into a lesson",
-    operation_id="deleteAbsence",
-    response_model=Message,
-    responses={
-        404: {"model": Message},
-        403: {"model": Message},
-        401: {"model": Message},
-        400: {"model": Message},
-    },
-)
-async def delete_absence(
-    uid: str,
-    sid: str,
-    lid: str,
-    request: Request,
-    absence: LessonAbsenceModel = Body(...),
-    auth_user: UserModel = Depends(get_current_user),
-):
-    """Delete an absence from a lesson with given userID, semesterID and lessonID"""
-
-    absence = absence.json(models_as_dict=False)
-    absence = json.loads(absence.replace("\\", ""))
-
-    if auth_user["_id"] == uid:
-        update_result = await request.app.mongodb["users"].update_one(
-            {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid,},
-            {"$pull": {"semesters.$[i].lessons.$[j].absences": absence["absence"]}},
-            array_filters=[{"i._id": sid}, {"j._id": lid}],
-        )
-
-        if update_result.modified_count == 1:
-            return JSONResponse(
-                status_code=status.HTTP_200_OK, content={"message": "Absence deleted"},
-            )
-
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Absence not found"},
         )
 
     return JSONResponse(
