@@ -40,10 +40,26 @@ async def create_lesson(
 ):
     """Create a lessons for a semester with given userID, semesterID"""
 
-    lesson = lesson.json(by_alias=True, models_as_dict=False)
-    lesson = json.loads(lesson.replace("\\", ""))
-
     if auth_user["_id"] == uid:
+
+        lesson = jsonable_encoder(lesson)
+
+        if (
+            await (
+                request.app.mongodb["users"].find(
+                    {
+                        "_id": uid,
+                        "semesters._id": sid,
+                        "semesters.lessons": {"$elemMatch": {"code": lesson["code"]}},
+                    }
+                )
+            ).to_list(length=None)
+        ) != []:
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"message": "Given lesson code already exists"},
+            )
+
         update_result = await request.app.mongodb["users"].update_one(
             {"_id": uid, "semesters._id": sid},
             {"$push": {"semesters.$.lessons": lesson}},
@@ -142,11 +158,7 @@ async def show_lesson(
                         {"$unwind": "$semesters"},
                         {"$match": {"semesters._id": sid}},
                         {"$unwind": "$semesters.lessons"},
-                        {
-                            "$match": {
-                                "semesters.lessons._id": lid,
-                            }
-                        },
+                        {"$match": {"semesters.lessons._id": lid,}},
                     ]
                 )
                 .to_list(length=None)
@@ -185,21 +197,56 @@ async def update_lesson(
 ):
     """Update a lesson with given userID, semesterID and lessonID"""
 
-    lesson = lesson.json(by_alias=True, models_as_dict=False)
-    lesson = json.loads(lesson.replace("\\", ""))
-
     if auth_user["_id"] == uid:
+        lesson = jsonable_encoder(lesson)
+
+        if (
+            await (
+                request.app.mongodb["users"]
+                .find(
+                    {
+                        "_id": uid,
+                        "semesters._id": sid,
+                        "semesters.lessons": {
+                            "$elemMatch": {"_id": lid, "code": lesson["code"]}
+                        },
+                    }
+                )
+                .to_list(length=None)
+            )
+            == []
+            and (
+                await request.app.mongodb["users"]
+                .find(
+                    {
+                        "_id": uid,
+                        "semesters._id": sid,
+                        "semesters.lessons": {"$elemMatch": {"code": lesson["code"]}},
+                    }
+                )
+                .to_list(length=None)
+            )
+            != []
+        ):
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={
+                    "message": "Given lesson code already exists or lesson not found"
+                },
+            )
+
         update_result = await request.app.mongodb["users"].update_many(
-            {
-                "_id": uid,
-                "semesters._id": sid,
-                "semesters.lessons._id": lid,
-            },
+            {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid,},
             {
                 "$set": {
                     "semesters.$[i].lessons.$[j].name": lesson["name"],
+                    "semesters.$[i].lessons.$[j].code": lesson["code"],
                     "semesters.$[i].lessons.$[j].instructor": lesson["instructor"],
-                    "semesters.$[i].lessons.$[j].absenceLimit": lesson["absenceLimit"],
+                    "semesters.$[i].lessons.$[j].ects": lesson["ects"],
+                    "semesters.$[i].lessons.$[j].grade": lesson["grade"],
+                    "semesters.$[i].lessons.$[j].absence_limit": lesson[
+                        "absence_limit"
+                    ],
                     "semesters.$[i].lessons.$[j].slots": lesson["slots"],
                 }
             },
@@ -208,8 +255,7 @@ async def update_lesson(
 
         if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"message": "Lesson updated"},
+                status_code=status.HTTP_200_OK, content={"message": "Lesson updated"},
             )
 
         return JSONResponse(
@@ -250,8 +296,7 @@ async def delete_lesson(
 
         if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"message": "Lesson deleted"},
+                status_code=status.HTTP_200_OK, content={"message": "Lesson deleted"},
             )
 
         return JSONResponse(
@@ -307,16 +352,8 @@ async def create_absence(
             )
 
         update_result = await request.app.mongodb["users"].update_one(
-            {
-                "_id": uid,
-                "semesters._id": sid,
-                "semesters.lessons._id": lid,
-            },
-            {
-                "$push": {
-                    "semesters.$[i].lessons.$[j].absences": absence["absence"],
-                }
-            },
+            {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid,},
+            {"$push": {"semesters.$[i].lessons.$[j].absences": absence["absence"],}},
             array_filters=[{"i._id": sid}, {"j._id": lid}],
         )
 
@@ -363,19 +400,14 @@ async def delete_absence(
 
     if auth_user["_id"] == uid:
         update_result = await request.app.mongodb["users"].update_one(
-            {
-                "_id": uid,
-                "semesters._id": sid,
-                "semesters.lessons._id": lid,
-            },
+            {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid,},
             {"$pull": {"semesters.$[i].lessons.$[j].absences": absence["absence"]}},
             array_filters=[{"i._id": sid}, {"j._id": lid}],
         )
 
         if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"message": "Absence deleted"},
+                status_code=status.HTTP_200_OK, content={"message": "Absence deleted"},
             )
 
         return JSONResponse(
