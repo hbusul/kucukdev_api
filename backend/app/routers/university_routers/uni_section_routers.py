@@ -66,11 +66,38 @@ async def create_lesson_section(
 
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid, "semesters._id": unisid, "semesters.lessons._id": unilid,},
-            {"$push": {"semesters.$[i].lessons.$[j].sections": new_section}},
+            {
+                "$push": {
+                    "semesters.$[i].lessons.$[j].sections": {
+                        "$each": [new_section],
+                        "$sort": {"number": 1},
+                    }
+                }
+            },
             array_filters=[{"i._id": unisid}, {"j._id": unilid},],
         )
 
         if update_result.modified_count == 1:
+            await request.app.mongodb["universities"].update_one(
+                {
+                    "_id": unid,
+                    "semesters._id": unisid,
+                    "semesters.lessons._id": unilid,
+                },
+                {
+                    "$push": {
+                        "semesters.$[i].lessons.$[j].sections.$[k].slots": {
+                            "$each": [],
+                            "$sort": {"day": 1, "hour": 1},
+                        },
+                    },
+                },
+                array_filters=[
+                    {"i._id": unisid},
+                    {"j._id": unilid},
+                    {"k._id": new_section["_id"]},
+                ],
+            )
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
                 content=jsonable_encoder(
@@ -206,6 +233,38 @@ async def update_lesson_section(
         )
 
         if update_result.modified_count == 1:
+            await request.app.mongodb["universities"].update_one(
+                {
+                    "_id": unid,
+                    "semesters._id": unisid,
+                    "semesters.lessons._id": unilid,
+                },
+                {
+                    "$push": {
+                        "semesters.$[i].lessons.$[j].sections": {
+                            "$each": [],
+                            "$sort": {"number": 1},
+                        },
+                    },
+                },
+                array_filters=[{"i._id": unisid}, {"j._id": unilid}],
+            )
+            await request.app.mongodb["universities"].update_one(
+                {
+                    "_id": unid,
+                    "semesters._id": unisid,
+                    "semesters.lessons._id": unilid,
+                },
+                {
+                    "$push": {
+                        "semesters.$[i].lessons.$[j].sections.$[k].slots": {
+                            "$each": [],
+                            "$sort": {"day": 1, "hour": 1},
+                        },
+                    },
+                },
+                array_filters=[{"i._id": unisid}, {"j._id": unilid}, {"k._id": secid},],
+            )
             return JSONResponse(
                 status_code=status.HTTP_200_OK,
                 content={"message": "University lesson section updated"},
