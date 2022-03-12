@@ -1,13 +1,12 @@
-from typing import Optional, List
-from pydantic import BaseModel, Field
-from datetime import datetime
+from typing import List, Optional
+
 from bson import ObjectId
+from pydantic import BaseModel, Field
 
 from .PyObjectId import PyObjectId
 
 
 class UniversitySlotModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     room: str = Field(max_length=100)
     day: int = Field(..., ge=0, le=4)
     hour: int = Field(..., ge=0, le=15)
@@ -24,7 +23,7 @@ class UniversitySectionModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     number: int = Field(..., ge=0)
     instructor: str = Field(..., min_length=1, max_length=127)
-    slots: List[UniversitySlotModel] = Field()
+    slots: List[UniversitySlotModel] = []
 
     class Config:
         allow_population_by_field_name = True
@@ -55,20 +54,8 @@ class UniversitySectionAPIModel(BaseModel):
                 "number": 1,
                 "instructor": "Jack Joe",
                 "slots": [
-                    {
-                        "_id": "61ddea901311ecaed99afb7c",
-                        "room": "F0D01",
-                        "day": 2,
-                        "hour": 7,
-                        "is_lab": 0,
-                    },
-                    {
-                        "_id": "61ddea901311ecaed99afb7d",
-                        "room": "F0D01",
-                        "day": 2,
-                        "hour": 8,
-                        "is_lab": 0,
-                    },
+                    {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0,},
+                    {"room": "F0D01", "day": 2, "hour": 8, "is_lab": 0,},
                 ],
             }
         }
@@ -121,20 +108,8 @@ class UniversityLessonAPIModel(BaseModel):
                         "number": 1,
                         "instructor": "Jack Joe",
                         "slots": [
-                            {
-                                "_id": "61ddea901311ecaed99afb7c",
-                                "room": "F0D01",
-                                "day": 2,
-                                "hour": 7,
-                                "is_lab": 0,
-                            },
-                            {
-                                "_id": "61ddea901311ecaed99afb7d",
-                                "room": "F0D01",
-                                "day": 2,
-                                "hour": 8,
-                                "is_lab": 0,
-                            },
+                            {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0,},
+                            {"room": "F0D01", "day": 2, "hour": 8, "is_lab": 0,},
                         ],
                     }
                 ],
