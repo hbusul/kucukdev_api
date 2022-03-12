@@ -1,3 +1,4 @@
+import json
 from typing import List
 
 from app.routers.user_routers.user_routers import update_current_semester
@@ -40,20 +41,8 @@ async def create_semester(
 ):
     """Create a semester for a user with given userID"""
 
-    semester = jsonable_encoder(semester)
-
-    resStartHour = semester["startHour"].split(".")
-    if (
-        len(resStartHour) != 2
-        or int(resStartHour[0]) < 0
-        or int(resStartHour[0]) > 23
-        or int(resStartHour[1]) < 0
-        or int(resStartHour[1]) > 59
-    ):
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid start hour"},
-        )
+    semester = semester.json(by_alias=True, models_as_dict=False)
+    semester = json.loads(semester.replace("\\", ""))
 
     if auth_user["_id"] == uid:
         update_result = await request.app.mongodb["users"].update_one(
@@ -103,12 +92,7 @@ async def list_semesters(
     """list all semesters of a user with given userID"""
 
     if auth_user["_id"] == uid:
-        semesters = []
-        for semester in auth_user["semesters"]:
-            semester.pop("lessons")
-            semesters.append(semester)
-
-        return semesters
+        return auth_user["semesters"]
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -135,9 +119,20 @@ async def show_semester(
     """Get a single semester with given userID and semesterID"""
 
     if auth_user["_id"] == uid:
-        for semester in auth_user["semesters"]:
-            if semester["_id"] == sid:
-                return semester
+        if (
+            user := (
+                await request.app.mongodb["users"]
+                .aggregate(
+                    [
+                        {"$match": {"_id": uid}},
+                        {"$unwind": "$semesters"},
+                        {"$match": {"semesters._id": sid}},
+                    ]
+                )
+                .to_list(length=None)
+            )
+        ) :
+            return user[0]["semesters"]
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -169,53 +164,33 @@ async def update_semester(
 ):
     """Update a semester with given userID and semesterID"""
 
-    semester = {k: v for k, v in semester.dict().items() if v is not None}
-    semester = jsonable_encoder(semester)
-
-    resStartHour = semester["startHour"].split(".")
-    if (
-        len(resStartHour) != 2
-        or int(resStartHour[0]) < 0
-        or int(resStartHour[0]) > 23
-        or int(resStartHour[1]) < 0
-        or int(resStartHour[1]) > 59
-    ):
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid start hour"},
-        )
+    semester = semester.json(by_alias=True, models_as_dict=False)
+    semester = json.loads(semester.replace("\\", ""))
 
     if auth_user["_id"] == uid:
-        if len(semester) >= 1:
-            update_result = await request.app.mongodb["users"].update_many(
-                {"_id": uid, "semesters._id": sid},
-                {
-                    "$set": {
-                        "semesters.$.name": semester["name"],
-                        "semesters.$.startDate": semester["startDate"],
-                        "semesters.$.endDate": semester["endDate"],
-                        "semesters.$.startHour": semester["startHour"],
-                        "semesters.$.dLesson": semester["dLesson"],
-                        "semesters.$.dBreak": semester["dBreak"],
-                        "semesters.$.slotCount": semester["slotCount"],
-                    }
-                },
-            )
+        update_result = await request.app.mongodb["users"].update_many(
+            {"_id": uid, "semesters._id": sid},
+            {
+                "$set": {
+                    "semesters.$.name": semester["name"],
+                    "semesters.$.start_date": semester["start_date"],
+                    "semesters.$.end_date": semester["end_date"],
+                    "semesters.$.start_hour": semester["start_hour"],
+                    "semesters.$.duration_lesson": semester["duration_lesson"],
+                    "semesters.$.duration_break": semester["duration_break"],
+                    "semesters.$.slot_count": semester["slot_count"],
+                }
+            },
+        )
 
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "Semester updated"},
-                )
-
+        if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "Semester couldn't be updated"},
+                status_code=status.HTTP_200_OK, content={"message": "Semester updated"},
             )
 
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid input"},
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Semester couldn't be updated"},
         )
 
     return JSONResponse(

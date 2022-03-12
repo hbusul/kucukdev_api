@@ -1,7 +1,8 @@
-from typing import Optional, List
-from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
+from typing import List, Optional
+
 from bson import ObjectId
+from pydantic import BaseModel, EmailStr, Field
 
 from .PyObjectId import PyObjectId
 
@@ -108,9 +109,6 @@ class UpdateLessonModel(BaseModel):
     slots: List[SlotModel] = Field(...)
 
     class Config:
-        json_encoders = {
-            SlotModel: lambda x: [x.day, x.hour, x.isLab],
-        }
         schema_extra = {
             "example": {
                 "name": "Algebra",
@@ -127,12 +125,20 @@ class UpdateLessonModel(BaseModel):
         }
 
 
+class StartHourModel(BaseModel):
+    hour: int = Field(..., ge=0, le=23)
+    minute: int = Field(..., ge=0, le=59)
+
+    class Confid:
+        schema_extra = {"example": {"hour": 8, "minute": 20}}
+
+
 class UserSemesterModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     start_date: datetime = Field(...)
     end_date: datetime = Field(...)
-    start_hour: str = Field(...)
+    start_hour: StartHourModel = Field(...)
     duration_lesson: int = Field(..., gt=0)
     duration_break: int = Field(..., gt=0)
     slot_count: int = Field(..., gt=3, lt=16)
@@ -141,13 +147,16 @@ class UserSemesterModel(BaseModel):
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+        json_encoders = {
+            ObjectId: str,
+            StartHourModel: lambda x: [x.hour, x.minute],
+        }
         schema_extra = {
             "example": {
                 "name": "2020-21 Spring",
                 "start_date": "2022-02-18T00:00:00Z",
                 "end_date": "2022-06-18T00:00:00Z",
-                "start_hour": "8.10",
+                "start_hour": {"hour": 8, "minute": 20},
                 "duration_lesson": 50,
                 "duration_break": 10,
                 "slot_count": 12,
@@ -159,19 +168,22 @@ class UpdateUserSemesterModel(BaseModel):
     name: str = Field(...)
     start_date: datetime = Field(...)
     end_date: datetime = Field(...)
-    start_hour: str = Field(...)
+    start_hour: StartHourModel = Field(...)
     duration_lesson: int = Field(..., gt=0)
     duration_break: int = Field(..., gt=0)
     slot_count: int = Field(..., gt=3, lt=16)
 
     class Config:
-        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {
+            StartHourModel: lambda x: [x.hour, x.minute],
+        }
         schema_extra = {
             "example": {
                 "name": "2020-21 Spring",
                 "start_date": "2022-02-18T00:00:00Z",
                 "end_date": "2022-06-18T00:00:00Z",
-                "start_hour": "8.10",
+                "start_hour": {"hour": 8, "minute": 20},
                 "duration_lesson": 50,
                 "duration_break": 10,
                 "slot_count": 12,
@@ -184,7 +196,7 @@ class SemesterAPIModel(BaseModel):
     name: Optional[str]
     start_date: Optional[datetime]
     end_date: Optional[datetime]
-    start_hour: Optional[str]
+    start_hour: Optional[List[int]]
     duration_lesson: Optional[int]
     duration_break: Optional[int]
     slot_count: Optional[int]
@@ -197,7 +209,7 @@ class SemesterAPIModel(BaseModel):
                 "name": "2020-21 Spring",
                 "start_date": "2022-02-18T00:00:00Z",
                 "end_date": "2022-06-18T00:00:00Z",
-                "start_hour": "8.10",
+                "start_hour": [8, 20],
                 "duration_lesson": 50,
                 "duration_break": 10,
                 "slot_count": 12,
