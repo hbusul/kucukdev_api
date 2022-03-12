@@ -19,7 +19,7 @@ jobs:
     - name: Build Kucukdev backend image
       run: docker build ./backend --tag kucukdev_api_backend:latest
     - name: Start backend
-      run: docker run --env SECRET_KEY=SOMESECRETKEY --env DB_NAME=stg --env DB_URL=stg --network host -d kucukdev_api_backend && sleep 5
+      run: docker run --env AUTH_SECRET_KEY=SOMESECRETKEY --env DB_NAME=stg --env DB_URL=stg --network host -d kucukdev_api_backend && sleep 5
     - name: Download openapi.json
       run: wget -O openapi.json localhost:8000/openapi.json
     - uses: stefanzweifel/git-auto-commit-action@v4

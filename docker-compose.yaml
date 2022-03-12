@@ -32,6 +32,48 @@ services:
     ports:
       - "3000:3000"
 
+  auth_server:
+    image: quay.io/keycloak/keycloak:17.0.0
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_PASSWORD: fkAKA/+ZreOaWnck5PIqNC6rZKKcVf1vx+ZkD2ZhfpA= # development only
+      KC_DB_USERNAME: kc_user
+      KC_DB_URL_HOST: auth_database
+    command: ["start-dev"]
+    networks:
+      - app-network
+    ports:
+      - "8090:8080"
+
+  auth_server_init:
+    image: quay.io/keycloak/keycloak:17.0.0
+    environment:
+      KEYCLOAK_URL: http://auth_server:8080
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    restart: on-failure
+    entrypoint: ["/bin/sh"]
+    command: ["/tmp/init_keycloak.sh"]
+    volumes:
+      - "./init_keycloak.sh:/tmp/init_keycloak.sh"
+      - "./realm-export.json:/tmp/realm-export.json"
+    networks:
+      - app-network
+
+
+  auth_database:
+    image: postgres:10.20-alpine
+    environment:
+      POSTGRES_USER: kc_user
+      POSTGRES_PASSWORD: fkAKA/+ZreOaWnck5PIqNC6rZKKcVf1vx+ZkD2ZhfpA= # development only
+      POSTGRES_DB: keycloak
+    volumes:
+      - "auth-data:/var/lib/postgresql/data"
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
@@ -40,4 +82,4 @@ networks:
 volumes:
   node-modules:
   mongo-data:
-
+  auth-data:

@@ -50,7 +50,7 @@ async def startup_db_client():
     app.mongodb = app.mongodb_client[settings.DB_NAME]
     if settings.ADMIN_USERNAME is not None and settings.ADMIN_PASSWORD is not None:
         await create_admin_user(request=app.mongodb)
-    if settings.SECRET_KEY is None:
+    if settings.AUTH_SECRET_KEY is None:
         await control_secret_key(request=app.mongodb)
 
 
@@ -58,8 +58,10 @@ async def startup_db_client():
 async def shutdown_db_client():
     app.mongodb_client.close()
 
+if settings.AUTH_API_MANAGE_USERS:
+    # API can choose to accept login/signup requests
+    app.include_router(token_router, tags=["token"], prefix="/token")
 
-app.include_router(token_router, tags=["token"], prefix="/token")
 app.include_router(user_router, tags=["users"], prefix="/users")
 app.include_router(semester_router, tags=["semesters"], prefix="/users")
 app.include_router(lesson_router, tags=["lessons"], prefix="/users")

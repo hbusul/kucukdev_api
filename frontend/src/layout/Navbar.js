@@ -1,15 +1,64 @@
-import { useState, useContext } from "react"
+import { useState, useContext, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { UserContext } from "../Context"
+import { useAuth } from 'react-oauth2-pkce'
+import jwtDecode from 'jwt-decode'
+
+var Kucukdevapi = require("kucukdevapi")
 
 const Navbar = () => {
     const [login, setLogin] = useContext(UserContext)
 
     const [isVisible, setIsVisible] = useState(false)
+    const { authService } = useAuth();
 
-    const onLogoutUser = () => {
-        setLogin(false)
-    }
+    const authLogin = async () => authService.authorize();
+    const authLogout = async () => authService.logout(true);
+    //const jwtPayload = jwtDecode(authService.getAuthTokens().id_token);
+
+    useEffect(() => {
+        if (login && authService.isAuthenticated()) {
+            console.log('case 1')
+            //OK
+        } else if (login && !authService.isAuthenticated()) {
+            //We need to set login to false
+            setLogin(false);
+            console.log('case 2')
+        } else if (!login && authService.isAuthenticated()) {
+            //We need to set login
+            console.log('case 3')
+            const token = authService.getAuthTokens().access_token
+
+            let defaultClient = Kucukdevapi.ApiClient.instance
+            let OAuth2PasswordBearer =
+                defaultClient.authentications["OAuth2PasswordBearer"]
+            OAuth2PasswordBearer.accessToken = token
+
+            let apiInstance = new Kucukdevapi.UsersApi()
+            apiInstance.getCurrentUser((error, data, response) => {
+                if (error) {
+                    console.error(error)
+                } else {
+                    console.log(
+                        "API called successfully. Returned data: " +
+                        response.body
+                    )
+                    setLogin({
+                        userToken: token,
+                        userID: data._id,
+                        userGroup: data.userGroup,
+                        semesterID: data.curSemesterID,
+                        universityID: data.curUniversityID,
+                    })
+                }
+            })
+        } else { // !login && !authService.isAuthenticated()
+            console.log('case 4')
+
+            //OK
+        }
+    }, [authService, login, setLogin]);
+
 
     return (
         <nav className="bg-white md:h-28 shadow">
@@ -85,9 +134,8 @@ const Navbar = () => {
                             </Link>
                             <Link
                                 to="/professor-panel"
-                                className={`text-gray-800 text-md font-semibold hover:text-blue-600 mr-3 lg:mr-6 ${
-                                    login.userGroup !== "professor" && "hidden"
-                                }`}
+                                className={`text-gray-800 text-md font-semibold hover:text-blue-600 mr-3 lg:mr-6 ${"professor!" !== "professor" && "hidden"
+                                    }`}
                             >
                                 Panel
                             </Link>
@@ -96,18 +144,10 @@ const Navbar = () => {
 
                     {!login ? (
                         <div className="hidden md:flex md:items-center">
-                            <Link
-                                to="/signin"
-                                className="text-gray-800 text-md font-semibold hover:text-blue-600 mr-4"
-                            >
-                                Sign in
-                            </Link>
-                            <Link
-                                to="/signup"
+                            <button onClick={authLogin} className="text-gray-800 text-md font-semibold hover:text-blue-600 mr-4">Sign in</button>
+                            <a
                                 className="text-gray-800 text-md font-semibold border px-4 py-2 rounded-md hover:text-blue-600 hover:border-blue-600"
-                            >
-                                Sign up
-                            </Link>
+                                href="http://localhost:8090/realms/kucukdev/protocol/openid-connect/registrations?client_id=web-ui&response_type=code&scope=openid email&redirect_uri=http%3A%2F%2Flocalhost%3A3000/signin">Sign up</a>
                         </div>
                     ) : (
                         <div className="hidden md:flex md:items-center">
@@ -119,7 +159,7 @@ const Navbar = () => {
                             </Link>
                             <Link
                                 to="/"
-                                onClick={onLogoutUser.bind()}
+                                onClick={authLogout}
                                 className="text-gray-800 text-md font-semibold border px-4 py-2 rounded-lg hover:text-blue-600 hover:border-blue-600"
                             >
                                 Logout
@@ -180,10 +220,9 @@ const Navbar = () => {
                                 </Link>
                                 <Link
                                     to="/professor-panel"
-                                    className={`text-gray-800 text-sm font-semibold hover:text-blue-600 mb-1 ${
-                                        login.userGroup !== "professor" &&
+                                    className={`text-gray-800 text-sm font-semibold hover:text-blue-600 mb-1 ${"professor!" !== "professor" &&
                                         "hidden"
-                                    }`}
+                                        }`}
                                 >
                                     Panel
                                 </Link>
@@ -191,12 +230,8 @@ const Navbar = () => {
                         ) : null}
                         {!login ? (
                             <div className="flex justify-between items-center border-t-2 pt-2 mx-4">
-                                <Link
-                                    to="/signin"
-                                    className="text-gray-800 text-sm font-semibold hover:text-blue-600 mr-4"
-                                >
-                                    Sign in
-                                </Link>
+                                <button onClick={authLogin} className="text-gray-800 text-md font-semibold hover:text-blue-600 mr-4">Sign in</button>
+                                <a href="http://localhost:8090/auth/realms/kucukdev/protocol/openid-connect/registrations?client_id=web-ui&response_type=code&scope=openid email&redirect_uri=http://localhost:3000/">Sign up</a>
                                 <Link
                                     to="/signup"
                                     className="text-gray-800 text-sm font-semibold border px-4 py-1 rounded-lg hover:text-blue-600 hover:border-blue-600"
@@ -214,7 +249,7 @@ const Navbar = () => {
                                 </Link>
                                 <Link
                                     to="/"
-                                    onClick={onLogoutUser.bind()}
+                                    onClick={authLogout}
                                     className="text-gray-800 text-sm font-semibold border px-4 py-1 rounded-lg hover:text-blue-600 hover:border-blue-600"
                                 >
                                     Logout
