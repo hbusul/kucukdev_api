@@ -151,6 +151,13 @@ class StartHourModel(BaseModel):
         schema_extra = {"example": {"hour": 8, "minute": 20}}
 
 
+class UpdateSemesterGPAModel(BaseModel):
+    semester_gpa: float = Field(ge=0, le=10)
+
+    class Config:
+        schema_extra = {"example": {"semester_gpa": 3.67}}
+
+
 class UserSemesterModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
@@ -160,6 +167,7 @@ class UserSemesterModel(BaseModel):
     duration_lesson: int = Field(..., gt=0)
     duration_break: int = Field(..., gt=0)
     slot_count: int = Field(..., gt=3, lt=16)
+    semester_gpa: float = Field(0.0, ge=0, le=10)
     lessons: List[LessonModel] = []
 
     class Config:
@@ -190,6 +198,7 @@ class UpdateUserSemesterModel(BaseModel):
     duration_lesson: int = Field(..., gt=0)
     duration_break: int = Field(..., gt=0)
     slot_count: int = Field(..., gt=3, lt=16)
+    semester_gpa: float = Field(..., ge=0, le=10)
 
     class Config:
         arbitrary_types_allowed = True
@@ -218,6 +227,7 @@ class SemesterAPIModel(BaseModel):
     duration_lesson: Optional[int]
     duration_break: Optional[int]
     slot_count: Optional[int]
+    semester_gpa: Optional[float]
 
     class Config:
         allow_population_by_field_name = True
@@ -231,6 +241,7 @@ class SemesterAPIModel(BaseModel):
                 "duration_lesson": 50,
                 "duration_break": 10,
                 "slot_count": 12,
+                "semester_gpa": 3.67,
             }
         }
 
@@ -238,8 +249,13 @@ class SemesterAPIModel(BaseModel):
 class UserModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     email: EmailStr = Field(...)
-    password: str = Field(...)
-    full_name: str = Field(...)
+    password: str = Field(..., max_length=32)
+    first_name: str = Field(..., max_length=32)
+    last_name: str = Field(..., max_length=32)
+    current_gpa: float = Field(3.67, ge=0, le=10.0)
+    current_semester_id: str = "null"
+    current_university_id: str = "null"
+    entrance_year: int = Field(2010, gt=2000)
     semesters: List[UserSemesterModel] = []
 
     class Config:
@@ -250,7 +266,8 @@ class UserModel(BaseModel):
             "example": {
                 "email": "hello@agu.edu.tr",
                 "password": "123456",
-                "full_name": "John Doe",
+                "first_name": "John",
+                "last_name": "Doe",
             }
         }
 
@@ -258,7 +275,8 @@ class UserModel(BaseModel):
 class UserAPIModel(BaseModel):
     id: Optional[str] = Field(alias="_id")
     email: Optional[EmailStr]
-    full_name: Optional[str]
+    first_name: Optional[str]
+    last_name: Optional[str]
     current_gpa: Optional[float]
     user_group: Optional[str]
     current_semester_id: Optional[str]
@@ -271,8 +289,9 @@ class UserAPIModel(BaseModel):
             "example": {
                 "_id": "61ddea901311ecaed99afb7c",
                 "email": "hello@agu.edu.tr",
-                "full_name": "John Doe",
-                "current_gpa": 4.0,
+                "first_name": "John",
+                "last_name": "Doe",
+                "current_gpa": 3.67,
                 "user_group": "default",
                 "current_semester_id": "61ddea901311ecaed99afb7d",
                 "current_university_id": "61ddea901311ecaed99afb7e",
@@ -282,10 +301,18 @@ class UserAPIModel(BaseModel):
 
 
 class UpdatePasswordModel(BaseModel):
-    password: str = Field(...)
+    password: str = Field(..., max_length=32)
 
     class Config:
-        schema_extra = {"example": {"password": "123456",}}
+        schema_extra = {"example": {"password": "123456"}}
+
+
+class UpdateUserNameModel(BaseModel):
+    first_name: str = Field(..., max_length=32)
+    last_name: str = Field(..., max_length=32)
+
+    class Config:
+        schema_extra = {"example": {"first_name": "John", "last_name": "Doe"}}
 
 
 class UpdateSemesterModel(BaseModel):
@@ -296,10 +323,10 @@ class UpdateSemesterModel(BaseModel):
 
 
 class UpdateEntranceYearModel(BaseModel):
-    entrance_year: int = Field(...)
+    entrance_year: int = Field(..., gt=2000)
 
     class Config:
-        schema_extra = {"example": {"entrance_year": 2018,}}
+        schema_extra = {"example": {"entrance_year": 2018}}
 
 
 class UpdateUniversityModel(BaseModel):
@@ -309,6 +336,20 @@ class UpdateUniversityModel(BaseModel):
         schema_extra = {
             "example": {"current_university_id": "61ddea901311ecaed99afb7g"}
         }
+
+
+class UpdateCurrentGPAModel(BaseModel):
+    current_gpa: float = Field(..., ge=0, le=10.0)
+
+    class Config:
+        schema_extra = {"example": {"current_gpa": 3.67}}
+
+
+class UpdateUserGroupModel(BaseModel):
+    user_group: str = Field(...)
+
+    class Config:
+        schema_extra = {"example": {"user_group": "professor",}}
 
 
 class MessageCreate(BaseModel):
