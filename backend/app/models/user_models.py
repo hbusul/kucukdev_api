@@ -249,7 +249,7 @@ class SemesterAPIModel(BaseModel):
 class UserModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     email: EmailStr = Field(...)
-    password: str = Field(..., max_length=32)
+    password: str = Field(...)
     first_name: str = Field(..., max_length=32)
     last_name: str = Field(..., max_length=32)
     current_gpa: float = Field(3.67, ge=0, le=10.0)
@@ -301,7 +301,7 @@ class UserAPIModel(BaseModel):
 
 
 class UpdatePasswordModel(BaseModel):
-    password: str = Field(..., max_length=32)
+    password: str = Field(...)
 
     class Config:
         schema_extra = {"example": {"password": "123456"}}

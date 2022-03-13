@@ -27,13 +27,13 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def create_admin_user(request: Request):
     if await request["users"].find_one({"email": settings.ADMIN_USERNAME}) is None:
         user = UserModel(
-            email=settings.ADMIN_USERNAME, password=bcrypt.hash(settings.ADMIN_PASSWORD)
+            email=settings.ADMIN_USERNAME,
+            password=bcrypt.hash(settings.ADMIN_PASSWORD),
+            first_name="Admin",
+            last_name="User",
         )
         user = jsonable_encoder(user)
         user["user_group"] = "admin"
-        user["current_semester_id"] = "null"
-        user["current_university_id"] = "null"
-        user["entrance_year"] = 0
         res = await request["users"].insert_one(user)
         if res.inserted_id is None:
             raise HTTPException(status_code=500, detail="Could not create admin user")
