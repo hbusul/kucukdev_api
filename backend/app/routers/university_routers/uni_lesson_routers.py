@@ -39,6 +39,20 @@ async def create_university_lesson(
     if auth_user["user_group"] == "professor":
         university_lesson = jsonable_encoder(university_lesson)
 
+        if (
+            await request.app.mongodb["universities"].find_one(
+                {
+                    "_id": unid,
+                    "semesters._id": unisid,
+                    "semesters.lessons.code": university_lesson["code"],
+                }
+            )
+        ) is not None:
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={"message": "Given lesson code already exists",},
+            )
+
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid, "semesters._id": unisid},
             {"$push": {"semesters.$.lessons": university_lesson}},
