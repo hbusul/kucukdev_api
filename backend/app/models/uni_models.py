@@ -204,10 +204,12 @@ class UniversityDepartmentModel(BaseModel):
 class UniversityModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(..., min_length=2, max_length=100)
-    domain: str = Field(..., min_length=5, max_length=100)
+    website: str = Field(..., min_length=5, max_length=255)
     country: str = Field(..., min_length=2, max_length=100)
     city: str = Field(..., min_length=2, max_length=100)
     address: str = Field(..., min_length=2, max_length=100)
+    phone: str = Field(..., min_length=2, max_length=100)
+    email: str = Field(..., min_length=2, max_length=100)
     zip_code: str = Field(..., min_length=2, max_length=100)
     description: str = Field(..., max_length=255)
     logo: str = Field(..., max_length=255)
@@ -222,10 +224,12 @@ class UniversityModel(BaseModel):
         schema_extra = {
             "example": {
                 "name": "Test University",
-                "domain": "test.com",
+                "website": "test.com",
                 "country": "USA",
                 "city": "Los Angeles",
                 "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
                 "zip_code": "90210",
                 "description": "Test University Description",
                 "logo": "test_logo.png",
@@ -237,10 +241,12 @@ class UniversityModel(BaseModel):
 class UniversityAPIModel(BaseModel):
     id: Optional[str] = Field(alias="_id")
     name: Optional[str]
-    domain: Optional[str]
+    website: Optional[str]
     country: Optional[str]
     city: Optional[str]
     address: Optional[str]
+    phone: Optional[str]
+    email: Optional[str]
     zip_code: Optional[str]
     description: Optional[str]
     logo: Optional[str]
@@ -249,16 +255,16 @@ class UniversityAPIModel(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "_id": "61fc266ae3d749b1d65c17c6",
                 "name": "Test University",
-                "domain": "test.com",
+                "website": "test.com",
                 "country": "USA",
                 "city": "Los Angeles",
                 "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
                 "zip_code": "90210",
                 "description": "Test University Description",
                 "logo": "test_logo.png",
@@ -268,9 +274,39 @@ class UniversityAPIModel(BaseModel):
         }
 
 
-class UpdateUniversityNameModel(BaseModel):
-    name: str = Field(...)
+class UpdateUniversityModel(BaseModel):
+    name: str = Field(..., min_length=2, max_length=100)
+    website: str = Field(..., min_length=5, max_length=255)
+    country: str = Field(..., min_length=2, max_length=100)
+    city: str = Field(..., min_length=2, max_length=100)
+    address: str = Field(..., min_length=2, max_length=100)
+    phone: str = Field(..., min_length=2, max_length=100)
+    email: str = Field(..., min_length=2, max_length=100)
+    zip_code: str = Field(..., min_length=2, max_length=100)
+    description: str = Field(..., max_length=255)
+    logo: str = Field(..., max_length=255)
+    cover_photo: str = Field(..., max_length=255)
 
     class Config:
-        schema_extra = {"example": {"name": "AGU",}}
+        schema_extra = {
+            "example": {
+                "name": "Test University",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+            }
+        }
 
+
+class UpdateCurrentSemesterModel(BaseModel):
+    current_semester_id: str = Field(...)
+
+    class Config:
+        schema_extra = {"example": {"current_semester_id": "61ddea901311ecaed99afb7f"}}
