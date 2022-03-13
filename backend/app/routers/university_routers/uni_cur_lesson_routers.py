@@ -279,8 +279,8 @@ async def update_curriculum_lesson(
                     "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].code": curriculum_lesson[
                         "code"
                     ],
-                    "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].lessonType": curriculum_lesson[
-                        "lessonType"
+                    "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].lesson_type": curriculum_lesson[
+                        "lesson_type"
                     ],
                 }
             },

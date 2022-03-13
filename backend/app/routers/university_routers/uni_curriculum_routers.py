@@ -153,9 +153,7 @@ async def update_department_curriculum(
     """Update department of a university with given universityID, universityDepartmentID and departmentCurriculumID"""
 
     if auth_user["user_group"] == "professor":
-        department_curriculum = {
-            k: v for k, v in department_curriculum.dict().items() if v is not None
-        }
+        department_curriculum = jsonable_encoder(department_curriculum)
 
         if (
             result := await request.app.mongodb["universities"].find_one(
@@ -186,38 +184,37 @@ async def update_department_curriculum(
                     },
                 )
 
-        if len(department_curriculum) >= 1:
-            update_result = await request.app.mongodb["universities"].update_many(
-                {
-                    "_id": unid,
-                    "departments._id": depid,
-                    "departments.curriculums._id": curid,
-                },
-                {
-                    "$set": {
-                        "departments.$[i].curriculums.$[j].name": department_curriculum[
-                            "name"
-                        ],
-                        "departments.$[i].curriculums.$[j].startYear": department_curriculum[
-                            "startYear"
-                        ],
-                        "departments.$[i].curriculums.$[j].endYear": department_curriculum[
-                            "endYear"
-                        ],
-                    }
-                },
-                array_filters=[{"i._id": depid}, {"j._id": curid}],
-            )
+        update_result = await request.app.mongodb["universities"].update_many(
+            {
+                "_id": unid,
+                "departments._id": depid,
+                "departments.curriculums._id": curid,
+            },
+            {
+                "$set": {
+                    "departments.$[i].curriculums.$[j].name": department_curriculum[
+                        "name"
+                    ],
+                    "departments.$[i].curriculums.$[j].start_year": department_curriculum[
+                        "start_year"
+                    ],
+                    "departments.$[i].curriculums.$[j].end_year": department_curriculum[
+                        "end_year"
+                    ],
+                }
+            },
+            array_filters=[{"i._id": depid}, {"j._id": curid}],
+        )
 
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "Curriculum updated"},
-                )
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "Curriculum updated"},
+            )
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Curriculum name cannot be empty"},
+            content={"message": "Curriculum could not be updated"},
         )
 
     return JSONResponse(

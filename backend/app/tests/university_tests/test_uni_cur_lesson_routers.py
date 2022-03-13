@@ -28,7 +28,12 @@ with TestClient(app) as client:
     def test_prepare_test_data():
         admin_token = login_admin_user(client, settings)
         test_user.user_id, test_user.token = create_professor_and_login(
-            client, admin_token, "professor_uni_cur_lesson_routers@test.com", "test"
+            client,
+            admin_token,
+            "professor_uni_cur_lesson_routers@test.com",
+            "test",
+            "professor_first_name",
+            "professor_last_name",
         )
         test_user.university_id = create_university(
             client, test_user.token, "Test University for Uni Cur Lesson Routers"
@@ -56,7 +61,11 @@ with TestClient(app) as client:
         )
 
         default_user.user_id, default_user.token = create_user_and_login(
-            client, "default_user_uni_cur@test.com", "test"
+            client,
+            "default_user_uni_cur@test.com",
+            "test",
+            "default_first_name",
+            "default_last_name",
         )
 
     def test_create_curriculum_lesson():
@@ -68,7 +77,7 @@ with TestClient(app) as client:
             json={
                 "name": "Test Curriculum Lesson",
                 "code": "TEST_CUR_LESSON",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         )
 
@@ -89,7 +98,7 @@ with TestClient(app) as client:
             "_id": test_user.curriculum_lesson_id,
             "name": "Test Curriculum Lesson",
             "code": "TEST_CUR_LESSON",
-            "lessonType": "default",
+            "lesson_type": "default",
         }
 
     def test_get_curriculum_lesson_with_default_user():
@@ -105,7 +114,7 @@ with TestClient(app) as client:
             "_id": test_user.curriculum_lesson_id,
             "name": "Test Curriculum Lesson",
             "code": "TEST_CUR_LESSON",
-            "lessonType": "default",
+            "lesson_type": "default",
         }
 
     def test_get_curriculum_lesson_with_invalid_lesson_id():
@@ -128,7 +137,7 @@ with TestClient(app) as client:
             json={
                 "name": "Test Curriculum Lesson",
                 "code": "TEST_CUR_LESSON",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         )
 
@@ -145,7 +154,7 @@ with TestClient(app) as client:
             json={
                 "name": "Test Curriculum Lesson",
                 "code": "TEST_CUR_LESSON",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         )
 
@@ -162,7 +171,7 @@ with TestClient(app) as client:
             json={
                 "name": "Test Curriculum Lesson",
                 "code": "TEST_CUR_LESSON",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         )
 
@@ -178,7 +187,7 @@ with TestClient(app) as client:
             json={
                 "name": "Test Curriculum Lesson",
                 "code": "TEST_CUR_LESSON",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         )
 
@@ -199,7 +208,7 @@ with TestClient(app) as client:
                 "_id": test_user.curriculum_lesson_id,
                 "name": "Test Curriculum Lesson",
                 "code": "TEST_CUR_LESSON",
-                "lessonType": "default",
+                "lesson_type": "default",
             }
         ]
 
@@ -217,7 +226,7 @@ with TestClient(app) as client:
                 "_id": test_user.curriculum_lesson_id,
                 "name": "Test Curriculum Lesson",
                 "code": "TEST_CUR_LESSON",
-                "lessonType": "default",
+                "lesson_type": "default",
             }
         ]
 
@@ -254,7 +263,7 @@ with TestClient(app) as client:
             json={
                 "name": "Test Curriculum Lesson Updated",
                 "code": "TEST_CUR_LESSON",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         )
 
@@ -270,7 +279,7 @@ with TestClient(app) as client:
             json={
                 "name": "Test Curriculum Lesson 2",
                 "code": "TEST_CUR_LESSON_2",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         )
 
@@ -292,13 +301,13 @@ with TestClient(app) as client:
                 "_id": test_user.curriculum_lesson_id,
                 "name": "Test Curriculum Lesson Updated",
                 "code": "TEST_CUR_LESSON",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
             {
                 "_id": test_user.second_curriculum_lesson_id,
                 "name": "Test Curriculum Lesson 2",
                 "code": "TEST_CUR_LESSON_2",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         ]
 
@@ -312,7 +321,7 @@ with TestClient(app) as client:
             json={
                 "name": "Test Curriculum Lesson Updated 3",
                 "code": "TEST_CUR_LESSON_3",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         )
 
@@ -331,7 +340,7 @@ with TestClient(app) as client:
             json={
                 "name": "Test Curriculum Lesson Updated 4",
                 "code": "TEST_CUR_LESSON_2",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         )
 
@@ -350,7 +359,7 @@ with TestClient(app) as client:
             json={
                 "name": "Test Curriculum Lesson Updated",
                 "code": "TEST_CUR_LESSON",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         )
 
@@ -369,7 +378,7 @@ with TestClient(app) as client:
             json={
                 "name": "Test Curriculum Lesson Updated",
                 "code": "TEST_CUR_LESSON_4",
-                "lessonType": "default",
+                "lesson_type": "default",
             },
         )
 

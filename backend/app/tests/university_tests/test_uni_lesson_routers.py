@@ -1,10 +1,10 @@
 from app.main import app, settings
 from app.tests.create_requirements import (
     create_professor_and_login,
-    create_user_and_login,
-    login_admin_user,
     create_university,
     create_university_semester,
+    create_user_and_login,
+    login_admin_user,
 )
 from fastapi.testclient import TestClient
 
@@ -16,8 +16,6 @@ with TestClient(app) as client:
         university_id = None
         semester_id = None
         lesson_id = None
-        section_id = None
-        second_section_id = None
 
     test_user = TestUser()
     default_user = TestUser()
@@ -25,7 +23,12 @@ with TestClient(app) as client:
     def test_prepare_test_data():
         admin_token = login_admin_user(client, settings)
         test_user.user_id, test_user.token = create_professor_and_login(
-            client, admin_token, "professor_uni_lesson_routers@test.com", "test"
+            client,
+            admin_token,
+            "professor_uni_lesson_routers@test.com",
+            "test",
+            "professor_first_name",
+            "professor_last_name",
         )
         test_user.university_id = create_university(
             client, test_user.token, "Test University for Uni Lesson Routers"
@@ -39,7 +42,11 @@ with TestClient(app) as client:
         )
 
         default_user.user_id, default_user.token = create_user_and_login(
-            client, "default_user_uni_lesson@test.com", "test"
+            client,
+            "default_user_uni_lesson@test.com",
+            "test",
+            "default_first_name",
+            "default_last_name",
         )
 
     def test_create_university_lesson():
@@ -52,15 +59,10 @@ with TestClient(app) as client:
                 "name": "Test University Lesson",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
-                "section": "01",
-                "instructor": "Test University Instructor",
-                "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
-                ],
+                "absence_limit": 12,
             },
         )
+
         assert lesson.status_code == 201
         assert lesson.json()["message"] == "University lesson created"
         test_user.lesson_id = lesson.json()["_id"]
@@ -78,17 +80,9 @@ with TestClient(app) as client:
             "name": "Test University Lesson",
             "code": "TEST_UNI_LESSON",
             "ects": 5,
-            "absenceLimit": 12,
-            "sections": [
-                {
-                    "_id": lesson.json()["sections"][0]["_id"],
-                    "section": "01",
-                    "instructor": "Test University Instructor",
-                    "slots": [[2, 7, 0], [2, 8, 0],],
-                }
-            ],
+            "absence_limit": 12,
+            "sections": [],
         }
-        test_user.section_id = lesson.json()["sections"][0]["_id"]
 
     def test_get_university_lesson_with_invalid_lesson_id():
         """Test getting university lesson with invalid lesson id"""
@@ -122,40 +116,11 @@ with TestClient(app) as client:
                 "name": "Test University Lesson",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
-                "section": "01",
-                "instructor": "Test University Instructor 2",
-                "slots": [
-                    {"day": 3, "hour": 5, "isLab": 0},
-                    {"day": 3, "hour": 6, "isLab": 0},
-                ],
+                "absence_limit": 12,
             },
         )
         assert section.status_code == 409
-        assert section.json()["message"] == "University lesson section already exists"
-
-    def test_create_university_lesson_section():
-        """Test creating university lesson section"""
-
-        section = client.post(
-            f"/universities/{test_user.university_id}/semesters/{test_user.semester_id}/lessons",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={
-                "name": "Test University Lesson",
-                "code": "TEST_UNI_LESSON",
-                "ects": 5,
-                "absenceLimit": 12,
-                "section": "02",
-                "instructor": "Test University Instructor 2",
-                "slots": [
-                    {"day": 3, "hour": 5, "isLab": 0},
-                    {"day": 3, "hour": 6, "isLab": 0},
-                ],
-            },
-        )
-        assert section.status_code == 201
-        assert section.json()["message"] == "University lesson section created"
-        test_user.second_section_id = section.json()["_id"]
+        assert section.json()["message"] == "Given lesson code already exists"
 
     def test_create_university_lesson_with_invalid_semester_id():
         """Test creating university lesson with invalid semester id"""
@@ -168,13 +133,7 @@ with TestClient(app) as client:
                 "name": "Test University Lesson",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
-                "section": "01",
-                "instructor": "Test University Instructor",
-                "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
-                ],
+                "absence_limit": 12,
             },
         )
         assert lesson.status_code == 404
@@ -191,13 +150,7 @@ with TestClient(app) as client:
                 "name": "Test University Lesson",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
-                "section": "01",
-                "instructor": "Test University Instructor",
-                "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
-                ],
+                "absence_limit": 12,
             },
         )
         assert lesson.status_code == 404
@@ -213,13 +166,7 @@ with TestClient(app) as client:
                 "name": "Test University Lesson",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
-                "section": "01",
-                "instructor": "Test University Instructor",
-                "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
-                ],
+                "absence_limit": 12,
             },
         )
         assert lesson.status_code == 403
@@ -239,21 +186,8 @@ with TestClient(app) as client:
                 "name": "Test University Lesson",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
-                "sections": [
-                    {
-                        "_id": test_user.section_id,
-                        "section": "01",
-                        "instructor": "Test University Instructor",
-                        "slots": [[2, 7, 0], [2, 8, 0],],
-                    },
-                    {
-                        "_id": test_user.second_section_id,
-                        "section": "02",
-                        "instructor": "Test University Instructor 2",
-                        "slots": [[3, 5, 0], [3, 6, 0],],
-                    },
-                ],
+                "absence_limit": 12,
+                "sections": [],
             }
         ]
 
@@ -293,21 +227,8 @@ with TestClient(app) as client:
                 "name": "Test University Lesson",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
-                "sections": [
-                    {
-                        "_id": test_user.section_id,
-                        "section": "01",
-                        "instructor": "Test University Instructor",
-                        "slots": [[2, 7, 0], [2, 8, 0],],
-                    },
-                    {
-                        "_id": test_user.second_section_id,
-                        "section": "02",
-                        "instructor": "Test University Instructor 2",
-                        "slots": [[3, 5, 0], [3, 6, 0],],
-                    },
-                ],
+                "absence_limit": 12,
+                "sections": [],
             }
         ]
 
@@ -321,13 +242,7 @@ with TestClient(app) as client:
                 "name": "Test University Lesson 2",
                 "code": "TEST_UNI_LESSON_2",
                 "ects": 5,
-                "absenceLimit": 12,
-                "section": "01",
-                "instructor": "Test University Instructor",
-                "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
-                ],
+                "absence_limit": 12,
             },
         )
         assert lesson.status_code == 201
@@ -343,7 +258,7 @@ with TestClient(app) as client:
                 "name": "Test University Lesson 3",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
+                "absence_limit": 12,
             },
         )
         assert lesson.status_code == 200
@@ -359,7 +274,7 @@ with TestClient(app) as client:
                 "name": "Test University Lesson 3",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
+                "absence_limit": 12,
             },
         )
         assert lesson.status_code == 400
@@ -375,7 +290,7 @@ with TestClient(app) as client:
                 "name": "Test University Lesson 3",
                 "code": "TEST_UNI_LESSON_2",
                 "ects": 5,
-                "absenceLimit": 12,
+                "absence_limit": 12,
             },
         )
         assert lesson.status_code == 409
@@ -395,7 +310,7 @@ with TestClient(app) as client:
                 "name": "Test University Lesson 3",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
+                "absence_limit": 12,
             },
         )
         assert lesson.status_code == 409
@@ -414,7 +329,7 @@ with TestClient(app) as client:
                 "name": "Test University Lesson 3",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
+                "absence_limit": 12,
             },
         )
         assert lesson.status_code == 403

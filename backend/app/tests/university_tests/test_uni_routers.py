@@ -22,11 +22,20 @@ with TestClient(app) as client:
     def test_prepare_test_data():
         admin_token = login_admin_user(client, settings)
         test_user.user_id, test_user.token = create_professor_and_login(
-            client, admin_token, "professor_uni_routers@test.com", "test"
+            client,
+            admin_token,
+            "professor_uni_routers@test.com",
+            "test",
+            "professor_first_name",
+            "professor_test_last_name",
         )
 
         default_user.user_id, default_user.token = create_user_and_login(
-            client, "default_user@test.com", "test"
+            client,
+            "default_user@test.com",
+            "test",
+            "default_first_name",
+            "default_last_name",
         )
 
     def test_create_university():
@@ -35,7 +44,19 @@ with TestClient(app) as client:
         university = client.post(
             "/universities",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"name": "University of Test"},
+            json={
+                "name": "University of Test",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+            },
         )
         assert university.status_code == 201
         assert university.json()["message"] == "University created"
@@ -52,7 +73,17 @@ with TestClient(app) as client:
         assert university.json() == {
             "_id": test_user.university_id,
             "name": "University of Test",
-            "curSemesterID": "null",
+            "website": "test.com",
+            "country": "USA",
+            "city": "Los Angeles",
+            "address": "123 Main Street",
+            "phone": "555-555-5555",
+            "email": "info@test.com",
+            "zip_code": "90210",
+            "description": "Test University Description",
+            "logo": "test_logo.png",
+            "cover_photo": "test_cover_photo.png",
+            "current_semester_id": "null",
         }
 
     def test_get_university_with_invalid_university_id():
@@ -72,7 +103,19 @@ with TestClient(app) as client:
         university = client.post(
             "/universities",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"name": "University of Test"},
+            json={
+                "name": "University of Test",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+            },
         )
         assert university.status_code == 409
         assert university.json()["message"] == "University already exists"
@@ -83,55 +126,92 @@ with TestClient(app) as client:
         university = client.post(
             "/universities",
             headers={"Authorization": f"Bearer {default_user.token}"},
-            json={"name": "University of Test 2"},
+            json={
+                "name": "University of Test 2",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+            },
         )
         assert university.status_code == 403
         assert university.json()["message"] == "No right to access"
 
-    def test_update_university_name():
-        """Test updating university name"""
+    def test_update_university():
+        """Test updating university"""
 
         university = client.put(
-            f"/universities/{test_user.university_id}/update-name",
+            f"/universities/{test_user.university_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"name": "University of Test 3"},
+            json={
+                "name": "University of Test 3",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+            },
         )
         assert university.status_code == 200
-        assert university.json()["message"] == "University name updated"
+        assert university.json()["message"] == "University updated"
 
-    def test_update_university_name_with_same_name():
-        """Test updating university name with same name"""
-
-        university = client.put(
-            f"/universities/{test_user.university_id}/update-name",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"name": "University of Test 3"},
-        )
-        assert university.status_code == 409
-        assert university.json()["message"] == "University already exists"
-
-    def test_update_university_name_with_default_user():
+    def test_update_university_with_default_user():
         """Test updating university name with default user"""
 
         university = client.put(
-            f"/universities/{test_user.university_id}/update-name",
+            f"/universities/{test_user.university_id}",
             headers={"Authorization": f"Bearer {default_user.token}"},
-            json={"name": "University of Test 4"},
+            json={
+                "name": "University of Test 4",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+            },
         )
         assert university.status_code == 403
         assert university.json()["message"] == "No right to access"
 
-    def test_update_university_name_with_invalid_id():
+    def test_update_university_with_invalid_id():
         """Test updating university name with invalid id"""
 
         university_id = "non_exists_university_id"
         university = client.put(
-            f"/universities/{university_id}/update-name",
+            f"/universities/{university_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"name": "University of Test 5"},
+            json={
+                "name": "University of Test 5",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+            },
         )
         assert university.status_code == 404
-        assert university.json()["message"] == "University not found"
+        assert university.json()["message"] == "University could not be updated"
 
     def test_list_universities():
         """Test listing universities"""
@@ -144,7 +224,17 @@ with TestClient(app) as client:
             {
                 "_id": test_user.university_id,
                 "name": "University of Test 3",
-                "curSemesterID": "null",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+                "current_semester_id": "null",
             }
         ]
 
@@ -159,7 +249,17 @@ with TestClient(app) as client:
             {
                 "_id": test_user.university_id,
                 "name": "University of Test 3",
-                "curSemesterID": "null",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+                "current_semester_id": "null",
             }
         ]
 
@@ -169,7 +269,19 @@ with TestClient(app) as client:
         university = client.post(
             "/universities",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"name": "University of Test 4"},
+            json={
+                "name": "University of Test 4",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+            },
         )
         assert university.status_code == 201
         assert university.json()["message"] == "University created"
@@ -186,12 +298,32 @@ with TestClient(app) as client:
             {
                 "_id": test_user.university_id,
                 "name": "University of Test 3",
-                "curSemesterID": "null",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+                "current_semester_id": "null",
             },
             {
                 "_id": test_user.second_university_id,
                 "name": "University of Test 4",
-                "curSemesterID": "null",
+                "website": "test.com",
+                "country": "USA",
+                "city": "Los Angeles",
+                "address": "123 Main Street",
+                "phone": "555-555-5555",
+                "email": "info@test.com",
+                "zip_code": "90210",
+                "description": "Test University Description",
+                "logo": "test_logo.png",
+                "cover_photo": "test_cover_photo.png",
+                "current_semester_id": "null",
             },
         ]
 
@@ -262,7 +394,7 @@ with TestClient(app) as client:
         semester = client.put(
             f"/universities/{test_user.university_id}/current-semester",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"curSemesterID": test_user.second_semester_id},
+            json={"current_semester_id": test_user.second_semester_id},
         )
 
         assert semester.status_code == 200
@@ -279,7 +411,17 @@ with TestClient(app) as client:
         assert university.json() == {
             "_id": test_user.university_id,
             "name": "University of Test 3",
-            "curSemesterID": test_user.second_semester_id,
+            "website": "test.com",
+            "country": "USA",
+            "city": "Los Angeles",
+            "address": "123 Main Street",
+            "phone": "555-555-5555",
+            "email": "info@test.com",
+            "zip_code": "90210",
+            "description": "Test University Description",
+            "logo": "test_logo.png",
+            "cover_photo": "test_cover_photo.png",
+            "current_semester_id": test_user.second_semester_id,
         }
 
     def test_update_current_semester_with_default_user():
@@ -288,7 +430,7 @@ with TestClient(app) as client:
         semester = client.put(
             f"/universities/{test_user.university_id}/current-semester",
             headers={"Authorization": f"Bearer {default_user.token}"},
-            json={"curSemesterID": test_user.second_semester_id},
+            json={"current_semester_id": test_user.second_semester_id},
         )
 
         assert semester.status_code == 403
@@ -301,7 +443,7 @@ with TestClient(app) as client:
         semester = client.put(
             f"/universities/{test_user.university_id}/current-semester",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"curSemesterID": semester_id},
+            json={"current_semester_id": semester_id},
         )
         assert semester.status_code == 404
         assert (

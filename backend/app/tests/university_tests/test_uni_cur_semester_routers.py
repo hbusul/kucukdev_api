@@ -26,7 +26,12 @@ with TestClient(app) as client:
     def test_prepare_test_data():
         admin_token = login_admin_user(client, settings)
         test_user.user_id, test_user.token = create_professor_and_login(
-            client, admin_token, "professor_uni_cur_semester_routers@test.com", "test"
+            client,
+            admin_token,
+            "professor_uni_cur_semester_routers@test.com",
+            "test",
+            "professor_first_name",
+            "professor_last_name",
         )
         test_user.university_id = create_university(
             client, test_user.token, "Test University for Uni Cur Semester Routers"
@@ -46,7 +51,11 @@ with TestClient(app) as client:
         )
 
         default_user.user_id, default_user.token = create_user_and_login(
-            client, "default_user_uni_cur_semester@test.com", "test"
+            client,
+            "default_user_uni_cur_semester@test.com",
+            "test",
+            "default_first_name",
+            "default_last_name",
         )
 
     def test_create_curriculum_semester():
@@ -55,9 +64,7 @@ with TestClient(app) as client:
         curriculum_semester = client.post(
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={
-                "semester": 1,
-            },
+            json={"number": 1,},
         )
 
         assert curriculum_semester.status_code == 201
@@ -75,7 +82,7 @@ with TestClient(app) as client:
         assert curriculum_semester.status_code == 200
         assert curriculum_semester.json() == {
             "_id": test_user.curriculum_semester_id,
-            "semester": 1,
+            "number": 1,
             "lessons": [],
         }
 
@@ -90,7 +97,7 @@ with TestClient(app) as client:
         assert curriculum_semester.status_code == 200
         assert curriculum_semester.json() == {
             "_id": test_user.curriculum_semester_id,
-            "semester": 1,
+            "number": 1,
             "lessons": [],
         }
 
@@ -111,9 +118,7 @@ with TestClient(app) as client:
         curriculum_semester = client.post(
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={
-                "semester": 1,
-            },
+            json={"number": 1,},
         )
 
         assert curriculum_semester.status_code == 409
@@ -129,9 +134,7 @@ with TestClient(app) as client:
         curriculum_semester = client.post(
             f"/universities/{university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={
-                "semester": 1,
-            },
+            json={"number": 1,},
         )
 
         assert curriculum_semester.status_code == 404
@@ -147,9 +150,7 @@ with TestClient(app) as client:
         curriculum_semester = client.post(
             f"/universities/{test_user.university_id}/departments/{department_id}/curriculums/{test_user.curriculum_id}/semesters",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={
-                "semester": 1,
-            },
+            json={"number": 1,},
         )
 
         assert curriculum_semester.status_code == 404
@@ -165,9 +166,7 @@ with TestClient(app) as client:
         curriculum_semester = client.post(
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{curriculum_id}/semesters",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={
-                "semester": 1,
-            },
+            json={"number": 1,},
         )
 
         assert curriculum_semester.status_code == 404
@@ -182,9 +181,7 @@ with TestClient(app) as client:
         curriculum_semester = client.post(
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters",
             headers={"Authorization": f"Bearer {default_user.token}"},
-            json={
-                "semester": 1,
-            },
+            json={"number": 1,},
         )
 
         assert curriculum_semester.status_code == 403
@@ -200,11 +197,7 @@ with TestClient(app) as client:
 
         assert curriculum_semesters.status_code == 200
         assert curriculum_semesters.json() == [
-            {
-                "_id": test_user.curriculum_semester_id,
-                "semester": 1,
-                "lessons": [],
-            }
+            {"_id": test_user.curriculum_semester_id, "number": 1, "lessons": [],}
         ]
 
     def test_list_curriculum_semesters_with_default_user():
@@ -217,11 +210,7 @@ with TestClient(app) as client:
 
         assert curriculum_semesters.status_code == 200
         assert curriculum_semesters.json() == [
-            {
-                "_id": test_user.curriculum_semester_id,
-                "semester": 1,
-                "lessons": [],
-            }
+            {"_id": test_user.curriculum_semester_id, "number": 1, "lessons": [],}
         ]
 
     def test_list_curriculum_semesters_with_invalid_university_id():
@@ -266,9 +255,7 @@ with TestClient(app) as client:
         curriculum_semester = client.put(
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={
-                "semester": 2,
-            },
+            json={"number": 2,},
         )
 
         assert curriculum_semester.status_code == 200
@@ -280,9 +267,7 @@ with TestClient(app) as client:
         curriculum_semester = client.post(
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={
-                "semester": 3,
-            },
+            json={"number": 3,},
         )
 
         assert curriculum_semester.status_code == 201
@@ -299,14 +284,10 @@ with TestClient(app) as client:
 
         assert curriculum_semesters.status_code == 200
         assert curriculum_semesters.json() == [
-            {
-                "_id": test_user.curriculum_semester_id,
-                "semester": 2,
-                "lessons": [],
-            },
+            {"_id": test_user.curriculum_semester_id, "number": 2, "lessons": [],},
             {
                 "_id": test_user.second_curriculum_semester_id,
-                "semester": 3,
+                "number": 3,
                 "lessons": [],
             },
         ]
@@ -317,9 +298,7 @@ with TestClient(app) as client:
         curriculum_semester = client.put(
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={
-                "semester": 3,
-            },
+            json={"number": 3,},
         )
 
         assert curriculum_semester.status_code == 400
@@ -334,9 +313,7 @@ with TestClient(app) as client:
         curriculum_semester = client.put(
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}/semesters/{test_user.curriculum_semester_id}",
             headers={"Authorization": f"Bearer {default_user.token}"},
-            json={
-                "semester": 4,
-            },
+            json={"number": 4,},
         )
 
         assert curriculum_semester.status_code == 403

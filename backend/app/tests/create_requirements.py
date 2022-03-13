@@ -1,7 +1,15 @@
-def create_user_and_login(client, email, password):
+def create_user_and_login(client, email, password, first_name, last_name):
     """Create user and login. Return user id, token"""
 
-    user = client.post("/users", json={"email": email, "password": password})
+    user = client.post(
+        "/users",
+        json={
+            "email": email,
+            "password": password,
+            "first_name": first_name,
+            "last_name": last_name,
+        },
+    )
 
     assert user.status_code == 201
     assert user.json()["message"] == "User created"
@@ -33,13 +41,20 @@ def login_admin_user(client, settings):
     return admin_login.json()["access_token"]
 
 
-def create_professor_and_login(client, admin_token, email, password):
+def create_professor_and_login(
+    client, admin_token, email, password, first_name, last_name
+):
     """Create professor and login. Return professor id, token"""
 
     professor = client.post(
         "/users/professors",
         headers={"Authorization": f"Bearer {admin_token}"},
-        json={"email": email, "password": password},
+        json={
+            "email": email,
+            "password": password,
+            "first_name": first_name,
+            "last_name": last_name,
+        },
     )
 
     assert professor.status_code == 201
@@ -61,7 +76,19 @@ def create_university(client, token, university_name):
     university = client.post(
         "/universities",
         headers={"Authorization": f"Bearer {token}"},
-        json={"name": university_name},
+        json={
+            "name": university_name,
+            "website": "test.com",
+            "country": "USA",
+            "city": "Los Angeles",
+            "address": "123 Main Street",
+            "phone": "555-555-5555",
+            "email": "info@test.com",
+            "zip_code": "90210",
+            "description": "Test University Description",
+            "logo": "test_logo.png",
+            "cover_photo": "test_cover_photo.png",
+        },
     )
 
     assert university.status_code == 201
@@ -91,7 +118,7 @@ def create_curriculum(client, token, university_id, department_id, curriculum_na
     curriculum = client.post(
         f"/universities/{university_id}/departments/{department_id}/curriculums",
         headers={"Authorization": f"Bearer {token}"},
-        json={"name": curriculum_name, "startYear": 2020, "endYear": 2032,},
+        json={"name": curriculum_name, "start_year": 2020, "end_year": 2032,},
     )
 
     assert curriculum.status_code == 201
@@ -108,7 +135,7 @@ def create_curriculum_semester(
     curriculum_semester = client.post(
         f"/universities/{university_id}/departments/{department_id}/curriculums/{curriculum_id}/semesters",
         headers={"Authorization": f"Bearer {token}"},
-        json={"semester": semester,},
+        json={"number": semester,},
     )
 
     assert curriculum_semester.status_code == 201
@@ -140,12 +167,12 @@ def create_semester(client, user_id, token):
         headers={"Authorization": f"Bearer {token}"},
         json={
             "name": "Test Semester",
-            "startDate": "2022-02-18T00:00:00Z",
-            "endDate": "2022-06-18T00:00:00Z",
-            "startHour": "8.20",
-            "dLesson": 40,
-            "dBreak": 20,
-            "slotCount": 12,
+            "start_date": "2022-02-18T00:00:00Z",
+            "end_date": "2022-06-18T00:00:00Z",
+            "start_hour": {"hour": 8, "minute": 20},
+            "duration_esson": 40,
+            "duration_break": 20,
+            "slot_count": 12,
         },
     )
 

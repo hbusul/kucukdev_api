@@ -64,7 +64,7 @@ class UniversitySectionAPIModel(BaseModel):
 class UniversityLessonModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(..., min_length=1, max_length=127)
-    code: str = Field(..., min_length=1, max_length=10)
+    code: str = Field(..., min_length=1, max_length=20)
     ects: float = Field(..., ge=0)
     absence_limit: int = Field(..., ge=0)
     sections: List[UniversitySectionAPIModel] = []

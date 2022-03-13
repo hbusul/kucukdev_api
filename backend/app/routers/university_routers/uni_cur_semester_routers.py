@@ -43,8 +43,8 @@ async def create_curriculum_semester(
                     "_id": unid,
                     "departments._id": depid,
                     "departments.curriculums._id": curid,
-                    "departments.curriculums.semesters.semester": curriculum_semester[
-                        "semester"
+                    "departments.curriculums.semesters.number": curriculum_semester[
+                        "number"
                     ],
                 }
             )
@@ -176,9 +176,7 @@ async def update_curriculum_semester(
     """Update semester of a curriculum with given universityID, universityDepartmentID, departmentCurriculumID and curriculumSemesterID"""
 
     if auth_user["user_group"] == "professor":
-        curriculum_semester = {
-            k: v for k, v in curriculum_semester.dict().items() if v is not None
-        }
+        curriculum_semester = jsonable_encoder(curriculum_semester)
 
         if (
             result := await request.app.mongodb["universities"].find_one(
@@ -197,38 +195,37 @@ async def update_curriculum_semester(
             )
         else:
             semester_name_list = [
-                semester["semester"]
+                semester["number"]
                 for semester in result["departments"][0]["curriculums"][0]["semesters"]
             ]
-            if curriculum_semester["semester"] in semester_name_list:
+            if curriculum_semester["number"] in semester_name_list:
                 return JSONResponse(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content={"message": "Curriculum semester already exists"},
                 )
 
-        if len(curriculum_semester) >= 1:
-            update_result = await request.app.mongodb["universities"].update_many(
-                {
-                    "_id": unid,
-                    "departments._id": depid,
-                    "departments.curriculums._id": curid,
-                    "departments.curriculums.semesters._id": cursid,
-                },
-                {
-                    "$set": {
-                        "departments.$[i].curriculums.$[j].semesters.$[k].semester": curriculum_semester[
-                            "semester"
-                        ],
-                    }
-                },
-                array_filters=[{"i._id": depid}, {"j._id": curid}, {"k._id": cursid}],
-            )
+        update_result = await request.app.mongodb["universities"].update_many(
+            {
+                "_id": unid,
+                "departments._id": depid,
+                "departments.curriculums._id": curid,
+                "departments.curriculums.semesters._id": cursid,
+            },
+            {
+                "$set": {
+                    "departments.$[i].curriculums.$[j].semesters.$[k].number": curriculum_semester[
+                        "number"
+                    ],
+                }
+            },
+            array_filters=[{"i._id": depid}, {"j._id": curid}, {"k._id": cursid}],
+        )
 
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "Curriculum semester updated"},
-                )
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "Curriculum semester updated"},
+            )
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
