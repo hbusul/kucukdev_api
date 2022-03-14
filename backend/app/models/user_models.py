@@ -250,14 +250,14 @@ class UserModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     email: EmailStr = Field(...)
     password: str = Field(...)
-    first_name: str = Field(..., max_length=32)
-    last_name: str = Field(..., max_length=32)
-    current_gpa: float = Field(3.67, ge=0, le=10.0)
+    first_name: str = Field(..., min_length=3, max_length=127)
+    last_name: str = Field(..., min_length=3, max_length=127)
+    current_gpa: float = Field(0, ge=0, le=10.0)
     current_semester_id: str = "null"
     current_university_id: str = "null"
     entrance_year: int = Field(2010, gt=2000)
     semesters: List[UserSemesterModel] = []
-
+    
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
@@ -308,8 +308,8 @@ class UpdatePasswordModel(BaseModel):
 
 
 class UpdateUserNameModel(BaseModel):
-    first_name: str = Field(..., max_length=32)
-    last_name: str = Field(..., max_length=32)
+    first_name: str = Field(..., min_length=3, max_length=127)
+    last_name: str = Field(..., min_length=3, max_length=127)
 
     class Config:
         schema_extra = {"example": {"first_name": "John", "last_name": "Doe"}}

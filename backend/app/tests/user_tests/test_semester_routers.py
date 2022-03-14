@@ -14,7 +14,7 @@ with TestClient(app) as client:
 
     def test_prepare_test_data():
         test_user.user_id, test_user.token = create_user_and_login(
-            client, "semester_routers@test.com", "test"
+            client, "semester_routers@test.com", "password", "name", "surname"
         )
 
     def test_create_semester():
@@ -25,12 +25,12 @@ with TestClient(app) as client:
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
                 "name": "Test Semester",
-                "startDate": "2022-02-18T00:00:00Z",
-                "endDate": "2022-06-18T00:00:00Z",
-                "startHour": "8.20",
-                "dLesson": 40,
-                "dBreak": 20,
-                "slotCount": 12,
+                "start_date": "2022-02-18T00:00:00+00:00",
+                "end_date": "2022-06-18T00:00:00+00:00",
+                "start_hour": {"hour": "8", "minute": "20",},
+                "duration_lesson": 40,
+                "duration_break": 20,
+                "slot_count": 12,
             },
         )
 
@@ -48,12 +48,12 @@ with TestClient(app) as client:
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
                 "name": "Test Semester",
-                "startDate": "2022-02-18T00:00:00Z",
-                "endDate": "2022-06-18T00:00:00Z",
-                "startHour": "8.20",
-                "dLesson": 40,
-                "dBreak": 20,
-                "slotCount": 12,
+                "start_date": "2022-02-18T00:00:00+00:00",
+                "end_date": "2022-06-18T00:00:00+00:00",
+                "start_hour": {"hour": "8", "minute": "20",},
+                "duration_lesson": 40,
+                "duration_break": 20,
+                "slot_count": 12,
             },
         )
 
@@ -68,16 +68,18 @@ with TestClient(app) as client:
             headers={"Authorization": f"Bearer {test_user.token}"},
         )
 
+        print(semester.json())
         assert semester.status_code == 200
         assert semester.json() == {
             "_id": test_user.semester_id,
             "name": "Test Semester",
-            "startDate": "2022-02-18T00:00:00+00:00",
-            "endDate": "2022-06-18T00:00:00+00:00",
-            "startHour": "8.20",
-            "dLesson": 40,
-            "dBreak": 20,
-            "slotCount": 12,
+            "start_date": "2022-02-18T00:00:00+00:00",
+            "end_date": "2022-06-18T00:00:00+00:00",
+            "start_hour": [8, 20],
+            "duration_lesson": 40,
+            "duration_break": 20,
+            "slot_count": 12,
+            "semester_gpa": 0.0,
         }
 
     def test_get_semester_with_another_user_id():
@@ -112,15 +114,17 @@ with TestClient(app) as client:
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
                 "name": "Test Semester 2",
-                "startDate": "2022-02-18T00:00:00+00:00",
-                "endDate": "2022-06-18T00:00:00+00:00",
-                "startHour": "8.20",
-                "dLesson": 40,
-                "dBreak": 20,
-                "slotCount": 12,
+                "start_date": "2022-02-18T00:00:00+00:00",
+                "end_date": "2022-06-18T00:00:00+00:00",
+                "start_hour": {"hour": "8", "minute": "20",},
+                "duration_lesson": 40,
+                "duration_break": 20,
+                "slot_count": 12,
+                "semester_gpa": 0.0,
             },
         )
 
+        print(semester.json())
         assert semester.status_code == 200
         assert semester.json()["message"] == "Semester updated"
 
@@ -133,12 +137,13 @@ with TestClient(app) as client:
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
                 "name": "Test Semester 2",
-                "startDate": "2022-02-18T00:00:00+00:00",
-                "endDate": "2022-06-18T00:00:00+00:00",
-                "startHour": "8.20",
-                "dLesson": 40,
-                "dBreak": 20,
-                "slotCount": 12,
+                "start_date": "2022-02-18T00:00:00+00:00",
+                "end_date": "2022-06-18T00:00:00+00:00",
+                "start_hour": {"hour": "8", "minute": "20",},
+                "duration_lesson": 40,
+                "duration_break": 20,
+                "slot_count": 12,
+                "semester_gpa": 0.0,
             },
         )
 
@@ -154,14 +159,17 @@ with TestClient(app) as client:
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
                 "name": "Test Semester 2",
-                "startDate": "2022-02-18T00:00:00+00:00",
-                "endDate": "2022-06-18T00:00:00+00:00",
-                "startHour": "8.20",
-                "dLesson": 40,
-                "dBreak": 20,
-                "slotCount": 12,
+                "start_date": "2022-02-18T00:00:00+00:00",
+                "end_date": "2022-06-18T00:00:00+00:00",
+                "start_hour": {"hour": "8", "minute": "20",},
+                "duration_lesson": 40,
+                "duration_break": 20,
+                "slot_count": 12,
+                "semester_gpa": 0.0,
             },
         )
+
+        assert semester.status_code == 404
 
     def test_list_semesters():
         """Test listing semesters"""
@@ -172,18 +180,19 @@ with TestClient(app) as client:
         )
 
         assert semesters.status_code == 200
-        # semesters.json() only includes our last semester that created and updated
+        # semesters.json() only includes our last semester that is created and updated
         assert semesters.json() == [
             {
                 "_id": test_user.semester_id,
                 "name": "Test Semester 2",
-                "startDate": "2022-02-18T00:00:00+00:00",
-                "endDate": "2022-06-18T00:00:00+00:00",
-                "startHour": "8.20",
-                "dLesson": 40,
-                "dBreak": 20,
-                "slotCount": 12,
-            }
+                "start_date": "2022-02-18T00:00:00+00:00",
+                "end_date": "2022-06-18T00:00:00+00:00",
+                "start_hour": [8, 20],
+                "duration_lesson": 40,
+                "duration_break": 20,
+                "slot_count": 12,
+                "semester_gpa": 0.0,
+            },
         ]
 
     def test_list_semesters_with_another_user_id():
@@ -205,13 +214,13 @@ with TestClient(app) as client:
             f"/users/{test_user.user_id}/semesters",
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
-                "name": "Test Semester 3",
-                "startDate": "2023-02-18T00:00:00+00:00",
-                "endDate": "2023-06-18T00:00:00+00:00",
-                "startHour": "8.20",
-                "dLesson": 40,
-                "dBreak": 20,
-                "slotCount": 12,
+                "name": "Second Test Semester",
+                "start_date": "2022-02-18T00:00:00+00:00",
+                "end_date": "2022-06-18T00:00:00+00:00",
+                "start_hour": {"hour": "8", "minute": "20",},
+                "duration_lesson": 50,
+                "duration_break": 10,
+                "slot_count": 12,
             },
         )
 
@@ -226,28 +235,30 @@ with TestClient(app) as client:
             f"/users/{test_user.user_id}/semesters",
             headers={"Authorization": f"Bearer {test_user.token}"},
         )
-
+        print(semesters.json())
         assert semesters.status_code == 200
         assert semesters.json() == [
             {
-                "_id": semesters.json()[0]["_id"],
+                "_id": test_user.semester_id,
                 "name": "Test Semester 2",
-                "startDate": "2022-02-18T00:00:00+00:00",
-                "endDate": "2022-06-18T00:00:00+00:00",
-                "startHour": "8.20",
-                "dLesson": 40,
-                "dBreak": 20,
-                "slotCount": 12,
+                "start_date": "2022-02-18T00:00:00+00:00",
+                "end_date": "2022-06-18T00:00:00+00:00",
+                "start_hour": [8, 20],
+                "duration_lesson": 40,
+                "duration_break": 20,
+                "slot_count": 12,
+                "semester_gpa": 0.0,
             },
             {
                 "_id": semesters.json()[1]["_id"],
-                "name": "Test Semester 3",
-                "startDate": "2023-02-18T00:00:00+00:00",
-                "endDate": "2023-06-18T00:00:00+00:00",
-                "startHour": "8.20",
-                "dLesson": 40,
-                "dBreak": 20,
-                "slotCount": 12,
+                "name": "Second Test Semester",
+                "start_date": "2022-02-18T00:00:00+00:00",
+                "end_date": "2022-06-18T00:00:00+00:00",
+                "start_hour": [8, 20],
+                "duration_lesson": 50,
+                "duration_break": 10,
+                "slot_count": 12,
+                "semester_gpa": 0.0,
             },
         ]
 

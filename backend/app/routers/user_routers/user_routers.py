@@ -161,7 +161,12 @@ async def update_user_name(
 
         update_result = await request.app.mongodb["users"].update_one(
             {"_id": uid},
-            {"$set": {"first_name": user_name["first_name"], "last_name": user_name["last_name"]}},
+            {
+                "$set": {
+                    "first_name": user_name["first_name"],
+                    "last_name": user_name["last_name"],
+                }
+            },
         )
 
         if update_result.matched_count == 1:
@@ -349,7 +354,7 @@ async def update_entrance_year(
 
 
 @router.put(
-    "/{uid}/current-gpa",
+    "/{uid}/change-gpa",
     response_description="Update current gpa of a user",
     operation_id="updateCurrentGPA",
     response_model=Message,

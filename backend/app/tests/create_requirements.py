@@ -170,7 +170,7 @@ def create_semester(client, user_id, token):
             "start_date": "2022-02-18T00:00:00Z",
             "end_date": "2022-06-18T00:00:00Z",
             "start_hour": {"hour": 8, "minute": 20},
-            "duration_esson": 40,
+            "duration_lesson": 40,
             "duration_break": 20,
             "slot_count": 12,
         },
