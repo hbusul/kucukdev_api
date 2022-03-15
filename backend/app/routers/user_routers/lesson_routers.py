@@ -126,6 +126,7 @@ async def list_lessons(
                         {"$match": {"_id": uid}},
                         {"$unwind": "$semesters"},
                         {"$match": {"semesters._id": sid}},
+                        {"$project": {"semesters.lessons.slots._id": 0}},
                     ]
                 )
                 .to_list(length=None)
@@ -173,7 +174,8 @@ async def show_lesson(
                         {"$unwind": "$semesters"},
                         {"$match": {"semesters._id": sid}},
                         {"$unwind": "$semesters.lessons"},
-                        {"$match": {"semesters.lessons._id": lid,}},
+                        {"$match": {"semesters.lessons._id": lid}},
+                        {"$project": {"semesters.lessons.slots._id": 0}},
                     ]
                 )
                 .to_list(length=None)

@@ -9,12 +9,13 @@ with TestClient(app) as client:
         token = None
         semester_id = None
         lesson_id = None
+        lesson_id_list = []
 
     test_user = TestUser()
 
     def test_prepare_test_data():
         test_user.user_id, test_user.token = create_user_and_login(
-            client, "lesson_routers@test.com", "test"
+            client, "lesson_routers@test.com", "password", "name", "surname"
         )
         test_user.semester_id = create_semester(
             client, test_user.user_id, test_user.token
@@ -28,11 +29,14 @@ with TestClient(app) as client:
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
                 "name": "Test Lesson",
+                "code": "TEST",
                 "instructor": "Test Instructor",
-                "absenceLimit": 0,
+                "ects": 5,
+                "absence_limit": 0,
+                "grade": "3.0",
                 "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
+                    {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "B200", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
@@ -40,6 +44,7 @@ with TestClient(app) as client:
         assert lesson.status_code == 201
         assert lesson.json()["message"] == "Lesson created"
         test_user.lesson_id = lesson.json()["_id"]
+        test_user.lesson_id_list.append(lesson.json()["_id"])
 
     def test_create_lesson_with_another_user_id():
         """Test creating lesson with a user id other than auth user"""
@@ -50,11 +55,14 @@ with TestClient(app) as client:
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
                 "name": "Test Lesson",
+                "code": "TEST",
                 "instructor": "Test Instructor",
-                "absenceLimit": 0,
+                "ects": 5,
+                "absence_limit": 0,
+                "grade": "3.0",
                 "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
+                    {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "B200", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
@@ -71,11 +79,14 @@ with TestClient(app) as client:
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
                 "name": "Test Lesson",
+                "code": "TEST",
                 "instructor": "Test Instructor",
-                "absenceLimit": 0,
+                "ects": 5,
+                "absence_limit": 0,
+                "grade": "3.0",
                 "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
+                    {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "B200", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
@@ -91,14 +102,35 @@ with TestClient(app) as client:
             headers={"Authorization": f"Bearer {test_user.token}"},
         )
 
+        print(lesson.json())
+        print(lesson.json()["slots"])
         assert lesson.status_code == 200
         assert lesson.json() == {
             "_id": test_user.lesson_id,
             "name": "Test Lesson",
+            "code": "TEST",
             "instructor": "Test Instructor",
-            "absenceLimit": 0,
-            "slots": [[2, 7, 0], [2, 8, 0]],
-            "absences": [],
+            "absence_limit": 0,
+            "grade": 3.0,
+            "ects": 5,
+            "slots": [
+                {
+                    "_id": None,
+                    "room": "B200",
+                    "day": 2,
+                    "hour": 7,
+                    "is_lab": 0,
+                    "absences": [],
+                },
+                {
+                    "_id": None,
+                    "room": "B200",
+                    "day": 2,
+                    "hour": 8,
+                    "is_lab": 0,
+                    "absences": [],
+                },
+            ],
         }
 
     def test_get_lesson_with_another_user_id():
@@ -144,12 +176,15 @@ with TestClient(app) as client:
             f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
-                "name": "Test Lesson 2",
-                "instructor": "Test Instructor 2",
-                "absenceLimit": 0,
+                "name": "Updated Test Lesson",
+                "code": "TEST",
+                "instructor": "Updated Instructor",
+                "ects": 5,
+                "absence_limit": 0,
+                "grade": "3.0",
                 "slots": [
-                    {"day": 3, "hour": 5, "isLab": 0},
-                    {"day": 3, "hour": 6, "isLab": 1},
+                    {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "B201", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
@@ -165,12 +200,15 @@ with TestClient(app) as client:
             f"/users/{user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
-                "name": "Test Lesson 2",
-                "instructor": "Test Instructor 2",
-                "absenceLimit": 0,
+                "name": "Updated Test Lesson",
+                "code": "TEST",
+                "instructor": "Updated Instructor",
+                "ects": 5,
+                "absence_limit": 0,
+                "grade": "3.0",
                 "slots": [
-                    {"day": 3, "hour": 5, "isLab": 0},
-                    {"day": 3, "hour": 6, "isLab": 1},
+                    {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "B201", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
@@ -186,12 +224,15 @@ with TestClient(app) as client:
             f"/users/{test_user.user_id}/semesters/{semester_id}/lessons/{test_user.lesson_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
-                "name": "Test Lesson 2",
-                "instructor": "Test Instructor 2",
-                "absenceLimit": 0,
+                "name": "Updated Test Lesson",
+                "code": "TEST",
+                "instructor": "Updated Instructor",
+                "ects": 5,
+                "absence_limit": 0,
+                "grade": "3.0",
                 "slots": [
-                    {"day": 3, "hour": 5, "isLab": 0},
-                    {"day": 3, "hour": 6, "isLab": 1},
+                    {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "B201", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
@@ -207,18 +248,24 @@ with TestClient(app) as client:
             f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{lesson_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
-                "name": "Test Lesson 2",
-                "instructor": "Test Instructor 2",
-                "absenceLimit": 0,
+                "name": "Updated Test Lesson",
+                "code": "TEST",
+                "instructor": "Updated Instructor",
+                "ects": 5,
+                "absence_limit": 0,
+                "grade": "3.0",
                 "slots": [
-                    {"day": 3, "hour": 5, "isLab": 0},
-                    {"day": 3, "hour": 6, "isLab": 1},
+                    {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "B201", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
 
-        assert lesson.status_code == 404
-        assert lesson.json()["message"] == "Lesson not found"
+        assert lesson.status_code == 409
+        assert (
+            lesson.json()["message"]
+            == "Given lesson code already exists or lesson not found"
+        )
 
     def test_list_lessons():
         """Test listing lessons"""
@@ -233,12 +280,31 @@ with TestClient(app) as client:
         assert lessons.json() == [
             {
                 "_id": test_user.lesson_id,
-                "name": "Test Lesson 2",
-                "instructor": "Test Instructor 2",
-                "absenceLimit": 0,
-                "slots": [[3, 5, 0], [3, 6, 1]],
-                "absences": [],
-            }
+                "name": "Updated Test Lesson",
+                "code": "TEST",
+                "instructor": "Updated Instructor",
+                "ects": 5,
+                "absence_limit": 0,
+                "grade": 3.0,
+                "slots": [
+                    {
+                        "_id": None,
+                        "room": "B200",
+                        "day": 2,
+                        "hour": 7,
+                        "is_lab": 0,
+                        "absences": [],
+                    },
+                    {
+                        "_id": None,
+                        "room": "B200",
+                        "day": 2,
+                        "hour": 8,
+                        "is_lab": 0,
+                        "absences": [],
+                    },
+                ],
+            },
         ]
 
     def test_list_lessons_with_another_user_id():
@@ -272,18 +338,22 @@ with TestClient(app) as client:
             f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons",
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
-                "name": "Test Lesson 3",
-                "instructor": "Test Instructor 3",
-                "absenceLimit": 0,
+                "name": "Test Lesson 2",
+                "code": "TEST 2",
+                "instructor": "Test Instructor",
+                "ects": 5,
+                "absence_limit": 0,
+                "grade": "3.0",
                 "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
+                    {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "B200", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
 
         assert lesson.status_code == 201
         assert lesson.json()["message"] == "Lesson created"
+        test_user.lesson_id_list.append(lesson.json()["_id"])
 
     def test_list_lessons_with_two_lessons():
         """Test listing lessons with two lessons"""
@@ -296,184 +366,60 @@ with TestClient(app) as client:
         assert lessons.status_code == 200
         assert lessons.json() == [
             {
-                "_id": lessons.json()[0]["_id"],
-                "name": "Test Lesson 2",
-                "instructor": "Test Instructor 2",
-                "absenceLimit": 0,
-                "slots": [[3, 5, 0], [3, 6, 1]],
-                "absences": [],
+                "_id": test_user.lesson_id,
+                "name": "Updated Test Lesson",
+                "code": "TEST",
+                "instructor": "Updated Instructor",
+                "ects": 5,
+                "absence_limit": 0,
+                "grade": 3.0,
+                "slots": [
+                    {
+                        "_id": None,
+                        "room": "B200",
+                        "day": 2,
+                        "hour": 7,
+                        "is_lab": 0,
+                        "absences": [],
+                    },
+                    {
+                        "_id": None,
+                        "room": "B200",
+                        "day": 2,
+                        "hour": 8,
+                        "is_lab": 0,
+                        "absences": [],
+                    },
+                ],
             },
             {
-                "_id": lessons.json()[1]["_id"],
-                "name": "Test Lesson 3",
-                "instructor": "Test Instructor 3",
-                "absenceLimit": 0,
-                "slots": [[2, 7, 0], [2, 8, 0]],
-                "absences": [],
+                "_id": test_user.lesson_id_list[1],
+                "name": "Test Lesson 2",
+                "code": "TEST 2",
+                "instructor": "Test Instructor",
+                "ects": 5,
+                "absence_limit": 0,
+                "grade": 3.0,
+                "slots": [
+                    {
+                        "_id": None,
+                        "room": "B200",
+                        "day": 2,
+                        "hour": 7,
+                        "is_lab": 0,
+                        "absences": [],
+                    },
+                    {
+                        "_id": None,
+                        "room": "B200",
+                        "day": 2,
+                        "hour": 8,
+                        "is_lab": 0,
+                        "absences": [],
+                    },
+                ],
             },
         ]
-
-    def test_create_absence():
-        """Test creating absence"""
-
-        absence = client.post(
-            f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
-        )
-
-        assert absence.status_code == 201
-        assert absence.json()["message"] == "Absence created"
-
-    def test_get_lesson_after_adding_absence():
-        """Test getting lesson after adding absence"""
-
-        lesson = client.get(
-            f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-        )
-
-        assert lesson.status_code == 200
-        assert lesson.json() == {
-            "_id": test_user.lesson_id,
-            "name": "Test Lesson 2",
-            "instructor": "Test Instructor 2",
-            "absenceLimit": 0,
-            "slots": [[3, 5, 0], [3, 6, 1]],
-            "absences": [[0, 3, 5, 0]],
-        }
-
-    def test_create_same_absence():
-        """Test creating same absence"""
-
-        absence = client.post(
-            f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
-        )
-
-        assert absence.status_code == 400
-        assert absence.json()["message"] == "Absence already exists"
-
-    def test_create_absence_with_another_user_id():
-        """Test creating absence with a user id other than auth user"""
-
-        user_id = "non_exists_user_id"
-        absence = client.post(
-            f"/users/{user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
-        )
-
-        assert absence.status_code == 403
-        assert absence.json()["message"] == "No right to access"
-
-    def test_create_absence_with_invalid_semester_id():
-        """Test creating absence with an invalid semester id"""
-
-        semester_id = "non_exists_semester_id"
-        absence = client.post(
-            f"/users/{test_user.user_id}/semesters/{semester_id}/lessons/{test_user.lesson_id}/absences",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
-        )
-
-        assert absence.status_code == 404
-        assert absence.json()["message"] == "Absence could not be created"
-
-    def test_create_absence_with_invalid_lesson_id():
-        """Test creating absence with an invalid lesson id"""
-
-        lesson_id = "non_exists_lesson_id"
-        absence = client.post(
-            f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{lesson_id}/absences",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
-        )
-
-        assert absence.status_code == 404
-        assert absence.json()["message"] == "Absence could not be created"
-
-    def test_delete_absence():
-        """Test deleting absence"""
-
-        absence = client.delete(
-            f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
-        )
-
-        assert absence.status_code == 200
-        assert absence.json()["message"] == "Absence deleted"
-
-    def test_get_lesson_after_deleting_absence():
-        """Test getting lesson after deleting absence"""
-
-        lesson = client.get(
-            f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-        )
-
-        assert lesson.status_code == 200
-        assert lesson.json() == {
-            "_id": test_user.lesson_id,
-            "name": "Test Lesson 2",
-            "instructor": "Test Instructor 2",
-            "absenceLimit": 0,
-            "slots": [[3, 5, 0], [3, 6, 1]],
-            "absences": [],
-        }
-
-    def test_delete_same_absence():
-        """Test deleting same absence"""
-
-        absence = client.delete(
-            f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
-        )
-
-        assert absence.status_code == 404
-        assert absence.json()["message"] == "Absence not found"
-
-    def test_delete_absence_with_another_user_id():
-        """Test deleting absence with a user id other than auth user"""
-
-        user_id = "non_exists_user_id"
-        absence = client.delete(
-            f"/users/{user_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/absences",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
-        )
-
-        assert absence.status_code == 403
-        assert absence.json()["message"] == "No right to access"
-
-    def test_delete_absence_with_invalid_semester_id():
-        """Test deleting absence with an invalid semester id"""
-
-        semester_id = "non_exists_semester_id"
-        absence = client.delete(
-            f"/users/{test_user.user_id}/semesters/{semester_id}/lessons/{test_user.lesson_id}/absences",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
-        )
-
-        assert absence.status_code == 404
-        assert absence.json()["message"] == "Absence not found"
-
-    def test_delete_absence_with_invalid_lesson_id():
-        """Test deleting absence with an invalid lesson id"""
-
-        lesson_id = "non_exists_lesson_id"
-        absence = client.delete(
-            f"/users/{test_user.user_id}/semesters/{test_user.semester_id}/lessons/{lesson_id}/absences",
-            headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"absence": {"week": 0, "day": 3, "hour": 5, "isLab": 0}},
-        )
-
-        assert absence.status_code == 404
-        assert absence.json()["message"] == "Absence not found"
 
     def test_delete_lesson():
         """Test deleting lesson"""
@@ -532,3 +478,4 @@ with TestClient(app) as client:
 
         assert lesson.status_code == 404
         assert lesson.json()["message"] == "Lesson not found"
+

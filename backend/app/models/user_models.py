@@ -16,8 +16,8 @@ class AbsenceModel(BaseModel):
 
 class SlotModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    room: str = Field(max_length=100)
-    day: int = Field(..., ge=0, le=4)
+    room: str = Field(max_length=127)
+    day: int = Field(..., ge=0, le=4) # TODO: check the value '4' later
     hour: int = Field(..., ge=0, le=15)
     is_lab: int = Field(..., ge=0, le=1)
     absences: List[int] = []
@@ -257,7 +257,7 @@ class UserModel(BaseModel):
     current_university_id: str = "null"
     entrance_year: int = Field(2010, gt=2000)
     semesters: List[UserSemesterModel] = []
-    
+
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
