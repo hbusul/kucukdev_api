@@ -16,7 +16,7 @@ class AbsenceModel(BaseModel):
 
 class SlotModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    room: str = Field(max_length=127)
+    room: str = Field(min_length=1, max_length=127)
     day: int = Field(..., ge=0, le=4) # TODO: check the value '4' later
     hour: int = Field(..., ge=0, le=15)
     is_lab: int = Field(..., ge=0, le=1)
