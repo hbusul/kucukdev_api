@@ -88,14 +88,14 @@ with TestClient(app) as client:
         )
         assert response.status_code == 422
 
-    def test_create_slot_with_invalid_room():
+    def test_create_slot_with_empty_room():
         response = client.post(
             f"/users/{test_user.user_id}/semesters/{test_user.semester_id}"
             + f"/lessons/{test_user.lesson_id}/slots",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={"room": "", "day": 2, "hour": 7, "is_lab": 0},
+            json={"room": "", "day": 0, "hour": 7, "is_lab": 0},
         )
-        assert response.status_code == 422
+        assert response.status_code == 201
 
     def test_create_slot_with_invalid_is_lab():
         response = client.post(
@@ -367,7 +367,7 @@ with TestClient(app) as client:
             headers={"Authorization": f"Bearer {test_user.token}"},
         )
         assert response.status_code == 403
-        
+
     def test_delete_user():
         """Test deleting user"""
 
