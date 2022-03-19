@@ -33,7 +33,7 @@ with TestClient(app) as client:
                 "instructor": "Test Instructor",
                 "ects": 5,
                 "absence_limit": 0,
-                "grade": "3.0",
+                "grade": 3.0,
                 "slots": [
                     {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
                     {"room": "B200", "day": 2, "hour": 8, "is_lab": 0},
@@ -59,7 +59,7 @@ with TestClient(app) as client:
                 "instructor": "Test Instructor",
                 "ects": 5,
                 "absence_limit": 0,
-                "grade": "3.0",
+                "grade": 3.0,
                 "slots": [
                     {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
                     {"room": "B200", "day": 2, "hour": 8, "is_lab": 0},
@@ -83,7 +83,7 @@ with TestClient(app) as client:
                 "instructor": "Test Instructor",
                 "ects": 5,
                 "absence_limit": 0,
-                "grade": "3.0",
+                "grade": 3.0,
                 "slots": [
                     {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
                     {"room": "B200", "day": 2, "hour": 8, "is_lab": 0},
@@ -181,11 +181,7 @@ with TestClient(app) as client:
                 "instructor": "Updated Instructor",
                 "ects": 5,
                 "absence_limit": 0,
-                "grade": "3.0",
-                "slots": [
-                    {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
-                    {"room": "B201", "day": 2, "hour": 8, "is_lab": 0},
-                ],
+                "grade": 3.0,
             },
         )
 
@@ -205,7 +201,7 @@ with TestClient(app) as client:
                 "instructor": "Updated Instructor",
                 "ects": 5,
                 "absence_limit": 0,
-                "grade": "3.0",
+                "grade": 3.0,
                 "slots": [
                     {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
                     {"room": "B201", "day": 2, "hour": 8, "is_lab": 0},
@@ -229,7 +225,7 @@ with TestClient(app) as client:
                 "instructor": "Updated Instructor",
                 "ects": 5,
                 "absence_limit": 0,
-                "grade": "3.0",
+                "grade": 3.0,
                 "slots": [
                     {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
                     {"room": "B201", "day": 2, "hour": 8, "is_lab": 0},
@@ -253,7 +249,7 @@ with TestClient(app) as client:
                 "instructor": "Updated Instructor",
                 "ects": 5,
                 "absence_limit": 0,
-                "grade": "3.0",
+                "grade": 3.0,
                 "slots": [
                     {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
                     {"room": "B201", "day": 2, "hour": 8, "is_lab": 0},
@@ -343,7 +339,7 @@ with TestClient(app) as client:
                 "instructor": "Test Instructor",
                 "ects": 5,
                 "absence_limit": 0,
-                "grade": "3.0",
+                "grade": 3.0,
                 "slots": [
                     {"room": "B200", "day": 2, "hour": 7, "is_lab": 0},
                     {"room": "B200", "day": 2, "hour": 8, "is_lab": 0},

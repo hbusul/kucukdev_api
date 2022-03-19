@@ -141,9 +141,7 @@ async def update_university_department(
     """Update department of a university with given universityID and universityDepartmentID"""
 
     if auth_user["user_group"] == "professor":
-        university_department = {
-            k: v for k, v in university_department.dict().items() if v is not None
-        }
+        university_department = jsonable_encoder(university_department)
 
         if (
             existing_university := await request.app.mongodb["universities"].find_one(

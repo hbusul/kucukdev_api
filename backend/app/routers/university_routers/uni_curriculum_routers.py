@@ -5,7 +5,10 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
-from ...models.uni_models import UniversityCurriculumModel
+from ...models.uni_models import (
+    UniversityCurriculumModel,
+    UpdateUniversityCurriculumModel,
+)
 from ...models.user_models import Message, MessageCreate, UserModel
 
 router = APIRouter()
@@ -147,7 +150,7 @@ async def update_department_curriculum(
     depid: str,
     curid: str,
     request: Request,
-    department_curriculum: UniversityCurriculumModel = Body(...),
+    department_curriculum: UpdateUniversityCurriculumModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update department of a university with given universityID, universityDepartmentID and departmentCurriculumID"""
@@ -184,25 +187,24 @@ async def update_department_curriculum(
                     },
                 )
 
+        updated_features = {}
+        for key in department_curriculum:
+            if department_curriculum[key] is not None:
+                updated_features.update(
+                    {
+                        f"departments.$[i].curriculums.$[j].{key}": department_curriculum[
+                            key
+                        ]
+                    }
+                )
+
         update_result = await request.app.mongodb["universities"].update_many(
             {
                 "_id": unid,
                 "departments._id": depid,
                 "departments.curriculums._id": curid,
             },
-            {
-                "$set": {
-                    "departments.$[i].curriculums.$[j].name": department_curriculum[
-                        "name"
-                    ],
-                    "departments.$[i].curriculums.$[j].start_year": department_curriculum[
-                        "start_year"
-                    ],
-                    "departments.$[i].curriculums.$[j].end_year": department_curriculum[
-                        "end_year"
-                    ],
-                }
-            },
+            {"$set": updated_features},
             array_filters=[{"i._id": depid}, {"j._id": curid}],
         )
 

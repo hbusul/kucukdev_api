@@ -29,6 +29,16 @@ class SlotModel(BaseModel):
         schema_extra = {"example": {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0}}
 
 
+class UpdateSlotModel(BaseModel):
+    room: Optional[str] = Field(max_length=127)
+    day: Optional[int] = Field(ge=0, le=4)  # TODO: check the value '4' later
+    hour: Optional[int] = Field(ge=0, le=15)
+    is_lab: Optional[int] = Field(ge=0, le=1)
+
+    class Config:
+        schema_extra = {"example": {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0}}
+
+
 class SlotAPIModel(BaseModel):
     id: Optional[str] = Field(alias="_id")
     room: Optional[str]
@@ -53,13 +63,13 @@ class SlotAPIModel(BaseModel):
 
 class LessonModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(..., min_length=1)
-    code: str = Field(..., min_length=1)
-    instructor: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=1, max_length=127)
+    code: str = Field(..., min_length=1, max_length=127)
+    instructor: str = Field(..., min_length=1, max_length=127)
     ects: int = Field(..., ge=0)
-    grade: float = Field(ge=0, le=10)
-    absence_limit: int = Field(..., ge=0)
-    slots: List[SlotModel] = Field()
+    grade: Optional[float] = Field(ge=0, le=10)
+    absence_limit: Optional[int] = Field(ge=0)
+    slots: List[SlotModel] = []
 
     class Config:
         allow_population_by_field_name = True
@@ -123,12 +133,12 @@ class LessonAPIModel(BaseModel):
 
 
 class UpdateLessonModel(BaseModel):
-    name: str = Field(..., min_length=1)
-    code: str = Field(..., min_length=1)
-    instructor: str = Field(..., min_length=1)
-    ects: int = Field(..., ge=0)
-    grade: float = Field(ge=0, le=10)
-    absence_limit: int = Field(..., ge=0)
+    name: Optional[str] = Field(min_length=1, max_length=127)
+    code: Optional[str] = Field(min_length=1, max_length=127)
+    instructor: Optional[str] = Field(min_length=1, max_length=127)
+    ects: Optional[int] = Field(ge=0)
+    grade: Optional[float] = Field(ge=0, le=10)
+    absence_limit: Optional[int] = Field(ge=0)
 
     class Config:
         schema_extra = {
@@ -160,7 +170,7 @@ class UpdateSemesterGPAModel(BaseModel):
 
 class UserSemesterModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
+    name: str = Field(..., min_length=1, max_length=127)
     start_date: datetime = Field(...)
     end_date: datetime = Field(...)
     start_hour: StartHourModel = Field(...)
@@ -191,14 +201,14 @@ class UserSemesterModel(BaseModel):
 
 
 class UpdateUserSemesterModel(BaseModel):
-    name: str = Field(...)
-    start_date: datetime = Field(...)
-    end_date: datetime = Field(...)
-    start_hour: StartHourModel = Field(...)
-    duration_lesson: int = Field(..., gt=0)
-    duration_break: int = Field(..., gt=0)
-    slot_count: int = Field(..., gt=3, lt=16)
-    semester_gpa: float = Field(..., ge=0, le=10)
+    name: Optional[str] = Field(min_length=1, max_length=127)
+    start_date: Optional[datetime]
+    end_date: Optional[datetime]
+    start_hour: Optional[StartHourModel]
+    duration_lesson: Optional[int] = Field(gt=0)
+    duration_break: Optional[int] = Field(gt=0)
+    slot_count: Optional[int] = Field(gt=3, lt=16)
+    semester_gpa: Optional[float] = Field(ge=0, le=10)
 
     class Config:
         arbitrary_types_allowed = True

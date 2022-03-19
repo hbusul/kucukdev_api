@@ -165,23 +165,17 @@ async def update_semester(
 ):
     """Update a semester with given userID and semesterID"""
 
-    semester = semester.json(by_alias=True, models_as_dict=False)
-    semester = json.loads(semester.replace("\\", ""))
-
     if auth_user["_id"] == uid:
+        semester = semester.json(by_alias=True, models_as_dict=False)
+        semester = json.loads(semester.replace("\\", ""))
+
+        updated_features = {}
+        for key in semester:
+            if semester[key] is not None:
+                updated_features.update({f"semesters.$.{key}": semester[key]})
+
         update_result = await request.app.mongodb["users"].update_one(
-            {"_id": uid, "semesters._id": sid},
-            {
-                "$set": {
-                    "semesters.$.name": semester["name"],
-                    "semesters.$.start_date": semester["start_date"],
-                    "semesters.$.end_date": semester["end_date"],
-                    "semesters.$.start_hour": semester["start_hour"],
-                    "semesters.$.duration_lesson": semester["duration_lesson"],
-                    "semesters.$.duration_break": semester["duration_break"],
-                    "semesters.$.slot_count": semester["slot_count"],
-                }
-            },
+            {"_id": uid, "semesters._id": sid}, {"$set": updated_features},
         )
 
         if update_result.modified_count == 1:

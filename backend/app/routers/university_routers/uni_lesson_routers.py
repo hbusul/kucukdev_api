@@ -9,6 +9,7 @@ from ...dependencies import get_current_user
 from ...models.uni_models import (
     UniversityLessonAPIModel,
     UniversityLessonModel,
+    UpdateUniversityLessonModel,
 )
 from ...models.user_models import Message, MessageCreate, UserModel
 
@@ -196,14 +197,13 @@ async def update_university_lesson(
     unisid: str,
     unilid: str,
     request: Request,
-    university_lesson: UniversityLessonModel = Body(...),
+    university_lesson: UpdateUniversityLessonModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update lesson of a university semester with given universityID, universitySemesterID and universityLessonID"""
 
     if auth_user["user_group"] == "professor":
-        university_lesson = university_lesson.json(by_alias=True, models_as_dict=False)
-        university_lesson = json.loads(university_lesson.replace("\\", ""))
+        university_lesson = jsonable_encoder(university_lesson)
 
         if (
             (
@@ -250,18 +250,16 @@ async def update_university_lesson(
                 },
             )
 
+        updated_features = {}
+        for key in university_lesson:
+            if university_lesson[key] is not None:
+                updated_features.update(
+                    {f"semesters.$[i].lessons.$[j].{key}": university_lesson[key]}
+                )
+
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid, "semesters._id": unisid, "semesters.lessons._id": unilid,},
-            {
-                "$set": {
-                    "semesters.$[i].lessons.$[j].name": university_lesson["name"],
-                    "semesters.$[i].lessons.$[j].code": university_lesson["code"],
-                    "semesters.$[i].lessons.$[j].ects": university_lesson["ects"],
-                    "semesters.$[i].lessons.$[j].absence_limit": university_lesson[
-                        "absence_limit"
-                    ],
-                }
-            },
+            {"$set": updated_features},
             array_filters=[{"i._id": unisid}, {"j._id": unilid}],
         )
 

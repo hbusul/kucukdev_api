@@ -8,6 +8,7 @@ from ...models.user_models import (
     Message,
     MessageCreate,
     SlotModel,
+    UpdateSlotModel,
     UserModel,
 )
 
@@ -109,7 +110,7 @@ async def update_slot(
     lid: str,
     slid: str,
     request: Request,
-    slot: SlotModel = Body(...),
+    slot: UpdateSlotModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update a slot of a lesson"""
@@ -158,6 +159,13 @@ async def update_slot(
                 content={"message": "Given slot already exists or slot not found"},
             )
 
+        updated_features = {}
+        for key in slot:
+            if slot[key] is not None:
+                updated_features.update(
+                    {f"semesters.$[i].lessons.$[j].slots.$[k].{key}": slot[key]}
+                )
+
         update_result = await request.app.mongodb["users"].update_one(
             {
                 "_id": uid,
@@ -165,14 +173,7 @@ async def update_slot(
                 "semesters.lessons._id": lid,
                 "semesters.lessons.slots._id": slid,
             },
-            {
-                "$set": {
-                    "semesters.$[i].lessons.$[j].slots.$[k].room": slot["room"],
-                    "semesters.$[i].lessons.$[j].slots.$[k].day": slot["day"],
-                    "semesters.$[i].lessons.$[j].slots.$[k].hour": slot["hour"],
-                    "semesters.$[i].lessons.$[j].slots.$[k].is_lab": slot["is_lab"],
-                }
-            },
+            {"$set": updated_features},
             array_filters=[{"i._id": sid}, {"j._id": lid}, {"k._id": slid},],
         )
 

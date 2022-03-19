@@ -253,20 +253,16 @@ async def update_lesson(
                 },
             )
 
+        updated_features = {}
+        for key in lesson:
+            if lesson[key] is not None:
+                updated_features.update(
+                    {f"semesters.$[i].lessons.$[j].{key}": lesson[key]}
+                )
+
         update_result = await request.app.mongodb["users"].update_one(
             {"_id": uid, "semesters._id": sid, "semesters.lessons._id": lid,},
-            {
-                "$set": {
-                    "semesters.$[i].lessons.$[j].name": lesson["name"],
-                    "semesters.$[i].lessons.$[j].code": lesson["code"],
-                    "semesters.$[i].lessons.$[j].instructor": lesson["instructor"],
-                    "semesters.$[i].lessons.$[j].ects": lesson["ects"],
-                    "semesters.$[i].lessons.$[j].grade": lesson["grade"],
-                    "semesters.$[i].lessons.$[j].absence_limit": lesson[
-                        "absence_limit"
-                    ],
-                }
-            },
+            {"$set": updated_features},
             array_filters=[{"i._id": sid}, {"j._id": lid}],
         )
 

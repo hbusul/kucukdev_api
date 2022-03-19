@@ -154,23 +154,13 @@ async def update_university(
                 content={"message": "Given university name already exists"},
             )
 
+        updated_features = {}
+        for key in university:
+            if university[key] is not None:
+                updated_features.update({key: university[key]})
+
         update_result = await request.app.mongodb["universities"].update_one(
-            {"_id": unid},
-            {
-                "$set": {
-                    "name": university["name"],
-                    "website": university["website"],
-                    "country": university["country"],
-                    "city": university["city"],
-                    "address": university["address"],
-                    "phone": university["phone"],
-                    "email": university["email"],
-                    "zip_code": university["zip_code"],
-                    "description": university["description"],
-                    "logo": university["logo"],
-                    "cover_photo": university["cover_photo"],
-                }
-            },
+            {"_id": unid}, {"$set": updated_features}
         )
 
         if update_result.modified_count == 1:

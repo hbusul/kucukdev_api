@@ -108,18 +108,22 @@ with TestClient(app) as client:
 
     ####### * UPDATE SLOT SECTION * #######
 
+    def test_update_slot_without_room():
+        response = client.put(
+            f"/users/{test_user.user_id}/semesters/{test_user.semester_id}"
+            + f"/lessons/{test_user.lesson_id}/slots/{test_user.slot_id}",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+            json={"day": 3, "hour": 7, "is_lab": 1,},
+        )
+
+        assert response.status_code == 200
+
     def test_update_slot():
         response = client.put(
             f"/users/{test_user.user_id}/semesters/{test_user.semester_id}"
             + f"/lessons/{test_user.lesson_id}/slots/{test_user.slot_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={
-                "room": "updated_room",
-                "day": 3,
-                "hour": 7,
-                "is_lab": 1,
-                "absences": [],
-            },
+            json={"room": "updated_room", "day": 3, "hour": 7, "is_lab": 1,},
         )
 
         assert response.status_code == 200

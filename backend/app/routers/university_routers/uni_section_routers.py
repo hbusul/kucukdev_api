@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
-from ...models.uni_models import UniversitySectionModel
+from ...models.uni_models import UniversitySectionModel, UpdateUniversitySectionModel
 from ...models.user_models import Message, MessageCreate, UserModel
 
 router = APIRouter()
@@ -136,15 +136,13 @@ async def update_lesson_section(
     unilid: str,
     secid: str,
     request: Request,
-    new_section: UniversitySectionModel = Body(...),
+    new_section: UpdateUniversitySectionModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update section of a lesson with given universityID, universitySemesterID, universityLessonID and sectionID"""
 
-    new_section = new_section.json(by_alias=True, models_as_dict=False)
-    new_section = json.loads(new_section.replace("\\", ""))
-
     if auth_user["user_group"] == "professor":
+        new_section = jsonable_encoder(new_section)
 
         if (
             await (
@@ -209,6 +207,17 @@ async def update_lesson_section(
                 },
             )
 
+        updated_features = {}
+        for key in new_section:
+            if new_section[key] is not None:
+                updated_features.update(
+                    {
+                        f"semesters.$[i].lessons.$[j].sections.$[k].{key}": new_section[
+                            key
+                        ]
+                    }
+                )
+
         update_result = await request.app.mongodb["universities"].update_many(
             {
                 "_id": unid,
@@ -216,19 +225,7 @@ async def update_lesson_section(
                 "semesters.lessons._id": unilid,
                 "semesters.lessons.sections._id": secid,
             },
-            {
-                "$set": {
-                    "semesters.$[i].lessons.$[j].sections.$[k].number": new_section[
-                        "number"
-                    ],
-                    "semesters.$[i].lessons.$[j].sections.$[k].instructor": new_section[
-                        "instructor"
-                    ],
-                    "semesters.$[i].lessons.$[j].sections.$[k].slots": new_section[
-                        "slots"
-                    ],
-                }
-            },
+            {"$set": updated_features},
             array_filters=[{"i._id": unisid}, {"j._id": unilid}, {"k._id": secid}],
         )
 

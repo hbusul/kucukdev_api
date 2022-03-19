@@ -152,9 +152,7 @@ async def update_university_semester(
     """Update university of a semester with given universityID and universitySemesterID"""
 
     if auth_user["user_group"] == "professor":
-        university_semester = {
-            k: v for k, v in university_semester.dict().items() if v is not None
-        }
+        university_semester = jsonable_encoder(university_semester)
 
         if (
             existing_university := await request.app.mongodb["universities"].find_one(
@@ -173,26 +171,20 @@ async def update_university_semester(
                         content={"message": "University semester already exists"},
                     )
 
-        if len(university_semester) >= 1:
-            update_result = await request.app.mongodb["universities"].update_many(
-                {"_id": unid, "semesters._id": unisid},
-                {"$set": {"semesters.$.name": university_semester["name"]}},
-            )
+        update_result = await request.app.mongodb["universities"].update_many(
+            {"_id": unid, "semesters._id": unisid},
+            {"$set": {"semesters.$.name": university_semester["name"]}},
+        )
 
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "University semester updated"},
-                )
-
+        if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "University semester not found"},
+                status_code=status.HTTP_200_OK,
+                content={"message": "University semester updated"},
             )
 
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid input"},
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "University semester not found"},
         )
 
     return JSONResponse(

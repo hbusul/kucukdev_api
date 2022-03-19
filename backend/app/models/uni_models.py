@@ -41,6 +41,24 @@ class UniversitySectionModel(BaseModel):
         }
 
 
+class UpdateUniversitySectionModel(BaseModel):
+    number: Optional[int] = Field(ge=0)
+    instructor: Optional[str] = Field(min_length=1, max_length=127)
+    slots: List[UniversitySlotModel] = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "number": 1,
+                "instructor": "Jack Joe",
+                "slots": [
+                    {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "F0D01", "day": 2, "hour": 8, "is_lab": 0},
+                ],
+            }
+        }
+
+
 class UniversitySectionAPIModel(BaseModel):
     id: Optional[str] = Field(alias="_id")
     number: Optional[int]
@@ -73,6 +91,23 @@ class UniversityLessonModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "name": "ART OF COMPUTING",
+                "code": "COMP101",
+                "ects": 6,
+                "absence_limit": 8,
+            }
+        }
+
+
+class UpdateUniversityLessonModel(BaseModel):
+    name: Optional[str] = Field(min_length=1, max_length=127)
+    code: Optional[str] = Field(min_length=1, max_length=20)
+    ects: Optional[float] = Field(ge=0)
+    absence_limit: Optional[int] = Field(ge=0)
+
+    class Config:
         schema_extra = {
             "example": {
                 "name": "ART OF COMPUTING",
@@ -161,6 +196,21 @@ class CurriculumLessonModel(BaseModel):
         }
 
 
+class UpdateCurriculumLessonModel(BaseModel):
+    name: Optional[str] = Field(min_length=1, max_length=100)
+    code: Optional[str] = Field(min_length=1, max_length=100)
+    lesson_type: Optional[str] = Field(min_length=1, max_length=30)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "PHYSICS I",
+                "code": "PHYS101",
+                "lesson_type": "science",
+            }
+        }
+
+
 class CurriculumSemesterModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     number: int = Field(..., gt=0, lt=20)
@@ -176,14 +226,25 @@ class CurriculumSemesterModel(BaseModel):
 class UniversityCurriculumModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(..., min_length=1)
-    start_year: int = Field(...)
-    end_year: int = Field(...)
+    start_year: int = Field(ge=2000, lt=2100)
+    end_year: int = Field(ge=2000, lt=2100)
     semesters: List[CurriculumSemesterModel] = []
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {"name": "2016 Later", "start_year": 2016, "end_year": 2100}
+        }
+
+
+class UpdateUniversityCurriculumModel(BaseModel):
+    name: Optional[str] = Field(min_length=1)
+    start_year: Optional[int] = Field(ge=2000, lt=2100)
+    end_year: Optional[int] = Field(ge=2000, lt=2100)
+
+    class Config:
         schema_extra = {
             "example": {"name": "2016 Later", "start_year": 2016, "end_year": 2100}
         }
@@ -198,7 +259,7 @@ class UniversityDepartmentModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {"example": {"name": "COMP",}}
+        schema_extra = {"example": {"name": "COMP"}}
 
 
 class UniversityModel(BaseModel):
@@ -275,17 +336,17 @@ class UniversityAPIModel(BaseModel):
 
 
 class UpdateUniversityModel(BaseModel):
-    name: str = Field(..., min_length=2, max_length=100)
-    website: str = Field(..., min_length=5, max_length=255)
-    country: str = Field(..., min_length=2, max_length=100)
-    city: str = Field(..., min_length=2, max_length=100)
-    address: str = Field(..., min_length=2, max_length=100)
-    phone: str = Field(..., min_length=2, max_length=100)
-    email: str = Field(..., min_length=2, max_length=100)
-    zip_code: str = Field(..., min_length=2, max_length=100)
-    description: str = Field(..., max_length=255)
-    logo: str = Field(..., max_length=255)
-    cover_photo: str = Field(..., max_length=255)
+    name: Optional[str] = Field(min_length=2, max_length=100)
+    website: Optional[str] = Field(min_length=5, max_length=255)
+    country: Optional[str] = Field(min_length=2, max_length=100)
+    city: Optional[str] = Field(min_length=2, max_length=100)
+    address: Optional[str] = Field(min_length=2, max_length=100)
+    phone: Optional[str] = Field(min_length=2, max_length=100)
+    email: Optional[str] = Field(min_length=2, max_length=100)
+    zip_code: Optional[str] = Field(min_length=2, max_length=100)
+    description: Optional[str] = Field(max_length=255)
+    logo: Optional[str] = Field(max_length=255)
+    cover_photo: Optional[str] = Field(max_length=255)
 
     class Config:
         schema_extra = {
