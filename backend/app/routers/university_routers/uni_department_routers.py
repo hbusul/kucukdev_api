@@ -38,7 +38,7 @@ async def create_university_department(
 ):
     """Create department for a university with given universityID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         university_department = jsonable_encoder(university_department)
 
         if (
@@ -140,10 +140,8 @@ async def update_university_department(
 ):
     """Update department of a university with given universityID and universityDepartmentID"""
 
-    if auth_user["userGroup"] == "professor":
-        university_department = {
-            k: v for k, v in university_department.dict().items() if v is not None
-        }
+    if auth_user["user_group"] == "professor":
+        university_department = jsonable_encoder(university_department)
 
         if (
             existing_university := await request.app.mongodb["universities"].find_one(
@@ -193,7 +191,7 @@ async def delete_university_department(
 ):
     """Delete a university department with given universityID and universitySemesterID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         delete_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid}, {"$pull": {"departments": {"_id": depid}}}
         )

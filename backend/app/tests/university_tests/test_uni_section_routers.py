@@ -25,7 +25,12 @@ with TestClient(app) as client:
     def test_prepare_test_data():
         admin_token = login_admin_user(client, settings)
         test_user.user_id, test_user.token = create_professor_and_login(
-            client, admin_token, "professor_uni_section_routers@test.com", "test"
+            client,
+            admin_token,
+            "professor_uni_section_routers@test.com",
+            "test",
+            "professor_fist_name",
+            "professor_last_name",
         )
         test_user.university_id = create_university(
             client, test_user.token, "Test University for Uni Section Routers"
@@ -39,7 +44,11 @@ with TestClient(app) as client:
         )
 
         default_user.user_id, default_user.token = create_user_and_login(
-            client, "default_user_uni_section@test.com", "test"
+            client,
+            "default_user_uni_section@test.com",
+            "test",
+            "default_user_fist_name",
+            "default_user_last_name",
         )
 
     def test_create_university_lesson():
@@ -52,13 +61,7 @@ with TestClient(app) as client:
                 "name": "Test University Lesson",
                 "code": "TEST_UNI_LESSON",
                 "ects": 5,
-                "absenceLimit": 12,
-                "section": "01",
-                "instructor": "Test University Instructor",
-                "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
-                ],
+                "absence_limit": 12,
             },
         )
         assert lesson.status_code == 201
@@ -78,34 +81,41 @@ with TestClient(app) as client:
             "name": "Test University Lesson",
             "code": "TEST_UNI_LESSON",
             "ects": 5,
-            "absenceLimit": 12,
-            "sections": [
-                {
-                    "_id": lesson.json()["sections"][0]["_id"],
-                    "section": "01",
-                    "instructor": "Test University Instructor",
-                    "slots": [[2, 7, 0], [2, 8, 0],],
-                }
-            ],
+            "absence_limit": 12,
+            "sections": [],
         }
-        test_user.section_id = lesson.json()["sections"][0]["_id"]
 
     def test_create_university_lesson_section():
         """Test creating university lesson section"""
 
         section = client.post(
-            f"/universities/{test_user.university_id}/semesters/{test_user.semester_id}/lessons",
+            f"/universities/{test_user.university_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/sections",
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
-                "name": "Test University Lesson",
-                "code": "TEST_UNI_LESSON",
-                "ects": 5,
-                "absenceLimit": 12,
-                "section": "02",
-                "instructor": "Test University Instructor 2",
+                "number": 1,
+                "instructor": "Test University Instructor",
                 "slots": [
-                    {"day": 3, "hour": 5, "isLab": 0},
-                    {"day": 3, "hour": 6, "isLab": 0},
+                    {"room": "F0D01", "day": 3, "hour": 5, "is_lab": 0},
+                    {"room": "F0D01", "day": 3, "hour": 6, "is_lab": 0},
+                ],
+            },
+        )
+        assert section.status_code == 201
+        assert section.json()["message"] == "University lesson section created"
+        test_user.section_id = section.json()["_id"]
+
+    def test_create_university_second_lesson_section():
+        """Test creating university lesson section"""
+
+        section = client.post(
+            f"/universities/{test_user.university_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/sections",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+            json={
+                "number": 2,
+                "instructor": "Test University Instructor",
+                "slots": [
+                    {"room": "F0D01", "day": 3, "hour": 5, "is_lab": 0},
+                    {"room": "F0D01", "day": 3, "hour": 6, "is_lab": 0},
                 ],
             },
         )
@@ -120,11 +130,11 @@ with TestClient(app) as client:
             f"/universities/{test_user.university_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/sections/{test_user.section_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
-                "section": "01",
+                "number": 1,
                 "instructor": "Test University Instructor 2",
                 "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
+                    {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "F0D01", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
@@ -138,11 +148,11 @@ with TestClient(app) as client:
             f"/universities/{test_user.university_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/sections/{test_user.section_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
-                "section": "02",
+                "number": 2,
                 "instructor": "Test University Instructor 2",
                 "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
+                    {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "F0D01", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
@@ -159,11 +169,11 @@ with TestClient(app) as client:
             f"/universities/{test_user.university_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/sections/{test_user.section_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
             json={
-                "section": "01",
+                "number": 1,
                 "instructor": "Test University Instructor 2",
                 "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
+                    {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "F0D01", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
@@ -180,38 +190,52 @@ with TestClient(app) as client:
             f"/universities/{test_user.university_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}/sections/{test_user.section_id}",
             headers={"Authorization": f"Bearer {default_user.token}"},
             json={
-                "section": "01",
+                "number": 1,
                 "instructor": "Test University Instructor 2",
                 "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
+                    {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0},
+                    {"room": "F0D01", "day": 2, "hour": 8, "is_lab": 0},
                 ],
             },
         )
         assert section.status_code == 403
         assert section.json()["message"] == "No right to access"
 
-    def test_update_university_lesson_section_with_invalid_semester_id():
-        """Test updating university lesson section with invalid semester id"""
+    def test_list_university_lessons():
+        """Test getting university lesson"""
 
-        semester_id = "non_exists_semester_id"
-        section = client.put(
-            f"/universities/{test_user.university_id}/semesters/{semester_id}/lessons/{test_user.lesson_id}/sections/{test_user.section_id}",
+        lesson = client.get(
+            f"/universities/{test_user.university_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}",
             headers={"Authorization": f"Bearer {test_user.token}"},
-            json={
-                "section": "01",
-                "instructor": "Test University Instructor 3",
-                "slots": [
-                    {"day": 2, "hour": 7, "isLab": 0},
-                    {"day": 2, "hour": 8, "isLab": 0},
-                ],
-            },
         )
-        assert section.status_code == 409
-        assert (
-            section.json()["message"]
-            == "University lesson section could not be found or there exists another section with given section number"
-        )
+        assert lesson.status_code == 200
+        assert lesson.json() == {
+            "_id": test_user.lesson_id,
+            "name": "Test University Lesson",
+            "code": "TEST_UNI_LESSON",
+            "ects": 5,
+            "absence_limit": 12,
+            "sections": [
+                {
+                    "_id": test_user.section_id,
+                    "number": 1,
+                    "instructor": "Test University Instructor 2",
+                    "slots": [
+                        {"room": "F0D01", "day": 2, "hour": 7, "is_lab": 0},
+                        {"room": "F0D01", "day": 2, "hour": 8, "is_lab": 0},
+                    ],
+                },
+                {
+                    "_id": test_user.second_section_id,
+                    "number": 2,
+                    "instructor": "Test University Instructor",
+                    "slots": [
+                        {"room": "F0D01", "day": 3, "hour": 5, "is_lab": 0},
+                        {"room": "F0D01", "day": 3, "hour": 6, "is_lab": 0},
+                    ],
+                },
+            ],
+        }
 
     def test_delete_university_lesson_section():
         """Test deleting university lesson section"""
@@ -223,6 +247,33 @@ with TestClient(app) as client:
         assert section.status_code == 200
         assert section.json()["message"] == "University lesson section deleted"
 
+    def test_list_university_lessons_after_deletion():
+        """Test getting university lesson"""
+
+        lesson = client.get(
+            f"/universities/{test_user.university_id}/semesters/{test_user.semester_id}/lessons/{test_user.lesson_id}",
+            headers={"Authorization": f"Bearer {test_user.token}"},
+        )
+        assert lesson.status_code == 200
+        assert lesson.json() == {
+            "_id": test_user.lesson_id,
+            "name": "Test University Lesson",
+            "code": "TEST_UNI_LESSON",
+            "ects": 5,
+            "absence_limit": 12,
+            "sections": [
+                {
+                    "_id": test_user.second_section_id,
+                    "number": 2,
+                    "instructor": "Test University Instructor",
+                    "slots": [
+                        {"room": "F0D01", "day": 3, "hour": 5, "is_lab": 0},
+                        {"room": "F0D01", "day": 3, "hour": 6, "is_lab": 0},
+                    ],
+                },
+            ],
+        }
+
     def test_delete_same_university_lesson_section():
         """Test deleting same university lesson section"""
 
@@ -233,7 +284,7 @@ with TestClient(app) as client:
         assert section.status_code == 404
         assert section.json()["message"] == "University lesson section not found"
 
-    def test_delete_university_lesson_section_with_default_user(): 
+    def test_delete_university_lesson_section_with_default_user():
         """Test deleting university lesson section with default user"""
 
         section = client.delete(

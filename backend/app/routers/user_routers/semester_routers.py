@@ -1,3 +1,4 @@
+import json
 from typing import List
 
 from app.routers.user_routers.user_routers import update_current_semester
@@ -10,6 +11,7 @@ from ...models.user_models import (
     Message,
     MessageCreate,
     SemesterAPIModel,
+    UpdateSemesterGPAModel,
     UpdateSemesterModel,
     UpdateUserSemesterModel,
     UserModel,
@@ -40,20 +42,8 @@ async def create_semester(
 ):
     """Create a semester for a user with given userID"""
 
-    semester = jsonable_encoder(semester)
-
-    resStartHour = semester["startHour"].split(".")
-    if (
-        len(resStartHour) != 2
-        or int(resStartHour[0]) < 0
-        or int(resStartHour[0]) > 23
-        or int(resStartHour[1]) < 0
-        or int(resStartHour[1]) > 59
-    ):
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid start hour"},
-        )
+    semester = semester.json(by_alias=True, models_as_dict=False)
+    semester = json.loads(semester.replace("\\", ""))
 
     if auth_user["_id"] == uid:
         update_result = await request.app.mongodb["users"].update_one(
@@ -65,7 +55,7 @@ async def create_semester(
                 await update_current_semester(
                     uid,
                     request,
-                    UpdateSemesterModel(curSemesterID=semester["_id"]),
+                    UpdateSemesterModel(current_semester_id=semester["_id"]),
                     auth_user,
                 )
 
@@ -98,18 +88,12 @@ async def create_semester(
     },
 )
 async def list_semesters(
-    uid: str,
-    auth_user: UserModel = Depends(get_current_user),
+    uid: str, auth_user: UserModel = Depends(get_current_user),
 ):
     """list all semesters of a user with given userID"""
 
     if auth_user["_id"] == uid:
-        semesters = []
-        for semester in auth_user["semesters"]:
-            semester.pop("lessons")
-            semesters.append(semester)
-
-        return semesters
+        return auth_user["semesters"]
 
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
@@ -136,9 +120,20 @@ async def show_semester(
     """Get a single semester with given userID and semesterID"""
 
     if auth_user["_id"] == uid:
-        for semester in auth_user["semesters"]:
-            if semester["_id"] == sid:
-                return semester
+        if (
+            user := (
+                await request.app.mongodb["users"]
+                .aggregate(
+                    [
+                        {"$match": {"_id": uid}},
+                        {"$unwind": "$semesters"},
+                        {"$match": {"semesters._id": sid}},
+                    ]
+                )
+                .to_list(length=None)
+            )
+        ) :
+            return user[0]["semesters"]
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -170,53 +165,71 @@ async def update_semester(
 ):
     """Update a semester with given userID and semesterID"""
 
-    semester = {k: v for k, v in semester.dict().items() if v is not None}
-    semester = jsonable_encoder(semester)
+    if auth_user["_id"] == uid:
+        semester = semester.json(by_alias=True, models_as_dict=False)
+        semester = json.loads(semester.replace("\\", ""))
 
-    resStartHour = semester["startHour"].split(".")
-    if (
-        len(resStartHour) != 2
-        or int(resStartHour[0]) < 0
-        or int(resStartHour[0]) > 23
-        or int(resStartHour[1]) < 0
-        or int(resStartHour[1]) > 59
-    ):
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid start hour"},
+        updated_features = {}
+        for key in semester:
+            if semester[key] is not None:
+                updated_features.update({f"semesters.$.{key}": semester[key]})
+
+        update_result = await request.app.mongodb["users"].update_one(
+            {"_id": uid, "semesters._id": sid}, {"$set": updated_features},
         )
 
-    if auth_user["_id"] == uid:
-        if len(semester) >= 1:
-            update_result = await request.app.mongodb["users"].update_many(
-                {"_id": uid, "semesters._id": sid},
-                {
-                    "$set": {
-                        "semesters.$.name": semester["name"],
-                        "semesters.$.startDate": semester["startDate"],
-                        "semesters.$.endDate": semester["endDate"],
-                        "semesters.$.startHour": semester["startHour"],
-                        "semesters.$.dLesson": semester["dLesson"],
-                        "semesters.$.dBreak": semester["dBreak"],
-                        "semesters.$.slotCount": semester["slotCount"],
-                    }
-                },
-            )
-
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "Semester updated"},
-                )
-
+        if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "Semester couldn't be updated"},
+                status_code=status.HTTP_200_OK, content={"message": "Semester updated"},
             )
 
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid input"},
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Semester couldn't be updated"},
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN, content={"message": "No right to access"}
+    )
+
+
+@router.put(
+    "/{uid}/semesters/{sid}/semester-gpa",
+    response_description="Update gpa of a semester",
+    operation_id="updateSemesterGPA",
+    response_model=Message,
+    responses={
+        401: {"model": Message},
+        403: {"model": Message},
+        404: {"model": Message},
+    },
+)
+async def update_semester_gpa(
+    uid: str,
+    sid: str,
+    request: Request,
+    semester_gpa: UpdateSemesterGPAModel = Body(...),
+    auth_user: UserModel = Depends(get_current_user),
+):
+    """Update gpa of a semester with given userID and semesterID"""
+
+    semester_gpa = jsonable_encoder(semester_gpa)
+
+    if auth_user["_id"] == uid:
+        update_result = await request.app.mongodb["users"].update_one(
+            {"_id": uid, "semesters._id": sid},
+            {"$set": {"semesters.$.semester_gpa": semester_gpa["semester_gpa"],}},
+        )
+
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "Semester GPA updated"},
+            )
+
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Semester GPA couldn't be updated"},
         )
 
     return JSONResponse(
@@ -245,7 +258,7 @@ async def delete_semester(
     """Delete a semester with given userID and semesterID"""
 
     if auth_user["_id"] == uid:
-        if auth_user["curSemesterID"] == sid:
+        if auth_user["current_semester_id"] == sid:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"message": "Cannot delete current semester"},
@@ -257,8 +270,7 @@ async def delete_semester(
 
         if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"message": "Semester deleted"},
+                status_code=status.HTTP_200_OK, content={"message": "Semester deleted"},
             )
 
         return JSONResponse(

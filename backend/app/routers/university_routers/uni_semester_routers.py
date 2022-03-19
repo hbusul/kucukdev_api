@@ -8,7 +8,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
-from ...models.uni_models import UniversitySemesterModel
+from ...models.uni_models import UniversitySemesterAPIModel, UniversitySemesterModel
 from ...models.user_models import Message, MessageCreate, UpdateSemesterModel, UserModel
 
 router = APIRouter()
@@ -33,7 +33,7 @@ async def create_university_semester(
 ):
     """Create semester for a university with given universityID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         university_semester = jsonable_encoder(university_semester)
 
         if await request.app.mongodb["universities"].find_one(
@@ -50,12 +50,12 @@ async def create_university_semester(
 
         if new_semester.modified_count == 1:
             if (await request.app.mongodb["universities"].find_one({"_id": unid}))[
-                "curSemesterID"
+                "current_semester_id"
             ] == "null":
                 await update_university_current_semester(
                     unid,
                     request,
-                    UpdateSemesterModel(curSemesterID=university_semester["_id"]),
+                    UpdateSemesterModel(current_semester_id=university_semester["_id"]),
                     auth_user,
                 )
 
@@ -84,10 +84,8 @@ async def create_university_semester(
     "/{unid}/semesters",
     response_description="List all university semeseters",
     operation_id="listUniversitySemesters",
-    response_model=List[UniversitySemesterModel],
-    responses={
-        404: {"model": Message},
-    },
+    response_model=List[UniversitySemesterAPIModel],
+    responses={404: {"model": Message},},
 )
 async def list_university_semesters(unid: str, request: Request):
     """list all semesters of a university with given universityID"""
@@ -108,9 +106,7 @@ async def list_university_semesters(unid: str, request: Request):
     response_description="List a university semeseters",
     operation_id="getSingleUniversitySemesters",
     response_model=UniversitySemesterModel,
-    responses={
-        404: {"model": Message},
-    },
+    responses={404: {"model": Message},},
 )
 async def show_university_semester(unid: str, unisid: str, request: Request):
     """Get a single semester of a university with given universityID and universitySemesterID"""
@@ -155,10 +151,8 @@ async def update_university_semester(
 ):
     """Update university of a semester with given universityID and universitySemesterID"""
 
-    if auth_user["userGroup"] == "professor":
-        university_semester = {
-            k: v for k, v in university_semester.dict().items() if v is not None
-        }
+    if auth_user["user_group"] == "professor":
+        university_semester = jsonable_encoder(university_semester)
 
         if (
             existing_university := await request.app.mongodb["universities"].find_one(
@@ -177,26 +171,20 @@ async def update_university_semester(
                         content={"message": "University semester already exists"},
                     )
 
-        if len(university_semester) >= 1:
-            update_result = await request.app.mongodb["universities"].update_many(
-                {"_id": unid, "semesters._id": unisid},
-                {"$set": {"semesters.$.name": university_semester["name"]}},
-            )
+        update_result = await request.app.mongodb["universities"].update_many(
+            {"_id": unid, "semesters._id": unisid},
+            {"$set": {"semesters.$.name": university_semester["name"]}},
+        )
 
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "University semester updated"},
-                )
-
+        if update_result.modified_count == 1:
             return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "University semester not found"},
+                status_code=status.HTTP_200_OK,
+                content={"message": "University semester updated"},
             )
 
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Invalid input"},
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "University semester not found"},
         )
 
     return JSONResponse(
@@ -209,10 +197,7 @@ async def update_university_semester(
     response_description="Delete university semester",
     operation_id="deleteUniversitySemester",
     response_model=Message,
-    responses={
-        404: {"model": Message},
-        403: {"model": Message},
-    },
+    responses={404: {"model": Message}, 403: {"model": Message},},
 )
 async def delete_university_semester(
     unid: str,
@@ -222,10 +207,10 @@ async def delete_university_semester(
 ):
     """Delete a university semester with given universityID and universitySemesterID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         if (
             await request.app.mongodb["universities"].find_one(
-                {"_id": unid, "curSemesterID": unisid}
+                {"_id": unid, "current_semester_id": unisid}
             )
         ) is not None:
             return JSONResponse(

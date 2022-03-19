@@ -9,9 +9,10 @@ from ...models.uni_models import (
     UniversityAPIModel,
     UniversityModel,
     UniversitySemesterModel,
-    UpdateUniversityNameModel,
+    UpdateCurrentSemesterModel,
+    UpdateUniversityModel,
 )
-from ...models.user_models import Message, MessageCreate, UpdateSemesterModel, UserModel
+from ...models.user_models import Message, MessageCreate, UserModel
 
 router = APIRouter()
 
@@ -35,9 +36,9 @@ async def create_university(
 ):
     """Create a university"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         university = jsonable_encoder(university)
-        university["curSemesterID"] = "null"
+        university["current_semester_id"] = "null"
 
         if await request.app.mongodb["universities"].find_one(
             {"name": university["name"]}
@@ -113,9 +114,9 @@ async def show_university(unid: str, request: Request):
 
 
 @router.put(
-    "/{unid}/update-name",
-    response_description="Update a university name",
-    operation_id="updateUniversityName",
+    "/{unid}",
+    response_description="Update university",
+    operation_id="updateUniversity",
     response_model=Message,
     responses={
         404: {"model": Message},
@@ -123,41 +124,54 @@ async def show_university(unid: str, request: Request):
         400: {"model": Message},
     },
 )
-async def update_university_name(
+async def update_university(
     unid: str,
     request: Request,
-    university_name: UpdateUniversityNameModel = Body(...),
+    university: UpdateUniversityModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update name of a university with given universityID"""
 
-    if auth_user["userGroup"] == "professor":
-        university_name = jsonable_encoder(university_name)
+    if auth_user["user_group"] == "professor":
+        university = jsonable_encoder(university)
 
         if (
-            await request.app.mongodb["universities"].find_one(
-                {"name": university_name["name"]}
+            await (
+                request.app.mongodb["universities"]
+                .find({"_id": unid, "name": university["name"]})
+                .to_list(length=None)
             )
-            is not None
+            == []
+            and await (
+                request.app.mongodb["universities"]
+                .find({"name": university["name"]})
+                .to_list(length=None)
+            )
+            != []
         ):
             return JSONResponse(
                 status_code=status.HTTP_409_CONFLICT,
-                content={"message": "University already exists"},
+                content={"message": "Given university name already exists"},
             )
 
+        updated_features = {}
+        for key in university:
+            if university[key] is not None:
+                updated_features.update({key: university[key]})
+
         update_result = await request.app.mongodb["universities"].update_one(
-            {"_id": unid}, {"$set": {"name": university_name["name"]}}
+            {"_id": unid}, {"$set": updated_features}
         )
 
         if update_result.modified_count == 1:
             return JSONResponse(
                 status_code=status.HTTP_200_OK,
-                content={"message": "University name updated"},
+                content={"message": "University updated"},
             )
 
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "University not found"},
+            content={"message": "University could not be updated"},
         )
 
     return JSONResponse(
@@ -179,17 +193,17 @@ async def update_university_name(
 async def update_university_current_semester(
     unid: str,
     request: Request,
-    current_semester: UpdateSemesterModel = Body(...),
+    current_semester: UpdateCurrentSemesterModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update current semester of a university with given universityID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         current_semester = jsonable_encoder(current_semester)
 
         if (
             await request.app.mongodb["universities"].find_one(
-                {"_id": unid, "semesters._id": current_semester["curSemesterID"]}
+                {"_id": unid, "semesters._id": current_semester["current_semester_id"]}
             )
         ) is None:
             return JSONResponse(
@@ -199,7 +213,7 @@ async def update_university_current_semester(
 
         update_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid},
-            {"$set": {"curSemesterID": current_semester["curSemesterID"]}},
+            {"$set": {"current_semester_id": current_semester["current_semester_id"]}},
         )
 
         if update_result.modified_count == 1:
@@ -237,7 +251,7 @@ async def show_university_current_semester(unid: str, request: Request):
                     {"$unwind": "$semesters"},
                     {
                         "$match": {
-                            "$expr": {"$eq": ["$semesters._id", "$curSemesterID"]}
+                            "$expr": {"$eq": ["$semesters._id", "$current_semester_id"]}
                         }
                     },
                 ]
@@ -265,7 +279,7 @@ async def delete_university(
 ):
     """Delete a university with given universityID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         delete_result = await request.app.mongodb["universities"].delete_one(
             {"_id": unid}
         )

@@ -5,7 +5,10 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
-from ...models.uni_models import UniversityCurriculumModel
+from ...models.uni_models import (
+    UniversityCurriculumModel,
+    UpdateUniversityCurriculumModel,
+)
 from ...models.user_models import Message, MessageCreate, UserModel
 
 router = APIRouter()
@@ -33,7 +36,7 @@ async def create_department_curriculum(
 ):
     """Create department for a university with given universityID and universityDepartmentID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         department_curriculum = jsonable_encoder(department_curriculum)
 
         if (
@@ -147,15 +150,13 @@ async def update_department_curriculum(
     depid: str,
     curid: str,
     request: Request,
-    department_curriculum: UniversityCurriculumModel = Body(...),
+    department_curriculum: UpdateUniversityCurriculumModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update department of a university with given universityID, universityDepartmentID and departmentCurriculumID"""
 
-    if auth_user["userGroup"] == "professor":
-        department_curriculum = {
-            k: v for k, v in department_curriculum.dict().items() if v is not None
-        }
+    if auth_user["user_group"] == "professor":
+        department_curriculum = jsonable_encoder(department_curriculum)
 
         if (
             result := await request.app.mongodb["universities"].find_one(
@@ -186,38 +187,36 @@ async def update_department_curriculum(
                     },
                 )
 
-        if len(department_curriculum) >= 1:
-            update_result = await request.app.mongodb["universities"].update_many(
-                {
-                    "_id": unid,
-                    "departments._id": depid,
-                    "departments.curriculums._id": curid,
-                },
-                {
-                    "$set": {
-                        "departments.$[i].curriculums.$[j].name": department_curriculum[
-                            "name"
-                        ],
-                        "departments.$[i].curriculums.$[j].startYear": department_curriculum[
-                            "startYear"
-                        ],
-                        "departments.$[i].curriculums.$[j].endYear": department_curriculum[
-                            "endYear"
-                        ],
+        updated_features = {}
+        for key in department_curriculum:
+            if department_curriculum[key] is not None:
+                updated_features.update(
+                    {
+                        f"departments.$[i].curriculums.$[j].{key}": department_curriculum[
+                            key
+                        ]
                     }
-                },
-                array_filters=[{"i._id": depid}, {"j._id": curid}],
-            )
-
-            if update_result.modified_count == 1:
-                return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content={"message": "Curriculum updated"},
                 )
+
+        update_result = await request.app.mongodb["universities"].update_many(
+            {
+                "_id": unid,
+                "departments._id": depid,
+                "departments.curriculums._id": curid,
+            },
+            {"$set": updated_features},
+            array_filters=[{"i._id": depid}, {"j._id": curid}],
+        )
+
+        if update_result.modified_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": "Curriculum updated"},
+            )
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Curriculum name cannot be empty"},
+            content={"message": "Curriculum could not be updated"},
         )
 
     return JSONResponse(
@@ -241,7 +240,7 @@ async def delete_department_curriculum(
 ):
     """Delete a university department with given universityID, universityDepartmentID and departmentCurriculumID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         delete_result = await request.app.mongodb["universities"].update_one(
             {"_id": unid, "departments._id": depid,},
             {"$pull": {"departments.$.curriculums": {"_id": curid}}},

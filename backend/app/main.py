@@ -28,6 +28,7 @@ from .routers.university_routers.uni_section_routers import router as uni_sectio
 from .routers.university_routers.uni_semester_routers import (
     router as uni_semester_router,
 )
+from .routers.user_routers.slot_routers import router as slot_router
 from .routers.user_routers.lesson_routers import router as lesson_router
 from .routers.user_routers.semester_routers import router as semester_router
 from .routers.user_routers.user_routers import router as user_router
@@ -63,6 +64,7 @@ app.include_router(token_router, tags=["token"], prefix="/token")
 app.include_router(user_router, tags=["users"], prefix="/users")
 app.include_router(semester_router, tags=["semesters"], prefix="/users")
 app.include_router(lesson_router, tags=["lessons"], prefix="/users")
+app.include_router(slot_router, tags=["slots"], prefix="/users")
 app.include_router(uni_router, tags=["universities"], prefix="/universities")
 app.include_router(
     uni_semester_router, tags=["university semesters"], prefix="/universities"

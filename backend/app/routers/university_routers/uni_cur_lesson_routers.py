@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from ...dependencies import get_current_user
-from ...models.uni_models import CurriculumLessonModel
+from ...models.uni_models import CurriculumLessonModel, UpdateCurriculumLessonModel
 from ...models.user_models import Message, MessageCreate, UserModel
 
 router = APIRouter()
@@ -35,7 +35,7 @@ async def create_curriculum_lesson(
 ):
     """Create lesson for a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID and curriculumSemesterID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         curriculum_lesson = jsonable_encoder(curriculum_lesson)
 
         if (
@@ -190,12 +190,12 @@ async def update_curriculum_lesson(
     cursid: str,
     curlid: str,
     request: Request,
-    curriculum_lesson: CurriculumLessonModel = Body(...),
+    curriculum_lesson: UpdateCurriculumLessonModel = Body(...),
     auth_user: UserModel = Depends(get_current_user),
 ):
     """Update lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         curriculum_lesson = jsonable_encoder(curriculum_lesson)
 
         if (
@@ -263,6 +263,17 @@ async def update_curriculum_lesson(
                 },
             )
 
+        updated_features = {}
+        for key in curriculum_lesson:
+            if curriculum_lesson[key] is not None:
+                updated_features.update(
+                    {
+                        f"departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].{key}": curriculum_lesson[
+                            key
+                        ]
+                    }
+                )
+
         update_result = await request.app.mongodb["universities"].update_many(
             {
                 "_id": unid,
@@ -271,19 +282,7 @@ async def update_curriculum_lesson(
                 "departments.curriculums.semesters._id": cursid,
                 "departments.curriculums.semesters.lessons._id": curlid,
             },
-            {
-                "$set": {
-                    "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].name": curriculum_lesson[
-                        "name"
-                    ],
-                    "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].code": curriculum_lesson[
-                        "code"
-                    ],
-                    "departments.$[i].curriculums.$[j].semesters.$[k].lessons.$[l].lessonType": curriculum_lesson[
-                        "lessonType"
-                    ],
-                }
-            },
+            {"$set": updated_features},
             array_filters=[
                 {"i._id": depid},
                 {"j._id": curid},
@@ -326,7 +325,7 @@ async def delete_curriculum_lesson(
 ):
     """Delete a lesson of a curriculum semester with given universityID, universityDepartmentID, departmentCurriculumID, curriculumSemesterID and curriculumLessonID"""
 
-    if auth_user["userGroup"] == "professor":
+    if auth_user["user_group"] == "professor":
         delete_result = await request.app.mongodb["universities"].update_one(
             {
                 "_id": unid,

@@ -24,7 +24,12 @@ with TestClient(app) as client:
     def test_prepare_test_data():
         admin_token = login_admin_user(client, settings)
         test_user.user_id, test_user.token = create_professor_and_login(
-            client, admin_token, "professor_uni_curriculum_routers@test.com", "test"
+            client,
+            admin_token,
+            "professor_uni_curriculum_routers@test.com",
+            "test",
+            "professor_first_name",
+            "professor_last_name",
         )
         test_user.university_id = create_university(
             client, test_user.token, "Test University for Uni Curriculum Routers"
@@ -36,7 +41,11 @@ with TestClient(app) as client:
             "Test Department for Uni Lesson Routers",
         )
         default_user.user_id, default_user.token = create_user_and_login(
-            client, "default_user_uni_curriculum@test.com", "test"
+            client,
+            "default_user_uni_curriculum@test.com",
+            "test",
+            "default_first_name",
+            "default_last_name",
         )
 
     def test_create_department_curriculum():
@@ -46,8 +55,8 @@ with TestClient(app) as client:
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums",
             json={
                 "name": "Test Department Curriculum",
-                "startYear": 2020,
-                "endYear": 2040,
+                "start_year": 2020,
+                "end_year": 2040,
             },
             headers={"Authorization": f"Bearer {test_user.token}"},
         )
@@ -62,8 +71,8 @@ with TestClient(app) as client:
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums",
             json={
                 "name": "Test Department Curriculum",
-                "startYear": 2020,
-                "endYear": 2040,
+                "start_year": 2020,
+                "end_year": 2040,
             },
             headers={"Authorization": f"Bearer {test_user.token}"},
         )
@@ -80,8 +89,8 @@ with TestClient(app) as client:
             f"/universities/{default_user.university_id}/departments/{test_user.department_id}/curriculums",
             json={
                 "name": "Test Department Curriculum",
-                "startYear": 2020,
-                "endYear": 2040,
+                "start_year": 2020,
+                "end_year": 2040,
             },
             headers={"Authorization": f"Bearer {test_user.token}"},
         )
@@ -95,8 +104,8 @@ with TestClient(app) as client:
             f"/universities/{test_user.university_id}/departments/{default_user.department_id}/curriculums",
             json={
                 "name": "Test Department Curriculum",
-                "startYear": 2020,
-                "endYear": 2040,
+                "start_year": 2020,
+                "end_year": 2040,
             },
             headers={"Authorization": f"Bearer {test_user.token}"},
         )
@@ -110,8 +119,8 @@ with TestClient(app) as client:
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums",
             json={
                 "name": "Test Department Curriculum",
-                "startYear": 2020,
-                "endYear": 2040,
+                "start_year": 2020,
+                "end_year": 2040,
             },
             headers={"Authorization": f"Bearer {default_user.token}"},
         )
@@ -125,8 +134,8 @@ with TestClient(app) as client:
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums",
             json={
                 "name": "Test Department Curriculum",
-                "startYear": 2020,
-                "endYear": 2040,
+                "start_year": 2020,
+                "end_year": 2040,
             },
         )
         assert response.status_code == 401
@@ -136,7 +145,7 @@ with TestClient(app) as client:
 
         response = client.post(
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums",
-            json={"name": "", "startYear": 2020, "endYear": 2040,},
+            json={"name": "", "start_year": 2020, "end_year": 2040,},
             headers={"Authorization": f"Bearer {test_user.token}"},
         )
         assert response.status_code == 422
@@ -186,7 +195,7 @@ with TestClient(app) as client:
 
         response = client.put(
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}",
-            json={"name": "updated_name", "startYear": 2010, "endYear": 2022,},
+            json={"name": "updated_name", "start_year": 2010, "end_year": 2022,},
             headers={"Authorization": f"Bearer {test_user.token}"},
         )
         assert response.status_code == 200
@@ -199,8 +208,8 @@ with TestClient(app) as client:
             f"/universities/{default_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}",
             json={
                 "name": "Test Department Curriculum Updated",
-                "startYear": 2020,
-                "endYear": 2040,
+                "start_year": 2020,
+                "end_year": 2040,
             },
             headers={"Authorization": f"Bearer {test_user.token}"},
         )
@@ -216,8 +225,8 @@ with TestClient(app) as client:
             f"/universities/{test_user.university_id}/departments/{test_user.department_id}/curriculums/{test_user.curriculum_id}",
             json={
                 "name": "Test Department Curriculum Updated",
-                "startYear": 2020,
-                "endYear": 2040,
+                "start_year": 2020,
+                "end_year": 2040,
             },
             headers={"Authorization": f"Bearer {default_user.token}"},
         )

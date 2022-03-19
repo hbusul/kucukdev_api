@@ -26,7 +26,12 @@ with TestClient(app) as client:
     def test_prepare_test_data():
         admin_token = login_admin_user(client, settings)
         test_user.user_id, test_user.token = create_professor_and_login(
-            client, admin_token, "professor_uni_department_routers@test.com", "test"
+            client,
+            admin_token,
+            "professor_uni_department_routers@test.com",
+            "test",
+            "professor_first_name",
+            "professor_last_name",
         )
         test_user.university_id = create_university(
             client, test_user.token, "Test University"
@@ -35,7 +40,11 @@ with TestClient(app) as client:
             client, test_user.token, test_user.university_id, "Test Department",
         )
         default_user.user_id, default_user.token = create_user_and_login(
-            client, "default_user_uni_department@test.com", "test"
+            client,
+            "default_user_uni_department@test.com",
+            "test",
+            "default_first_name",
+            "default_last_name",
         )
 
     def test_create_university_department_that_already_exists():

@@ -35,7 +35,7 @@ async def create_schedule(unid: str, lesson_codes: List[str], request: Request):
             content={"message": "University not found"},
         )
 
-    current_semester_id = university["curSemesterID"]
+    current_semester_id = university["current_semester_id"]
     if not current_semester_id:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

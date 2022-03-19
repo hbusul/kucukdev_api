@@ -15,4 +15,6 @@ RUN pip install --no-cache-dir -r requirements.test.txt
 COPY . .
 COPY --from=scheduler-builder /tmp/_scheduler.so /tmp/scheduler.py ./
 
-CMD [ "pytest" ]
+# run the tests with verbose
+
+CMD [ "pytest" ,"-vv"]
